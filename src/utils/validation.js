@@ -11,7 +11,7 @@
 
 // ---- Regex patterns ----
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-const PHONE_REGEX = /^(\+4|0)[0-9]{9}$/
+const PHONE_REGEX = /^(\+40|0)[0-9]{9}$/
 
 /**
  * Verifică dacă un câmp este completat.

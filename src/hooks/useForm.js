@@ -50,7 +50,7 @@ export function useForm(initialValues, validationRules, onSubmit) {
   }, [validationRules, values])
 
   // Submit cu validare completă
-  const handleSubmit = useCallback((e) => {
+  const handleSubmit = useCallback(async (e) => {
     if (e) e.preventDefault()
 
     // Marchează toate câmpurile ca touched
@@ -68,7 +68,7 @@ export function useForm(initialValues, validationRules, onSubmit) {
     if (!hasErrors) {
       setIsSubmitting(true)
       try {
-        onSubmit(values)
+        await Promise.resolve(onSubmit(values))
       } finally {
         setIsSubmitting(false)
       }

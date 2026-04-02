@@ -29,7 +29,7 @@ function Login() {
     },
     (formValues) => {
       // TODO: Trimite request către backend
-      console.log('Login submit:', formValues)
+      console.log('Login submit for email:', formValues.email)
       alert('Login reușit! (placeholder — conectează cu API-ul)')
     }
   )

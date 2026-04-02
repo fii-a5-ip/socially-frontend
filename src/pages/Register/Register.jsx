@@ -38,7 +38,7 @@ function Register() {
     },
     (formValues) => {
       // TODO: Trimite request către backend
-      console.log('Register submit:', formValues)
+      console.log('Register submit for:', formValues.email)
       alert('Înregistrare reușită! (placeholder — conectează cu API-ul)')
     }
   )
