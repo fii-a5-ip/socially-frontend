@@ -1,0 +1,45 @@
+/* ========================================
+   Register Page
+   
+   Responsabili: Rluca + Teo
+   ======================================== */
+.register {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--navbar-height) - var(--footer-height));
+  padding: var(--space-xl);
+}
+
+.register__card {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-2xl);
+}
+
+.register__header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.register__title {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-xs);
+}
+
+.register__subtitle {
+  color: var(--text-secondary);
+}
+
+.register__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.register__footer {
+  text-align: center;
+  margin-top: var(--space-lg);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}

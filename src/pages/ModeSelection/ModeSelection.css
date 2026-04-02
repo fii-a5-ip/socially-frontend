@@ -1,0 +1,67 @@
+/* ========================================
+   Mode Selection Page
+   
+   Responsabil: Criss
+   ======================================== */
+.mode-selection {
+  min-height: calc(100vh - var(--navbar-height) - var(--footer-height));
+  display: flex;
+  align-items: center;
+  padding: var(--space-2xl) 0;
+}
+
+.mode-selection__title {
+  text-align: center;
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--space-sm);
+}
+
+.mode-selection__subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2xl);
+}
+
+.mode-selection__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-xl);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.mode-selection__card {
+  text-align: center;
+  padding: var(--space-2xl);
+  text-decoration: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.mode-selection__card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+
+.mode-selection__icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.mode-selection__card h2 {
+  margin-bottom: var(--space-sm);
+}
+
+.mode-selection__card p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 600px) {
+  .mode-selection__grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,45 @@
+/* ========================================
+   Login Page
+   
+   Responsabili: Rluca + Teo
+   ======================================== */
+.login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--navbar-height) - var(--footer-height));
+  padding: var(--space-xl);
+}
+
+.login__card {
+  width: 100%;
+  max-width: 440px;
+  padding: var(--space-2xl);
+}
+
+.login__header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.login__title {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-xs);
+}
+
+.login__subtitle {
+  color: var(--text-secondary);
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.login__footer {
+  text-align: center;
+  margin-top: var(--space-lg);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}

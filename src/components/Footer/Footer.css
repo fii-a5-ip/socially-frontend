@@ -1,0 +1,21 @@
+/* ========================================
+   Footer Component
+   
+   TODO (Elina + Mircea): Stilizați conform design-ului final
+   ======================================== */
+.footer {
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  padding: var(--space-lg) 0;
+}
+
+.footer__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer__text {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
