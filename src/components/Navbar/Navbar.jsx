@@ -9,6 +9,7 @@ import './Navbar.css'
  * - Implementați meniul responsive (hamburger pe mobile)
  * - Adăugați starea de utilizator logat/nelogat
  * - Stilizați conform design-ului final
+ * - Buton toggle languages
  */
 function Navbar() {
   const location = useLocation()
