@@ -1,2 +1,241 @@
-/* Profile Page — Responsabili: Ștefan + Călin */
-/* Adaugă stilurile specifice aici */
+.profile-wrapper {
+  background-color: #0b0e14;
+  min-height: 100vh;
+  color: #fff;
+}
+
+.profile-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.profile-header {
+  padding: 40px 0 20px;
+  text-align: center;
+}
+
+.profile-title {
+  font-size: 2.5rem;
+  margin-bottom: 5px;
+}
+
+.profile-accent {
+  color: #6c5ce7;
+}
+
+.profile-subtitle-mobile {
+  color: #8b949e;
+  font-size: 0.9rem;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 30px;
+  padding-bottom: 40px;
+}
+
+.profile-section {
+  background: #161b22;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #30363d;
+  margin-bottom: 20px;
+}
+
+.bio-container {
+  position: relative;
+}
+
+.profile-text {
+  width: 100%;
+  height: 80px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  color: white;
+  border-radius: 6px;
+  padding: 10px 10px 25px 10px;
+  resize: none;
+  font-family: inherit;
+}
+
+.bio-counter {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  font-size: 0.7rem;
+  color: #8b949e;
+}
+
+.avatar-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.avatar-display {
+  font-size: 50px;
+  background: #6c5ce7;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.btn-upload {
+  background: transparent;
+  border: 1px solid #6c5ce7;
+  color: #6c5ce7;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.profile-slider {
+  width: 100%;
+  accent-color: #6c5ce7;
+  margin-top: 15px;
+  height: 6px;
+}
+
+datalist {
+  display: flex;
+  justify-content: space-between;
+  color: #8b949e;
+  font-size: 0.65rem;
+  padding: 0 5px;
+}
+
+.ai-tooltip-trigger {
+  position: relative;
+  margin-left: 8px;
+  cursor: help;
+  color: #6c5ce7;
+}
+
+.ai-tooltip-text {
+  visibility: hidden;
+  width: 180px;
+  background: #4834d4;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  position: absolute;
+  z-index: 100;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: 0.3s;
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.ai-tooltip-trigger:hover .ai-tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.btn-save {
+  width: 100%;
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #30363d;
+}
+
+.admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-secondary-profile,
+.btn-danger-outline,
+.btn-logout {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  font-weight: 500;
+}
+
+.btn-secondary-profile {
+  border: 1px solid #6c5ce7;
+  color: #6c5ce7;
+}
+
+.btn-danger-outline {
+  border: 1px solid #d63031;
+  color: #d63031;
+}
+
+.btn-logout {
+  border: 1px solid #f85149;
+  color: #f85149;
+}
+
+.btn-history-more {
+  background: none;
+  border: none;
+  color: #58a6ff;
+  padding: 15px 0 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media (max-width: 992px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .profile-header {
+    padding: 30px 0;
+  }
+
+  .profile-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 0 15px;
+  }
+
+  .profile-section {
+    padding: 20px 15px;
+  }
+
+  .avatar-display {
+    width: 80px;
+    height: 80px;
+  }
+
+  .btn-save,
+  .btn-secondary-profile,
+  .btn-danger-outline,
+  .btn-logout {
+    padding: 12px;
+  }
+}
