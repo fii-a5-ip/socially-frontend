@@ -1,2 +1,209 @@
 /* Groups Page — Responsabil: Denisa */
 /* Adaugă stilurile specifice aici */
+/* Reset & Base */
+
+
+.groups-page {
+  min-height: 100vh;
+  background: #eee1de;
+  display: flex;
+  justify-content: center;
+  padding: 3.5rem 1rem 5rem;
+}
+
+.groups-container {
+  width: 100%;
+  max-width: 540px;
+}
+
+.groups-title {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #4b2f27;
+  margin: 0 0 2rem;
+}
+
+.groups-search {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: #f7f5f4;
+  border-radius: 1.35rem;
+  height: 58px;
+  padding: 0 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.groups-search__icon {
+  color: #9a7d74;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.groups-search__input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1.1rem;
+  color: #5f443d;
+}
+
+.groups-search__input::placeholder {
+  color: #967b74;
+}
+
+.groups-create-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 64px;
+  border-radius: 1.35rem;
+  text-decoration: none;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #4b2f27;
+  background: linear-gradient(90deg, #f2ada4 0%, #edbd8c 100%);
+  margin-bottom: 1.6rem;
+}
+
+.groups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.group-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #f7f5f4;
+  border-radius: 1.45rem;
+  padding: 1.25rem 1.2rem;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.group-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(75, 47, 39, 0.06);
+}
+
+.group-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.group-card__icon--pink {
+  background: #f5c0b8;
+}
+
+.group-card__icon--orange {
+  background: #f2c08f;
+}
+
+.group-card__icon--light-pink {
+  background: #f2d1ca;
+}
+
+.group-card__emoji {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.group-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.group-card__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #4b2f27;
+}
+
+.group-card__subtitle {
+  margin: 0;
+  font-size: 0.98rem;
+  color: #886c63;
+}
+
+.group-card__arrow {
+  font-size: 2rem;
+  color: #8a6b63;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .groups-page {
+    padding: 2.5rem 0.9rem 4rem;
+  }
+
+  .groups-container {
+    max-width: 100%;
+  }
+
+  .groups-title {
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .groups-search {
+    height: 52px;
+    padding: 0 1rem;
+  }
+
+  .groups-search__input {
+    font-size: 1rem;
+  }
+
+  .groups-create-btn {
+    height: 58px;
+    font-size: 1.05rem;
+  }
+
+  .group-card {
+    padding: 1rem;
+    border-radius: 1.2rem;
+  }
+
+  .group-card__icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .group-card__emoji {
+    font-size: 1.25rem;
+  }
+
+  .group-card__title {
+    font-size: 1.05rem;
+  }
+
+  .group-card__subtitle {
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .groups-title {
+    font-size: 1.9rem;
+  }
+
+  .group-card__subtitle {
+    line-height: 1.35;
+  }
+
+  .group-card__arrow {
+    font-size: 1.7rem;
+  }
+}
