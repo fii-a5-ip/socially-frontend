@@ -1,79 +1,213 @@
-/* ========================================
-   Landing Page
-   
-   Responsabili: Ruxi + Ioana
-   ======================================== */
-.landing__hero {
-  min-height: 70vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: var(--space-3xl) 0;
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --background: 245 230 232; /* #f5e6e8 */
+    --foreground: 45 45 45; /* #2d2d2d */
+    --primary: 230 124 148; /* #e67c94 */
+    --card: 255 255 255;
+    --border: 230 124 148;
 }
 
-.landing__title {
-  font-size: var(--font-size-4xl);
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: var(--space-lg);
+@layer base {
+    body {
+        @apply bg-[#f5e6e8] text-[#2d2d2d] antialiased;
+    }
 }
 
-.landing__title-accent {
-  color: var(--color-primary);
+/* Stiluri custom pentru a forța aspectul de Hero */
+.hero-gradient {
+    background: linear-gradient(to bottom, rgba(245, 230, 232, 0.6), rgba(245, 230, 232, 0.4), rgba(245, 230, 232, 0.7));
 }
 
-.landing__subtitle {
-  font-size: var(--font-size-lg);
-  color: var(--text-secondary);
-  max-width: 600px;
-  margin: 0 auto var(--space-xl);
-  line-height: 1.7;
+/*
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+    --font-size: 16px;
+    --background: #f5e6e8;
+    --foreground: #2d2d2d;
+    --card: #ffffff;
+    --card-foreground: #2d2d2d;
+    --popover: #ffffff;
+    --popover-foreground: #2d2d2d;
+    --primary: #e67c94;
+    --primary-foreground: #ffffff;
+    --secondary: #f5e6e8;
+    --secondary-foreground: #2d2d2d;
+    --muted: #f5e6e8;
+    --muted-foreground: #6d6d6d;
+    --accent: #e67c94;
+    --accent-foreground: #ffffff;
+    --destructive: #d4183d;
+    --destructive-foreground: #ffffff;
+    --border: rgba(230, 124, 148, 0.2);
+    --input: rgba(230, 124, 148, 0.1);
+    --input-background: #ffffff;
+    --switch-background: #e67c94;
+    --font-weight-medium: 500;
+    --font-weight-normal: 400;
+    --ring: #e67c94;
+    --chart-1: #e67c94;
+    --chart-2: #f5a3b5;
+    --chart-3: #d4577d;
+    --chart-4: #ffc7d4;
+    --chart-5: #b85675;
+    --radius: 0.75rem;
+    --sidebar: #f5e6e8;
+    --sidebar-foreground: #2d2d2d;
+    --sidebar-primary: #e67c94;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #ffc7d4;
+    --sidebar-accent-foreground: #2d2d2d;
+    --sidebar-border: rgba(230, 124, 148, 0.2);
+    --sidebar-ring: #e67c94;
 }
 
-.landing__cta {
-  display: flex;
-  gap: var(--space-md);
-  justify-content: center;
-  flex-wrap: wrap;
+.dark {
+    --background: #1a1a1a;
+    --foreground: #f5f5f5;
+    --card: #2d2d2d;
+    --card-foreground: #f5f5f5;
+    --popover: #2d2d2d;
+    --popover-foreground: #f5f5f5;
+    --primary: #e67c94;
+    --primary-foreground: #ffffff;
+    --secondary: #3d3d3d;
+    --secondary-foreground: #f5f5f5;
+    --muted: #3d3d3d;
+    --muted-foreground: #a0a0a0;
+    --accent: #3d3d3d;
+    --accent-foreground: #f5f5f5;
+    --destructive: oklch(0.396 0.141 25.723);
+    --destructive-foreground: oklch(0.637 0.237 25.331);
+    --border: rgba(230, 124, 148, 0.3);
+    --input: rgba(230, 124, 148, 0.15);
+    --ring: #e67c94;
+    --font-weight-medium: 500;
+    --font-weight-normal: 400;
+    --chart-1: #e67c94;
+    --chart-2: #f5a3b5;
+    --chart-3: #d4577d;
+    --chart-4: #ffc7d4;
+    --chart-5: #b85675;
+    --sidebar: #2d2d2d;
+    --sidebar-foreground: #f5f5f5;
+    --sidebar-primary: #e67c94;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #3d3d3d;
+    --sidebar-accent-foreground: #f5f5f5;
+    --sidebar-border: rgba(230, 124, 148, 0.3);
+    --sidebar-ring: #e67c94;
 }
 
-.landing__features {
-  padding: var(--space-3xl) 0;
-  background: var(--bg-secondary);
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-input-background: var(--input-background);
+    --color-switch-background: var(--switch-background);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
 }
 
-.landing__section-title {
-  text-align: center;
-  font-size: var(--font-size-2xl);
-  margin-bottom: var(--space-2xl);
-}
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
 
-.landing__features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--space-lg);
-}
+    body {
+        @apply bg-background text-foreground;
+    }
 
-.landing__feature-icon {
-  font-size: 2.5rem;
-  display: block;
-  margin-bottom: var(--space-md);
-}
+    /**
+  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
+  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
+  */
+    /*html {
+        font-size: var(--font-size);
+    }
 
-.landing__features-grid h3 {
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--space-sm);
-  color: var(--text-primary);
-}
+    h1 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-weight-medium);
+        line-height: 1.5;
+    }
 
-.landing__features-grid p {
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-}
+    h2 {
+        font-size: var(--text-xl);
+        font-weight: var(--font-weight-medium);
+        line-height: 1.5;
+    }
 
-@media (max-width: 768px) {
-  .landing__title {
-    font-size: var(--font-size-3xl);
-  }
+    h3 {
+        font-size: var(--text-lg);
+        font-weight: var(--font-weight-medium);
+        line-height: 1.5;
+    }
+
+    h4 {
+        font-size: var(--text-base);
+        font-weight: var(--font-weight-medium);
+        line-height: 1.5;
+    }
+
+    label {
+        font-size: var(--text-base);
+        font-weight: var(--font-weight-medium);
+        line-height: 1.5;
+    }
+
+    button {
+        font-size: var(--text-base);
+        font-weight: var(--font-weight-medium);
+        line-height: 1.5;
+    }
+
+    input {
+        font-size: var(--text-base);
+        font-weight: var(--font-weight-normal);
+        line-height: 1.5;
+    }
 }
+*/
+    
