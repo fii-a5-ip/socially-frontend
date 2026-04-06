@@ -16,7 +16,7 @@
 
 import './Notifications.css'
 /*import 'java.time.LocalDate'*/
-
+import { useState } from 'react';
 /* List<notification> = new Array<>();*/
 
 const test_Date= new Date();
@@ -28,14 +28,14 @@ const test_Time= test_Date.getHours() + ':' + test_Date.getMinutes();
 function Notifications() {
 
 
-  const notifications = [
+  const [notifications, setNotifications] = useState( [
     {
       id: 1,
       type: 'user',
       isRead: true,
       text: 'Bairam',
       time: test_Time,
-      hasActions: true,
+      hasActions: false,
     },
     {
       id: 2,
@@ -43,6 +43,7 @@ function Notifications() {
       isRead: false,
       text: 'Try 30 days of FREE premium Socially',
       time: 'acum 10 minute',
+      hasActions: false,
     },
     {
       id: 3,
@@ -50,23 +51,31 @@ function Notifications() {
       isRead: false,
       text: 'hai la gratar sau cv',
       time: 'ieri',
+      hasActions: true,
     },
     {
       id: 4,
       type: 'system',
       isRead: true,
       text: 'Profilul tău a fost actualizat',
-      time: 'acum 2 zile',
+      time: 'acum 2 minute',
+      hasActions: false,
     },
 
       {
       id: 666,
       type: 'system',
-      isRead: true,
+      isRead: false,
       text: 'Profilul tău a fost actualizat',
       time: 'acum 2 zile',
+      hasActions: false,
     }
-  ]
+  ]);
+
+  const handleAccept = (id) => { setNotifications(prev => prev.map
+    (notif => notif.id == id ?
+     { ...notif, isRead: true }  : notif ) ); }; // "...notif" = copie tot ce este in notif cu exceptia a ce urmeaza dupa virgula
+
 
 // probabil nu va mai fii necesar fiindca probabil listele vor fii deja sortate
   const newNotifications = notifications.filter(notif => !notif.isRead)
@@ -77,10 +86,7 @@ function Notifications() {
   const renderNotifications = (list, type) => {
     var filtered = list.filter(notif  => notif.type == type) //dc nu mere sa schimb numele la var???
 
-    if (filtered.length == 0 && check == false) 
-      return ( <div className="notifications_empty">  <p>Nu ai notificări noi.</p>  </div> )
-
-    else
+    if (filtered.length !== 0 && check == false) 
 
     return (
       <>
@@ -104,12 +110,13 @@ function Notifications() {
                 <span className="notification_time">{notif.time}</span>
               </div>
 
-              {notif.hasActions && (
+
+              {( notif.hasActions && notif.isRead == false) && ( //   "CONDITIE" && "executa daca CONDITIE este adevarat, sau nu exec daca fals/null"
                 <div className="notification_actions">
-                  <button className="btn btn--primary">Acceptă</button>
+                  <button className="btn btn--primary" onClick={() => handleAccept(notif.id)}>Acceptă</button>
                   <button className="btn btn--secondary">Refuză</button>
                 </div> )
-                }
+                } 
             </div>
             )
           
@@ -124,7 +131,7 @@ function Notifications() {
       <h1   font-size= "var(--font-size-3xl)" margin-bottom= "var(--space-xl)">Notificări</h1>
 
       <section className="notifications_section">
-          {newNotifications.length ==0 ? ( <p className="notifications_empty"> Nu ai notificări noi.</p>) : (
+          {newNotifications && newNotifications.length === 0 ? ( <p className="notifications_empty"> Nu ai notificări noi.</p>) : (
       <>
     <h2 className="notifications_section-title"> Noi</h2>
       {renderNotifications(newNotifications, 'user')}
