@@ -1,2 +1,66 @@
 /* Notifications Page — Responsabil: Dinu */
 /* Adaugă stilurile specifice aici */
+
+
+
+
+.notifications_list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.notification {
+  display: flex; /* astea 2 pun btn-ele de accept/refuz la dreapta*/
+  justify-content: space-between;/* ^^^^^^*/
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+
+.notification-unread {
+  border-left: 4px solid var(--color-primary);
+  background: rgba(108, 92, 231, 0.05);
+}*/
+
+.notification_content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.notification_text {
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+}
+
+.notification_time {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+
+.notification_actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+
+.notifications_empty {
+  text-align: center;
+  margin-top: var(--space-2xl);
+  color: var(--text-muted);
+}
+
+.notifications_section {
+  margin-bottom: var(--space-2xl);
+}
+
+
+/* pt textul "Noi"/"Arhivate"*/
+.notifications_section-title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-md);
+  color: var(--text-secondary);
+}
+
