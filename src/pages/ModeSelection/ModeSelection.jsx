@@ -2,18 +2,10 @@ import { Link } from 'react-router-dom'
 import './ModeSelection.css'
 
 /**
- * ModeSelection — Design sincronizat cu Landing Page-ul (fără cercuri/elemente grafice inutile).
+ * ModeSelection — Design sincronizat cu Landing Page-ul (fără elemente decorative).
  *
  * Responsabil: Criss
  */
-
-const PALETTE = [
-  'var(--color-primary-light)',       // '#FCD5CE'
-  'var(--bg-primary)',                // '#F8EDEB'
-  'var(--color-accent-light)',        // '#F9DCC4'
-  'var(--color-accent)',              // '#FEC89A'
-  'var(--color-primary)',             // '#FFB5A7'
-]
 
 const ArrowIcon = ({ stroke = 'var(--color-primary)' }) => (
   <svg viewBox="0 0 20 20" fill="none" width="24" height="24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -33,20 +25,6 @@ function ModeSelection() {
       
       <div className="container" style={{ position: 'relative', zIndex: 1, paddingTop: 48 }}>
         
-        {/* Linuțele colorate de sus */}
-        <div className="palette-strip" aria-hidden="true" style={{
-          display: "flex", margin: "0 auto 22px", justifyContent: "center",
-        }}>
-          {PALETTE.map((color, i) => (
-            <span key={i} style={{
-                width: 54, height: 10, borderRadius: 6, background: color,
-                display: "inline-block", marginRight: i === PALETTE.length-1 ? 0 : 6,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
-              }}
-            />
-          ))}
-        </div>
-
         <header className="mode-selection__header" style={{ textAlign: "center", marginBottom: 40 }}>
           <p className="mode-selection__eyebrow" style={{
               color: 'var(--color-primary-dark)', fontWeight: 700, letterSpacing: 1, fontSize: 18, marginBottom: 8
@@ -72,7 +50,7 @@ function ModeSelection() {
               background: 'var(--bg-card)', borderRadius: 24,
               boxShadow: "0 4px 20px rgba(0,0,0,0.04)", border: "1.5px solid var(--color-primary-light)",
               minWidth: 296, flex: "1 1 320px", maxWidth: 340, padding: "36px 34px 30px 34px",
-              textDecoration: "none", transition: "transform 0.2s, box-shadow 0.2s"
+              textDecoration: "none"
             }}>
             
             <div className="mode-selection__icon-wrap" aria-hidden="true" style={{
@@ -104,7 +82,7 @@ function ModeSelection() {
               background: 'var(--bg-card)', borderRadius: 24,
               boxShadow: "0 4px 20px rgba(0,0,0,0.04)", border: "1.5px solid var(--color-accent-light)",
               minWidth: 296, flex: "1 1 320px", maxWidth: 340, padding: "36px 34px 30px 34px",
-              textDecoration: "none", transition: "transform 0.2s, box-shadow 0.2s"
+              textDecoration: "none"
             }}>
             
             <div className="mode-selection__icon-wrap" aria-hidden="true" style={{

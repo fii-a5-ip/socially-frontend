@@ -5,52 +5,55 @@
 /* --- Google Fonts --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* --- CSS Custom Properties --- */
+/* --- CSS Custom Properties (Light Mode / Default) --- */
 :root {
-  /* Colors — Primary */
-  --color-primary: #6C5CE7;
-  --color-primary-light: #A29BFE;
-  --color-primary-dark: #4834D4;
+  /* Culori primare — roz/piersică */
+  --color-primary:        #FFB5A7;
+  --color-primary-dark:   #FF8C7A;
+  --color-primary-light:  #FCD5CE;
+  --color-primary-subtle: rgba(255, 181, 167, 0.15);
+  --color-primary-subtle-hover: rgba(255, 181, 167, 0.25);
+  --color-primary-glow:   rgba(255, 181, 167, 0.3);
 
-  /* Colors — Accent */
-  --color-accent: #00CEC9;
-  --color-accent-light: #55EFC4;
+  /* Culori accent */
+  --color-accent:         #FEC89A;
+  --color-accent-light:   #F9DCC4;
 
-  /* Colors — Semantic */
-  --color-success: #00B894;
-  --color-warning: #FDCB6E;
-  --color-error: #E17055;
-  --color-info: #74B9FF;
+  /* Semantic */
+  --color-success:  #00B894;
+  --color-warning:  #FDCB6E;
+  --color-error:    #E17055;
+  --color-info:     #74B9FF;
 
-  /* Colors — Neutral */
-  --color-white: #FFFFFF;
-  --color-gray-50: #F8F9FA;
-  --color-gray-100: #F1F3F5;
-  --color-gray-200: #E9ECEF;
-  --color-gray-300: #DEE2E6;
-  --color-gray-400: #CED4DA;
-  --color-gray-500: #ADB5BD;
-  --color-gray-600: #868E96;
-  --color-gray-700: #495057;
-  --color-gray-800: #343A40;
-  --color-gray-900: #212529;
-  --color-black: #0D0D0D;
+  /* Neutral */
+  --color-white:     #FFFFFF;
+  --color-gray-50:   #F8F9FA;
+  --color-gray-100:  #F1F3F5;
+  --color-gray-200:  #E9ECEF;
+  --color-gray-300:  #DEE2E6;
+  --color-gray-400:  #CED4DA;
+  --color-gray-500:  #ADB5BD;
+  --color-gray-600:  #868E96;
+  --color-gray-700:  #495057;
+  --color-gray-800:  #343A40;
+  --color-gray-900:  #212529;
+  --color-black:     #0D0D0D;
 
   /* Backgrounds */
-  --bg-primary: var(--color-white);
-  --bg-secondary: var(--color-gray-50);
-  --bg-card: var(--color-white);
-  --bg-elevated: var(--color-white);
+  --bg-primary:   #F8EDEB;
+  --bg-secondary: #FCD5CE;
+  --bg-card:      #FFFFFF;
+  --bg-elevated:  #FFFFFF;
 
   /* Text */
-  --text-primary: var(--color-gray-900);
-  --text-secondary: var(--color-gray-600);
-  --text-muted: var(--color-gray-500);
-  --text-inverse: var(--color-white);
+  --text-primary:   #5A4A42;
+  --text-secondary: #8B6F6A;
+  --text-muted:     #B09090;
+  --text-inverse:   #FFFFFF;
 
   /* Borders */
-  --border-color: var(--color-gray-200);
-  --border-color-hover: var(--color-gray-400);
+  --border-color: #F0D5CF;
+  --border-color-hover: var(--color-primary-light);
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -80,10 +83,10 @@
   --radius-full: 9999px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+  --shadow-sm: 0 1px 2px rgba(255, 140, 122, 0.08);
+  --shadow-md: 0 4px 12px rgba(255, 140, 122, 0.15);
+  --shadow-lg: 0 8px 30px rgba(255, 140, 122, 0.2);
+  --shadow-xl: 0 20px 60px rgba(255, 140, 122, 0.25);
 
   /* Transitions */
   --transition-fast: 150ms ease;
@@ -103,26 +106,42 @@
   --content-padding: var(--space-lg);
 }
 
-/* --- Dark Mode --- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: #0F0F14;
-    --bg-secondary: #16161D;
-    --bg-card: #1C1C26;
-    --bg-elevated: #22222E;
+/* --- Dark Mode via data-theme attribute --- */
+/* Palette: #030811 Ink Black · #23232F Shadow Grey · #3E3E51 Charcoal Blue · #FFFFFF White · #FF7070 Grapefruit Pink */
+[data-theme="dark"] {
+  /* Culori primare — coral/roz în dark */
+  --color-primary:        #FF7070;
+  --color-primary-dark:   #E85555;
+  --color-primary-light:  #FF9E9E;
+  --color-primary-subtle: rgba(255, 112, 112, 0.12);
+  --color-primary-subtle-hover: rgba(255, 112, 112, 0.22);
+  --color-primary-glow:   rgba(255, 112, 112, 0.25);
 
-    --text-primary: #F1F3F5;
-    --text-secondary: #ADB5BD;
-    --text-muted: #868E96;
+  /* Accent adaptat */
+  --color-accent:       #FF9E9E;
+  --color-accent-light: #FFBFBF;
 
-    --border-color: #2C2C3A;
-    --border-color-hover: #3C3C4E;
+  /* Backgrounds — din paletă */
+  --bg-primary:   #030811;   /* Ink Black — fundal principal */
+  --bg-secondary: #3E3E51;   /* Shadow Grey — fundal secundar */
+  --bg-card:      #23232F;   /* Shadow Grey — carduri */
+  --bg-elevated:  #23232F;   /* Charcoal Blue — navbar, modals */
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
-    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
-  }
+  /* Text */
+  --text-primary:   #FFFFFF;   /* alb pur */
+  --text-secondary: #B0B3C6;   /* gri-albăstrui deschis */
+  --text-muted:     #6B6E85;   /* gri-albăstrui estompat */
+  --text-inverse:   #030811;   /* negru pentru text pe fundal coral */
+
+  /* Borders */
+  --border-color:       #3E3E51;   /* Charcoal Blue */
+  --border-color-hover: #FF7070;   /* coral la hover */
+
+  /* Shadows mai pronunțate pe fundal negru */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.7);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
 /* --- Reset & Base --- */
@@ -148,16 +167,17 @@ body {
   color: var(--text-primary);
   background-color: var(--bg-primary);
   min-height: 100vh;
+  transition: background-color var(--transition-base), color var(--transition-base);
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--color-primary-dark);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 
 a:hover {
-  color: var(--color-primary-dark);
+  color: var(--color-primary);
 }
 
 img {
@@ -221,7 +241,7 @@ ol {
 
 .btn--primary {
   background: var(--color-primary);
-  color: var(--text-inverse);
+  color: var(--text-primary);
 }
 
 .btn--primary:hover {
@@ -232,13 +252,13 @@ ol {
 
 .btn--secondary {
   background: transparent;
-  color: var(--color-primary);
+  color: var(--color-primary-dark);
   border: 2px solid var(--color-primary);
 }
 
 .btn--secondary:hover {
-  background: var(--color-primary);
-  color: var(--text-inverse);
+  background: var(--color-primary-subtle);
+  color: var(--color-primary-dark);
 }
 
 .btn--large {
@@ -303,10 +323,9 @@ ol {
 
 .page-skeleton__assignee {
   font-size: var(--font-size-sm);
-  color: var(--color-primary);
+  color: var(--color-primary-dark);
   font-weight: 500;
-  background: var(--color-primary);
-  background: rgba(108, 92, 231, 0.1);
+  background: var(--color-primary-subtle);
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-full);
   margin-top: var(--space-md);

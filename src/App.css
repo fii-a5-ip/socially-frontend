@@ -1,13 +1,19 @@
 /* ========================================
    App Layout
    ======================================== */
-.app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.app__content {
-  flex: 1;
-  margin-top: var(--navbar-height);
-}
+   .app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .app__content {
+    flex: 1;
+    margin-top: var(--navbar-height);
+  }
+  
+  @media (max-width: 768px) {
+    .app {
+      padding-bottom: 60px;
+    }
+  }
