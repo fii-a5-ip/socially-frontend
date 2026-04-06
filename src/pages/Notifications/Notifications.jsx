@@ -1,5 +1,19 @@
 //Not final
 
+/**
+ * Notifications — Pagina de notificări.
+ *
+ * Responsabil: Dinu
+ *
+ * TODO:
+ * - Lista de notificări (invitații la grupuri, evenimente, mesaje)
+ * - Marcare ca citit / necitit
+ * - Filtrare după tip
+ * - Empty state (când nu sunt notificări)
+ * - Notificări real-time (WebSocket / polling)
+ * - Design responsive
+ */
+
 import './Notifications.css'
 /*import 'java.time.LocalDate'*/
 
