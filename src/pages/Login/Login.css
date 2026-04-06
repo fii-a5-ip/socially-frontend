@@ -1,45 +1,168 @@
-/* ========================================
-   Login Page
-   
-   Responsabili: Rluca + Teo
-   ======================================== */
-.login {
+.login-page {
+  min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  min-height: calc(100vh - var(--navbar-height) - var(--footer-height));
-  padding: var(--space-xl);
+  align-items: center;
+  background: #f8edeb;
 }
 
-.login__card {
+.dark .login-page {
+  background: #030811;
+}
+
+.login-wrapper {
   width: 100%;
-  max-width: 440px;
-  padding: var(--space-2xl);
+  max-width: 400px;
 }
 
-.login__header {
+.login-header {
   text-align: center;
-  margin-bottom: var(--space-xl);
+  margin-bottom: 2rem;
 }
 
-.login__title {
-  font-size: var(--font-size-2xl);
-  margin-bottom: var(--space-xs);
+.login-title {
+  font-size: 2rem;
+  color: #5c4742;
 }
 
-.login__subtitle {
-  color: var(--text-secondary);
+.login-subtitle {
+  color: #8b7b77;
 }
 
-.login__form {
+/* CARD */
+.login-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+}
+
+.dark .login-card {
+  background: #23232f;
+}
+
+.login-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: 1.2rem;
 }
 
-.login__footer {
+.login-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* LABEL */
+.login-label {
+  margin-bottom: 5px;
+  color: #5c4742;
+  font-weight: 500;
+}
+
+/* INPUT BOX */
+.login-input-box {
+  display: flex;
+  align-items: center;
+  background: #f8edeb;
+  padding: 10px;
+  border-radius: 10px;
+  gap: 10px;
+}
+
+.dark .login-input-box {
+  background: #3e3e51;
+}
+
+/* ICONS */
+.login-input-box svg {
+  color: #7a5f59; /* mai vizibile */
+}
+
+/* INPUT */
+.login-input {
+  border: none;
+  outline: none;
+  flex: 1;
+  background: transparent;
+  color: #5c4742;
+}
+
+/* PLACEHOLDER */
+.login-input::placeholder {
+  color: #c4b5b1;
+}
+
+/* EYE ICON */
+.login-eye {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #7a5f59;
+}
+
+/* OPTIONS */
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+/* REMEMBER */
+.login-remember {
+  color: #5c4742;
+  font-weight: 500;
+}
+
+.login-remember input {
+  accent-color: #ffb5a7;
+}
+
+/* FORGOT */
+.login-forgot {
+  color: #ff8a7a;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* BUTTON */
+.login-button {
+  background: linear-gradient(to right, #ffb5a7, #fec89a);
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.dark .login-button {
+  background: #ff7070;
+}
+
+/* DIVIDER */
+.login-divider {
   text-align: center;
-  margin-top: var(--space-lg);
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
+  margin: 10px 0;
+  color: #8b7b77;
+}
+
+/* GOOGLE BUTTON */
+.login-google {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+}
+
+/* FOOTER */
+.login-footer {
+  text-align: center;
+  margin-top: 1rem;
+  color: #5c4742;
+}
+
+.login-footer a {
+  color: #ff8a7a;
+  font-weight: 500;
 }
