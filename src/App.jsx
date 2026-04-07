@@ -13,6 +13,8 @@ import SoloDiscovering from './pages/SoloDiscovering/SoloDiscovering'
 import Profile from './pages/Profile/Profile'
 import './App.css'
 
+const PUBLIC_ROUTES = ['/', '/login', '/register']
+
 function App() {
   return (
     <div className="app">
