@@ -11,3 +11,9 @@
   flex: 1;
   margin-top: var(--navbar-height);
 }
+
+@media (max-width: 768px) {
+  .app {
+    padding-bottom: 60px;
+  }
+}
