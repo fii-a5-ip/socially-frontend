@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+/* ========================================
+   PUBLIC NAVBAR — Styles
+   Uses CSS variables from index.css
+   ======================================== */
+
+/* ── Top bar ── */
+.pnb-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--navbar-height);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(12px);
+  z-index: var(--z-navbar);
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.pnb-top__inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--content-padding);
+}
+
+/* ── Brand ── */
+.pnb-brand {
+  font-family: 'Pacifico', cursive;
+  font-size: 1.8rem;
+  color: #ffb5a7;
+  text-decoration: none;
+  flex-shrink: 0;
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .pnb-brand {
+    display: block;
+  }
+}
+
+/* ── Auth buttons ── */
+.pnb-auth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pnb-auth__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.pnb-auth__btn:hover {
+  background: var(--color-primary-subtle-hover);
+  color: var(--color-primary-dark);
+}
+
+/* ── About link (desktop only) ── */
+.pnb-about {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .pnb-about {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background var(--transition-fast), color var(--transition-fast);
+    flex-shrink: 0;
+  }
+
+  .pnb-about:hover {
+    background: var(--color-primary-subtle-hover);
+    color: var(--color-primary-dark);
+  }
+}
+
+/* ── Right controls ── */
+.pnb-top__controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+/* ── Icon button ── */
+.pnb-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  text-decoration: none;
+  gap: 4px;
+}
+
+.pnb-icon-btn:hover {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary-dark);
+}
+
+/* ── Language button ── */
+.pnb-lang-btn {
+  padding: 6px 8px;
+}
+
+.pnb-lang-label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+/* ── Flag SVG ── */
+.pnb-flag {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: inline-block;
+    vertical-align: middle;
+    border: none;
+}
+
+/* ── Dropdown ── */
+.pnb-dropdown {
+  position: relative;
+}
+
+.pnb-dropdown__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 150px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: var(--z-dropdown);
+  padding: 4px;
+  animation: pnb-fade-in 120ms ease;
+}
+
+@keyframes pnb-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pnb-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+  text-align: left;
+}
+
+.pnb-dropdown__item:hover {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary-dark);
+}
+
+/* ── Bottom bar (mobile only) ── */
+.pnb-bottom {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .pnb-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border-color);
+    z-index: var(--z-navbar);
+    padding: 0 16px;
+  }
+
+  .pnb-bottom__brand {
+    font-family: 'Pacifico', cursive;
+    font-size: 1.6rem;
+    color: #ffb5a7;
+    text-decoration: none;
+  }
+
+  .pnb-bottom__about {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background var(--transition-fast);
+  }
+
+  .pnb-bottom__about:hover {
+    background: var(--color-primary-subtle-hover);
+    color: var(--color-primary-dark);
+  }
+}
