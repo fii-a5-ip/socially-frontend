@@ -1,5 +1,6 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar/Navbar'
+import PublicNavbar from './components/PublicNavbar/PublicNavbar'
 import Footer from './components/Footer/Footer'
 import Landing from './pages/Landing/Landing'
 import Login from './pages/Login/Login'
@@ -13,10 +14,14 @@ import SoloDiscovering from './pages/SoloDiscovering/SoloDiscovering'
 import Profile from './pages/Profile/Profile'
 import './App.css'
 
+const PUBLIC_ROUTES = ['/', '/login', '/register']
+
 function App() {
+  const location = useLocation()
+  const isPublic = PUBLIC_ROUTES.includes(location.pathname)
   return (
     <div className="app">
-      <Navbar />
+      {isPublic ? <PublicNavbar /> : <Navbar />}
       <main className="app__content">
         <Routes>
           <Route path="/" element={<Landing />} />
