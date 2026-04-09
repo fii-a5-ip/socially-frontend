@@ -1,5 +1,7 @@
 /* Notifications Page — Responsabil: Dinu */
 /* Adaugă stilurile specifice aici */
+/* Notifications Page — Responsabil: Dinu */
+/* Adaugă stilurile specifice aici */
 
 
 
@@ -64,3 +66,23 @@
   color: var(--text-secondary);
 }
 
+.notifications_section-title.notifications_section_electricboogaloo {
+  display: flex;
+    align-items: flex-end;
+
+  /* pentru linie*/
+    padding-bottom: 4px;            
+      line-height: 1;
+    border-bottom: 1px solid var(--color-gray-700);
+}
+
+.toggle {
+  margin-left: auto;
+}
+/* nu mi-a iesit asta
+.notifications_section_header_cu_btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+} */ 
