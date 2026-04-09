@@ -1,85 +1,102 @@
-import { Link } from 'react-router-dom'
-import { useForm } from '../../hooks/useForm'
-import { validateEmail, validatePassword } from '../../utils/validation'
-import FormInput from '../../components/FormInput/FormInput'
-import './Login.css'
+import { useState } from "react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Link } from "react-router-dom";
+import "./Login.css";
 
-/**
- * Login — Pagina de autentificare.
- *
- * Responsabili: Rluca + Teo
- *
- * TODO:
- * - Integrare cu backend API (endpoint de login)
- * - "Ține-mă minte" checkbox
- * - "Am uitat parola" flow
- * - Login cu Google / Social login
- * - Redirect după login reușit
- * - Loading state pe butonul de submit
- */
 function Login() {
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit } = useForm(
-    {
-      email: '',
-      password: '',
-    },
-    {
-      email: (value) => validateEmail(value),
-      password: (value) => validatePassword(value),
-    },
-    (formValues) => {
-      // TODO: Trimite request către backend
-      console.log('Login submit for email:', formValues.email)
-      alert('Login reușit! (placeholder — conectează cu API-ul)')
-    }
-  )
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+  };
 
   return (
-    <div className="login">
-      <div className="login__card card">
-        <div className="login__header">
-          <h1 className="login__title">Bine ai revenit! 👋</h1>
-          <p className="login__subtitle">Conectează-te la contul tău Socially</p>
+    <div className="login-page">
+      <div className="login-wrapper">
+        <div className="login-header">
+          <h1 className="login-title">Bun venit</h1>
+          <p className="login-subtitle">Conectează-te la contul tău</p>
         </div>
 
-        <form className="login__form" onSubmit={handleSubmit} noValidate>
-          <FormInput
-            label="Email"
-            name="email"
-            type="email"
-            value={values.email}
-            placeholder="exemplu@email.com"
-            error={errors.email}
-            touched={touched.email}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-          />
+        <div className="login-card">
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="login-group">
+              <label className="login-label">Email</label>
+              <div className="login-input-box">
+                <Mail size={20} />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your.email@example.com"
+                  className="login-input"
+                />
+              </div>
+            </div>
 
-          <FormInput
-            label="Parolă"
-            name="password"
-            type="password"
-            value={values.password}
-            placeholder="Introdu parola"
-            error={errors.password}
-            touched={touched.password}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-          />
+            <div className="login-group">
+              <label className="login-label">Parolă</label>
+              <div className="login-input-box">
+                <Lock size={20} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="login-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="login-eye"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
 
-          <button type="submit" className="btn btn--primary btn--full btn--large">
-            Conectare
-          </button>
-        </form>
+            <div className="login-options">
+              <label className="login-remember">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                Ține-mă minte
+              </label>
 
-        <p className="login__footer">
-          Nu ai cont? <Link to="/register">Creează unul</Link>
-        </p>
+              <button className="login-forgot">
+                Am uitat parola
+              </button>
+            </div>
+
+            <button className="login-button" disabled={isLoading}>
+              {isLoading ? "Se încarcă..." : "Conectare"}
+            </button>
+
+            <div className="login-divider">sau</div>
+
+            <button className="login-google">
+              Conectare cu Google
+            </button>
+          </form>
+
+          <p className="login-footer">
+            Nu ai cont? <Link to="/register">Înregistrează-te</Link>
+          </p>
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Login
+export default Login;
