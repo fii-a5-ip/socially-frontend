@@ -1,67 +1,98 @@
-/* ========================================
-   Mode Selection Page
-   
-   Responsabil: Criss
-   ======================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+
+/* ─── Page shell ────────────────────────────────────────────── */
 .mode-selection {
-  min-height: calc(100vh - var(--navbar-height) - var(--footer-height));
+  min-height: 100dvh;
+  background-color: var(--bg-primary);
   display: flex;
   align-items: center;
-  padding: var(--space-2xl) 0;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow: hidden;
+  position: relative;
+  font-family: var(--font-family);
 }
 
+.mode-selection::before,
+.mode-selection::after {
+  display: none; 
+}
+
+/* ─── Container ─────────────────────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: 680px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Header ────────────────────────────────────────────────── */
 .mode-selection__title {
+  font-family: var(--font-family);
+  font-size: clamp(var(--font-size-3xl), 6vw, var(--font-size-4xl));
+  font-weight: 800;
+  color: var(--text-primary);
   text-align: center;
-  font-size: var(--font-size-3xl);
-  margin-bottom: var(--space-sm);
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  margin-bottom: 0.5rem;
+  opacity: 0;
+  animation: fadeUp .6s cubic-bezier(.4,0,.2,1) .2s forwards;
+}
+
+.mode-selection__title span {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .mode-selection__subtitle {
-  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 400;
   color: var(--text-secondary);
-  margin-bottom: var(--space-2xl);
+  text-align: center;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp .6s cubic-bezier(.4,0,.2,1) .3s forwards;
 }
 
-.mode-selection__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-xl);
-  max-width: 700px;
-  margin: 0 auto;
+/* ─── Keyframes ─────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ─── Hover & Focus States pe carduri ───────────────────────── */
+
+/* Asigurăm o tranziție foarte fină, cu un efect ușor de "arc" (spring) */
 .mode-selection__card {
-  text-align: center;
-  padding: var(--space-2xl);
-  text-decoration: none;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all var(--transition-base);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.2s ease !important;
 }
 
-.mode-selection__card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--color-primary);
+.mode-selection__card:hover,
+.mode-selection__card:focus-visible {
+  transform: translateY(-6px) scale(1.03) !important; 
+  box-shadow: 0 16px 40px rgba(255, 181, 167, 0.25) !important;
+  outline: none;
 }
 
-.mode-selection__icon {
-  font-size: 3rem;
-  display: block;
-  margin-bottom: var(--space-md);
+.mode-selection__card--groups:hover,
+.mode-selection__card--groups:focus-visible {
+  border-color: var(--color-primary) !important;
 }
 
-.mode-selection__card h2 {
-  margin-bottom: var(--space-sm);
+.mode-selection__card--solo:hover,
+.mode-selection__card--solo:focus-visible {
+  border-color: var(--color-accent) !important;
 }
 
-.mode-selection__card p {
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-@media (max-width: 600px) {
-  .mode-selection__grid {
-    grid-template-columns: 1fr;
-  }
+.mode-selection__card:active {
+  transform: translateY(-1px) scale(0.98) !important;
+  box-shadow: 0 4px 15px rgba(255, 181, 167, 0.1) !important;
+  transition-duration: 0.1s !important;
 }
