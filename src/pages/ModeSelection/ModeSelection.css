@@ -2,33 +2,7 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ─── Design tokens — extended palette ───────────────────────*/
-:root {
-  --color-primary: #FFB5A7;
-  --color-primary-dark: #E89A8C;
-  --color-primary-light: #FCD5CE;
-  --color-primary-subtle: rgba(255, 181, 167, 0.15);
-  --color-primary-subtle-hover: rgba(255, 181, 167, 0.25);
-  --color-primary-glow: rgba(255, 181, 167, 0.3);
 
-  --color-accent: #FEC89A;
-  --color-accent-light: #F9DCC4;
-
-  --bg-primary: #F8EDEB; 
-  --bg-secondary: #FCD5CE;
-  --bg-card: #FFFFFF; 
-  
-  --text-primary: #5A4A42;
-  --text-secondary: #8B6F6A;
-  --text-muted: #B09090;
-
-  --border-color: #F0D5CF;
-  --border-color-hover: var(--color-primary);
-
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-size-3xl: 2rem;
-  --font-size-4xl: 2.5rem;
-}
 
 /* ─── Page shell ────────────────────────────────────────────── */
 .mode-selection {
@@ -114,7 +88,7 @@
 
 .mode-selection__card--solo:hover,
 .mode-selection__card--solo:focus-visible {
-  border-color: #E2A676 !important;
+  border-color: var(--color-accent) !important;
 }
 
 .mode-selection__card:active {

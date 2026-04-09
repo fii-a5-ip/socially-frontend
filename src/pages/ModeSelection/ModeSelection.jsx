@@ -103,9 +103,9 @@ function ModeSelection() {
             
             <div className="mode-selection__arrow" style={{
                 display: "flex", alignItems: "center", gap: 7, marginTop: 22,
-                fontWeight: 600, color: '#D98A55', fontSize: 16
+                fontWeight: 600, color: 'var(--color-accent-dark, var(--color-accent))', fontSize: 16
               }}>
-              Descoperă <ArrowIcon stroke="#D98A55" />
+              Descoperă <ArrowIcon stroke="var(--color-accent-dark, var(--color-accent))" />
             </div>
           </Link>
 
