@@ -1,45 +1,384 @@
-/* ========================================
-   Register Page
-   
-   Responsabili: Rluca + Teo
-   ======================================== */
-.register {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100vh - var(--navbar-height) - var(--footer-height));
-  padding: var(--space-xl);
+.register-page {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding: 2rem;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.register__card {
-  width: 100%;
-  max-width: 480px;
-  padding: var(--space-2xl);
+.register-page * {
+    box-sizing: border-box;
 }
 
-.register__header {
-  text-align: center;
-  margin-bottom: var(--space-xl);
+.register-container {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    height: 90vh;
+    max-height: 850px;
+    min-height: 600px;
+    gap: 2rem;
 }
 
-.register__title {
-  font-size: var(--font-size-2xl);
-  margin-bottom: var(--space-xs);
+/* -------- Left Panel -------- */
+.left-panel {
+    flex: 0.8;
+    background-color: var(--bg-secondary);
+    border-radius: 24px;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.02);
+    transition: background-color 0.3s ease;
 }
 
-.register__subtitle {
-  color: var(--text-secondary);
+.brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: auto;
+    letter-spacing: -0.5px;
 }
 
-.register__form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
+.left-content {
+    margin: auto 0;
+    padding-bottom: 2rem;
 }
 
-.register__footer {
-  text-align: center;
-  margin-top: var(--space-lg);
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
+.left-content h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+}
+
+.left-content p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin: 0 0 3rem 0;
+}
+
+.social-sync {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.social-divider {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.social-divider::before,
+.social-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--border-color, var(--color-gray-300));
+}
+
+.social-divider::before {
+    margin-right: 1rem;
+}
+
+.social-divider::after {
+    margin-left: 1rem;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color, var(--color-gray-300));
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.social-btn:hover {
+    filter: brightness(0.97);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.footer-copyright {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: auto;
+}
+
+/* -------- Right Panel -------- */
+.right-panel {
+    flex: 1.2;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+}
+
+.right-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+}
+
+.right-header p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.form-card {
+    background-color: var(--bg-card);
+    border-radius: 24px;
+    padding: 2.5rem 3rem;
+    flex: 1;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+    transition: background-color 0.3s ease;
+}
+
+/* Scrollbar customization */
+.form-card::-webkit-scrollbar {
+    width: 6px;
+}
+
+.form-card::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 1rem;
+}
+
+.form-card::-webkit-scrollbar-thumb {
+    background-color: var(--border-color, var(--color-gray-300));
+    border-radius: 10px;
+}
+
+.profile-upload-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+    background-color: var(--color-primary-subtle);
+    color: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.05);
+}
+
+.upload-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: var(--color-primary);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--bg-card);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.upload-text {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.form-row .input-group {
+    flex: 1;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.input-group label svg {
+    color: var(--text-muted);
+}
+
+.at-symbol {
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: inline-block;
+    min-width: 16px;
+    text-align: center;
+}
+
+.input-group input {
+    background-color: var(--bg-primary);
+    border: 2px solid transparent;
+    color: var(--text-primary);
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    outline: none;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.input-group input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.input-group input:focus {
+    border-color: var(--color-primary);
+    background-color: transparent;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color, var(--color-gray-300));
+    border-radius: 6px;
+    background-color: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.checkbox-group input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 4px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.terms-highlight {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.submit-btn {
+    background: linear-gradient(to right, var(--color-primary), var(--color-accent));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-family: inherit;
+}
+
+.submit-btn:hover {
+    filter: brightness(0.95);
+}
+
+.submit-btn:active {
+    transform: scale(0.98);
+}
+
+.submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .register-container {
+        flex-direction: column;
+        height: auto;
+        max-height: none;
+    }
+
+    .left-panel {
+        padding: 2rem;
+    }
+
+    .form-card {
+        padding: 2rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
 }
