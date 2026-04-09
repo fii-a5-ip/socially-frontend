@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
 import { Users, Heart, Sparkles, Zap } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 
-// Importurile reparate de noi
-import Navbar from "../../components/Navbar/Navbar";
 import "./Landing.css";
 import heroImage from "./poza.png";
 
@@ -29,26 +27,26 @@ function Hero({ language }) {
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <img src={heroImage} alt="Imaginea principala" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80" />
+                <div className="absolute inset-0 hero-overlay" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
                 <div className="space-y-8">
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[var(--text-primary)] leading-tight">
                         {t.title1}
                         <br />
-                        <span className="text-primary">{t.title2}</span>
+                        <span className="text-[var(--color-primary)]">{t.title2}</span>
                     </h1>
 
-                    <p className="text-lg sm:text-xl md:text-2xl text-foreground/80 max-w-3xl mx-auto">
+                    <p className="text-lg sm:text-xl md:text-2xl text-[var(--text-primary)] opacity-80 max-w-3xl mx-auto">
                         {t.description}
                     </p>
                 </div>
             </div>
 
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-                <div className="w-6 h-10 rounded-full border-2 border-primary flex items-start justify-center p-2">
-                    <div className="w-1 h-3 bg-primary rounded-full animate-pulse" />
+                <div className="w-6 h-10 rounded-full border-2 border-[var(--color-primary)] flex items-start justify-center p-2">
+                    <div className="w-1 h-3 bg-[var(--color-primary)] rounded-full animate-pulse" />
                 </div>
             </div>
         </section>
@@ -117,13 +115,13 @@ function Features({ language }) {
     const t = translations[language] || translations['RO'];
 
     return (
-        <section className="py-20 bg-card">
+        <section className="py-20 bg-[var(--bg-card)]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
-                        {t.title} <span className="text-primary">Socially</span>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4">
+                        {t.title} <span className="text-[var(--color-primary)]">Socially</span>
                     </h2>
-                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                    <p className="text-lg text-[var(--text-muted)] max-w-2xl mx-auto">
                         {t.subtitle}
                     </p>
                 </div>
@@ -134,13 +132,13 @@ function Features({ language }) {
                         return (
                             <div
                                 key={index}
-                                className="p-6 rounded-2xl bg-background border border-border hover:border-primary transition-all hover:shadow-lg group"
+                                className="p-6 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[var(--color-primary)] transition-all hover:shadow-lg group"
                             >
-                                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:scale-110 transition-all">
-                                    <Icon className="h-7 w-7 text-primary group-hover:text-primary-foreground transition-colors" />
+                                <div className="w-14 h-14 rounded-full bg-[var(--color-primary-subtle)] flex items-center justify-center mb-4 group-hover:bg-[var(--color-primary)] group-hover:scale-110 transition-all">
+                                    <Icon className="h-7 w-7 text-[var(--color-primary)] group-hover:text-[var(--text-inverse)] transition-colors" />
                                 </div>
-                                <h3 className="text-xl font-semibold text-foreground mb-2">{feature.title}</h3>
-                                <p className="text-muted-foreground">{feature.description}</p>
+                                <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">{feature.title}</h3>
+                                <p className="text-[var(--text-muted)]">{feature.description}</p>
                             </div>
                         );
                     })}
@@ -172,20 +170,20 @@ function CTA({ language }) {
     const t = translations[language] || translations['RO'];
 
     return (
-        <section className="py-20 bg-gradient-to-br from-primary/10 via-background to-primary/5">
+        <section className="py-20 bg-gradient-to-br from-[var(--color-primary-subtle)] via-[var(--bg-primary)] to-[var(--color-primary-subtle)]">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-6">
                     {t.title}
                 </h2>
-                <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+                <p className="text-lg sm:text-xl text-[var(--text-muted)] mb-10 max-w-2xl mx-auto">
                     {t.description}
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button className="w-full sm:w-auto px-10 py-4 rounded-full bg-primary text-primary-foreground text-lg hover:opacity-90 transition-opacity shadow-lg hover:shadow-xl">
+                    <button className="w-full sm:w-auto px-10 py-4 rounded-full bg-[var(--color-primary)] text-[var(--text-inverse)] text-lg hover:opacity-90 transition-opacity shadow-lg hover:shadow-xl">
                         {t.button}
                     </button>
                 </div>
-                <p className="mt-8 text-sm text-muted-foreground">
+                <p className="mt-8 text-sm text-[var(--text-muted)]">
                     {t.disclaimer}
                 </p>
             </div>
@@ -197,52 +195,14 @@ function CTA({ language }) {
 // COMPONENTA PRINCIPALĂ
 // ==========================================
 export default function Landing() {
-    const [isDark, setIsDark] = useState(false);
-    const [language, setLanguage] = useState(() => {
-        const saved = localStorage.getItem('language');
-        return saved ? saved.toUpperCase() : 'RO';
-    });
-
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-            setIsDark(true);
-            document.documentElement.classList.add('dark');
-        }
-    }, []);
-
-    const toggleTheme = () => {
-        setIsDark(!isDark);
-        if (!isDark) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    };
-
-    const handleLanguageChange = (lang) => {
-        setLanguage(lang);
-        localStorage.setItem('language', lang);
-    };
+    const { lang } = useApp();
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
-            {Navbar && (
-                <Navbar
-                    isDark={isDark}
-                    toggleTheme={toggleTheme}
-                    language={language}
-                    onLanguageChange={handleLanguageChange}
-                />
-            )}
+        <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-250">
             <main>
-                <Hero language={language} />
-                <Features language={language} />
-                <CTA language={language} />
+                <Hero language={lang} />
+                <Features language={lang} />
+                <CTA language={lang} />
             </main>
         </div>
     );

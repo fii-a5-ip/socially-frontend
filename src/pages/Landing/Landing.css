@@ -1,25 +1,19 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    --background: 245 230 232; /* #f5e6e8 */
-    --foreground: 45 45 45; /* #2d2d2d */
-    --primary: 230 124 148; /* #e67c94 */
-    --card: 255 255 255;
-    --border: 230 124 148;
-}
+/* Landing.css options overrides (if any needed specifically) */
+/* The global styles from index.css govern the theme now */
 
-@layer base {
-    body {
-        @apply bg-[#f5e6e8] text-[#2d2d2d] antialiased;
-    }
-}
 
 /* Stiluri custom pentru a forța aspectul de Hero */
-.hero-gradient {
-    background: linear-gradient(to bottom, rgba(245, 230, 232, 0.6), rgba(245, 230, 232, 0.4), rgba(245, 230, 232, 0.7));
+.hero-overlay {
+    background: linear-gradient(to bottom, 
+        color-mix(in srgb, var(--bg-primary) 30%, transparent), 
+        color-mix(in srgb, var(--bg-primary) 50%, transparent), 
+        color-mix(in srgb, var(--bg-primary) 90%, transparent));
 }
+
 
 /*
 

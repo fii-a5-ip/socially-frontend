@@ -1,11 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 /* ========================================
    SOCIALLY — Design System
    ======================================== */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* --- Google Fonts --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 
 /* --- CSS Custom Properties (Light Mode / Default) --- */
 :root {
@@ -339,3 +339,16 @@ ol {
   font-family: monospace;
   margin-top: var(--space-sm);
 }
+
+/* --- Theme Mapping (Tailwind V4 Compatibility) --- */
+@theme {
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --color-card: var(--bg-card);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--text-inverse);
+  --color-muted: var(--bg-secondary);
+  --color-muted-foreground: var(--text-muted);
+  --color-border: var(--border-color);
+}
+

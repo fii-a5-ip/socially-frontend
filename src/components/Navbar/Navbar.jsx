@@ -94,8 +94,16 @@ function Dropdown({ trigger, children }) {
 }
 
 /* ── Navbar ── */
-function Navbar() {
+function NavBtn({ to, icon }) {
   const location = useLocation()
+  return (
+    <Link to={to} className={`nb-icon-btn${location.pathname === to ? ' nb-icon-btn--active' : ''}`}>
+      {icon}
+    </Link>
+  )
+}
+
+function Navbar() {
   const [search, setSearch] = useState('')
   const [theme, setTheme] = useState(() => localStorage.getItem('nb-theme') || 'light')
   const [lang, setLang] = useState(() => localStorage.getItem('nb-lang') || 'RO')
@@ -109,11 +117,6 @@ function Navbar() {
     localStorage.setItem('nb-lang', lang)
   }, [lang])
 
-  const NavBtn = ({ to, icon }) => (
-    <Link to={to} className={`nb-icon-btn${location.pathname === to ? ' nb-icon-btn--active' : ''}`}>
-      {icon}
-    </Link>
-  )
 
   return (
     <>
