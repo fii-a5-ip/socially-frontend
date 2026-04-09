@@ -1,11 +1,8 @@
 /* Groups Page — Responsabil: Denisa */
-/* Adaugă stilurile specifice aici */
-/* Reset & Base */
-
 
 .groups-page {
   min-height: 100vh;
-  background: #eee1de;
+  background: var(--bg-primary);
   display: flex;
   justify-content: center;
   padding: 3.5rem 1rem 5rem;
@@ -20,7 +17,7 @@
   text-align: center;
   font-size: 3rem;
   font-weight: 700;
-  color: #4b2f27;
+  color: var(--text-primary);
   margin: 0 0 2rem;
 }
 
@@ -28,7 +25,7 @@
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  background: #f7f5f4;
+  background: var(--bg-card);
   border-radius: 1.35rem;
   height: 58px;
   padding: 0 1.1rem;
@@ -36,7 +33,7 @@
 }
 
 .groups-search__icon {
-  color: #9a7d74;
+  color: var(--text-muted);
   font-size: 1rem;
   flex-shrink: 0;
 }
@@ -47,11 +44,11 @@
   outline: none;
   background: transparent;
   font-size: 1.1rem;
-  color: #5f443d;
+  color: var(--text-primary);
 }
 
 .groups-search__input::placeholder {
-  color: #967b74;
+  color: var(--text-muted);
 }
 
 .groups-create-btn {
@@ -64,8 +61,8 @@
   text-decoration: none;
   font-size: 1.15rem;
   font-weight: 700;
-  color: #4b2f27;
-  background: linear-gradient(90deg, #f2ada4 0%, #edbd8c 100%);
+  color: var(--text-primary);
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
   margin-bottom: 1.6rem;
 }
 
@@ -79,7 +76,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: #f7f5f4;
+  background: var(--bg-card);
   border-radius: 1.45rem;
   padding: 1.25rem 1.2rem;
   text-decoration: none;
@@ -88,7 +85,7 @@
 
 .group-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(75, 47, 39, 0.06);
+  box-shadow: 0 8px 20px var(--color-primary-glow);
 }
 
 .group-card__icon {
@@ -102,15 +99,15 @@
 }
 
 .group-card__icon--pink {
-  background: #f5c0b8;
+  background: var(--color-primary-light);
 }
 
 .group-card__icon--orange {
-  background: #f2c08f;
+  background: var(--color-accent-light);
 }
 
 .group-card__icon--light-pink {
-  background: #f2d1ca;
+  background: var(--color-primary-subtle);
 }
 
 .group-card__emoji {
@@ -127,18 +124,18 @@
   margin: 0 0 0.35rem;
   font-size: 1.15rem;
   font-weight: 700;
-  color: #4b2f27;
+  color: var(--text-primary);
 }
 
 .group-card__subtitle {
   margin: 0;
   font-size: 0.98rem;
-  color: #886c63;
+  color: var(--text-muted);
 }
 
 .group-card__arrow {
   font-size: 2rem;
-  color: #8a6b63;
+  color: var(--text-muted);
   line-height: 1;
   flex-shrink: 0;
 }
