@@ -29,14 +29,14 @@ function ProfileView({ data, onEdit }) {
 
         <div className="view-data-item">
           <span className="view-label">Bio</span>
-          <strong className="view-value" style={{ fontStyle: !data.bio ? 'italic' : 'normal', color: !data.bio ? '#8b949e' : '#fff' }}>
+          <strong className={`view-value${!data.bio ? ' view-value--muted' : ''}`}>
             {data.bio || 'Adaugă o scurtă descriere apăsând editează...'}
           </strong>
         </div>
 
         <div className="view-data-item">
           <span className="view-label">Buget Per Ieșire</span>
-          <strong className="view-value" style={{ color: '#6c5ce7' }}>
+          <strong className="view-value view-value--accent">
             {data.buget === '1000' ? 'Fără limită' : `${data.buget} RON`}
           </strong>
         </div>

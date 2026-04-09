@@ -79,7 +79,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
         />
 
         <div className="form-group" style={{ marginBottom: '15px' }}>
-          <label className="input-label" style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', color: '#8b949e' }}>
+          <label className="input-label">
             Bio (max 50 caractere)
           </label>
           <div className="bio-container">
@@ -97,8 +97,8 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
         </div>
 
         <div className="form-group">
-          <label className="input-label" style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', color: '#8b949e' }}>
-            Buget Per Ieșire: <span style={{ color: '#fff', fontWeight: 'bold' }}>{values.buget === '1000' ? 'Fără limită' : values.buget + ' RON'}</span>
+          <label className="input-label">
+            Buget Per Ieșire: <span style={{ fontWeight: 'bold' }}>{values.buget === '1000' ? 'Fără limită' : values.buget + ' RON'}</span>
           </label>
           <input
             type="range"
