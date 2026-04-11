@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './SoloDiscovering.css';
 
 // ==========================================
@@ -252,7 +252,20 @@ function SoloDiscovering() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [availablePlaces, setAvailablePlaces] = useState([]);
+  // Recalcularea listei vizibile (discovery)
+  const availablePlaces = useMemo(() => {
+    let places = MOCK_LOCATIONS;
+
+    if (activeCategory !== "Toate") {
+      places = places.filter(loc => loc.category === activeCategory);
+    }
+
+    // Auto-excludem locațiile cărora le-am dat swipe
+    return places.filter(loc =>
+      !likedPlaces.some(lp => lp.id === loc.id) &&
+      !dislikedIds.includes(loc.id)
+    );
+  }, [activeCategory, likedPlaces, dislikedIds]);
 
   // Hook pentru LocalStorage sync
   useEffect(() => {
@@ -262,23 +275,6 @@ function SoloDiscovering() {
   useEffect(() => {
     localStorage.setItem('socially_dislikedIds', JSON.stringify(dislikedIds));
   }, [dislikedIds]);
-
-  // Recalcularea listei vizibile (discovery)
-  useEffect(() => {
-    let places = MOCK_LOCATIONS;
-
-    if (activeCategory !== "Toate") {
-      places = places.filter(loc => loc.category === activeCategory);
-    }
-
-    // Auto-excludem locațiile cărora le-am dat swipe
-    places = places.filter(loc =>
-      !likedPlaces.some(lp => lp.id === loc.id) &&
-      !dislikedIds.includes(loc.id)
-    );
-
-    setAvailablePlaces(places);
-  }, [activeCategory, likedPlaces, dislikedIds]);
 
   // Callback la acțiunea finalizată pe cardul Swipe
   const handleCardAction = (location, action) => {
