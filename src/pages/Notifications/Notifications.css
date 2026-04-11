@@ -22,8 +22,8 @@
 
 .notification-unread {
   border-left: 4px solid var(--color-primary);
-  background: rgba(108, 92, 231, 0.05);
-}*/
+  background: var(--color-primary-subtle);
+}
 
 .notification_content {
   display: flex;
