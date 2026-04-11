@@ -1,9 +1,31 @@
 /* Notifications Page — Responsabil: Dinu */
 /* Adaugă stilurile specifice aici */
 /* Notifications Page — Responsabil: Dinu */
-/* Adaugă stilurile specifice aici */
+/* Adaugă stilurile specifice aici *//* --- Header Styling --- */
+.notifications_header {
+  padding: var(--space-xl) 0 var(--space-md);
+  text-align: center;
+}
 
+.notifications_title {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
 
+.notifications_accent {
+  font-size: var(--font-size-xl);
+  display: inline-block;
+  transform: rotate(15deg);
+  animation: gentle-ring 3s infinite ease-in-out;
+}
+
+@keyframes gentle-ring {
+  0%, 100% { transform: rotate(15deg); }
+  50% { transform: rotate(0deg); }
+}
 
 
 .notifications_list {

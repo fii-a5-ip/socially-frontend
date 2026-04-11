@@ -126,7 +126,9 @@ function Notifications() {
 
   return (
     <div className="container">
-      <h1>Notificări</h1>
+      <header className="notifications_header">
+        <h1 className="notifications_title">Notificări <span className="notifications_accent">🔔</span></h1>
+      </header>
 
       <section className="notifications_section">
         {newNotifications.length === 0 ? (
