@@ -13,14 +13,12 @@ import './CreateGroup.css';
 const initialValues = {
   name: '',
   description: '',
-  category: '',
   imageUrl: '',
   members: [],
 };
 
 const validationRules = {
   name: (v) => validateRequired(v, 'Numele grupului'),
-  category: (v) => validateRequired(v, 'Categoria'),
 };
 
 function CreateGroup() {
@@ -28,7 +26,7 @@ function CreateGroup() {
   const [step, setStep] = useState(1);
   const [creationSuccess, setCreationSuccess] = useState(false);
 
-  const { values, errors, touched, handleChange, handleBlur, setValues, setErrors, setTouched } = useForm(
+  const { values, errors, touched, handleChange, handleBlur, setValues, setErrors } = useForm(
     initialValues,
     validationRules,
     /* eslint-disable-next-line no-unused-vars */
@@ -43,15 +41,12 @@ function CreateGroup() {
     const stepErrors = {};
     let hasError = false;
     
-    if (!values.name) { stepErrors.name = 'Numele grupului este obligatoriu.'; hasError = true; }
-    if (!values.category) { stepErrors.category = 'Te rog să selectezi o tematică.'; hasError = true; }
+    if (!values.name) { stepErrors.name = 'Numele grupului este obligatoriu.'; }
     
-    setTouched(prev => ({ ...prev, name: true, category: true }));
     setErrors(prev => ({ ...prev, ...stepErrors }));
 
-    if (!hasError) {
-      setStep(2);
-    }
+    // Permitem trecerea la nivel vizual pentru testare chiar dacă sunt erori
+    setStep(2);
   };
 
   const handlePrevStep = () => {
@@ -72,8 +67,8 @@ function CreateGroup() {
         
         {/* Header simplu */}
         <div className="cg-header">
-          <h1 className="cg-page-title">Creează Ieșire</h1>
-          <p className="cg-page-subtitle">Configurează un spațiu nou pentru tine și grupul tău.</p>
+          <h1 className="cg-page-title">Creează Grup</h1>
+          <p className="cg-page-subtitle">Configurează un spațiu nou pentru tine și prietenii tăi.</p>
         </div>
 
         {/* Stepper Visualizer */}
@@ -127,7 +122,7 @@ function CreateGroup() {
                   <CheckCircle className="cg-success-icon" size={64} />
                 </div>
                 <h2>Grup Creat cu Succes!</h2>
-                <p>Te ducem imediat la experiența de matching...</p>
+                <p>Noul tău grup este pregătit. Redirecționare...</p>
                 <div className="cg-loader"></div>
               </motion.div>
             )}

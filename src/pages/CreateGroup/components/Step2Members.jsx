@@ -49,7 +49,7 @@ export function Step2Members({ values, setValues }) {
         <Search className="cg-search-icon" size={20} />
         <input
           type="text"
-          placeholder="Caută după nume sau @username..."
+          placeholder="Caută după nume,  @username, sau email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="cg-search-input"
@@ -61,8 +61,8 @@ export function Step2Members({ values, setValues }) {
           filteredFriends.map((friend) => {
             const isSelected = values.members?.includes(friend.id);
             return (
-              <div 
-                key={friend.id} 
+              <div
+                key={friend.id}
                 onClick={() => toggleMember(friend.id)}
                 className={`cg-friend-item ${isSelected ? 'selected' : ''}`}
               >

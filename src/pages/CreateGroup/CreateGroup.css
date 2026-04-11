@@ -205,10 +205,50 @@
   margin-top: 0.5rem;
 }
 
-.cg-image-preview img {
+/* File Upload Section */
+.cg-file-upload-container {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  border-radius: 1rem;
+  border: 2px dashed var(--border-color);
+  overflow: hidden;
+  transition: all 0.2s;
+  background-color: var(--bg-card);
+}
+
+.cg-file-upload-container:hover {
+  border-color: var(--color-primary);
+  background-color: var(--bg-primary);
+}
+
+.cg-file-input {
+  display: none;
+}
+
+.cg-file-upload-label {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.cg-image-preview-upload {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.cg-file-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.875rem;
 }
 
 /* Step 2 Content - Members */

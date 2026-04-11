@@ -6,16 +6,6 @@ import FormInput from '../../../components/FormInput/FormInput';
 import { FormTextArea } from './FormTextArea';
 
 export function Step1Details({ values, errors, touched, handleChange, handleBlur, setValues }) {
-  const categories = [
-    { id: 'mancare', label: 'Luăm Masa', icon: Utensils },
-    { id: 'petrecere', label: 'Petrecere', icon: PartyPopper },
-    { id: 'relaxare', label: 'Relaxare / Cafea', icon: Coffee },
-    { id: 'city_break', label: 'Călătorie', icon: MapPin },
-  ];
-
-  const handleCategorySelect = (categoryId) => {
-    setValues((prev) => ({ ...prev, category: categoryId }));
-  };
 
   return (
     <motion.div
@@ -52,49 +42,35 @@ export function Step1Details({ values, errors, touched, handleChange, handleBlur
         />
       </div>
 
-      <div className="cg-form-row">
-        <label className="cg-field-label">Tematica Ieșirii <span className="required">*</span></label>
-        <div className="cg-categories-grid">
-          {categories.map((cat) => {
-            const Icon = cat.icon;
-            const isSelected = values.category === cat.id;
-            return (
-              <button
-                type="button"
-                key={cat.id}
-                onClick={() => handleCategorySelect(cat.id)}
-                className={`cg-category-btn ${isSelected ? 'selected' : ''}`}
-              >
-                <div className="cg-category-icon">
-                  <Icon size={24} />
-                </div>
-                <span>{cat.label}</span>
-              </button>
-            );
-          })}
-        </div>
-        {touched.category && errors.category && (
-          <p className="cg-input-error">{errors.category}</p>
-        )}
-      </div>
+
 
       <div className="cg-form-row">
-        <FormInput
-          label="URL Imagine Copertă (opțional)"
-          name="imageUrl"
-          type="url"
-          value={values.imageUrl}
-          placeholder="https://..."
-          error={errors.imageUrl}
-          touched={touched.imageUrl}
-          onChange={handleChange}
-          onBlur={handleBlur}
-        />
-        {values.imageUrl && !errors.imageUrl && (
-          <div className="cg-image-preview mt-2">
-            <img src={values.imageUrl} alt="Preview" onError={(e) => e.target.style.display = 'none'} />
-          </div>
-        )}
+        <label className="cg-field-label">Imagine Copertă Grup (opțional)</label>
+        <div className="cg-file-upload-container">
+          <input 
+            type="file" 
+            accept="image/*" 
+            id="groupImage" 
+            className="cg-file-input"
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                const previewUrl = URL.createObjectURL(file);
+                setValues(prev => ({ ...prev, imageUrl: previewUrl }));
+              }
+            }}
+          />
+          <label htmlFor="groupImage" className="cg-file-upload-label">
+            {values.imageUrl ? (
+              <img src={values.imageUrl} alt="Preview" className="cg-image-preview-upload" />
+            ) : (
+              <div className="cg-file-placeholder">
+                <ImageIcon size={32} />
+                <span>Click pentru a încărca o imagine</span>
+              </div>
+            )}
+          </label>
+        </div>
       </div>
     </motion.div>
   );
