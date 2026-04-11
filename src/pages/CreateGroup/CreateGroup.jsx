@@ -37,9 +37,7 @@ function CreateGroup() {
   );
 
   const handleNextStep = () => {
-    // Validăm step 1 manual pentru că e multiform
     const stepErrors = {};
-    let hasError = false;
     
     if (!values.name) { stepErrors.name = 'Numele grupului este obligatoriu.'; }
     
