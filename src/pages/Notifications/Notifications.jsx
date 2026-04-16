@@ -14,12 +14,14 @@
 
 import './Notifications.css'
 import { useState } from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const test_Date= new Date();
 var check  = false;
 const test_Time= test_Date.getHours() + ':' + test_Date.getMinutes();
 
 function Notifications() {
+  const { t } = useTranslation();
 
   const [notifications, setNotifications] = useState([
     {
@@ -86,8 +88,8 @@ function Notifications() {
         <>
           <h3 className="notifications_group-title">
             {type == 'user'
-              ? '👥 De la utilizatori / grupuri'
-              : '⚙️ Sistem'}
+              ? t('notifications.group_users')
+              : t('notifications.group_system')}
           </h3>
 
           <div className="notifications_list">
@@ -110,10 +112,10 @@ function Notifications() {
                       className="btn btn--primary"
                       onClick={() => handleAccept(notif.id)}
                     >
-                      Acceptă
+                      {t('notifications.accept')}
                     </button>
                     <button className="btn btn--secondary">
-                      Refuză
+                      {t('notifications.decline')}
                     </button>
                   </div>
                 )}
@@ -127,17 +129,17 @@ function Notifications() {
   return (
     <div className="container">
       <header className="notifications_header">
-        <h1 className="notifications_title">Notificări <span className="notifications_accent">🔔</span></h1>
+        <h1 className="notifications_title">{t('notifications.title')} <span className="notifications_accent">🔔</span></h1>
       </header>
 
       <section className="notifications_section">
         {newNotifications.length === 0 ? (
           <p className="notifications_empty">
-            Nu ai notificări noi.
+            {t('notifications.empty')}
           </p>
         ) : (
           <>
-            <h2 className="notifications_section-title">Noi</h2>
+            <h2 className="notifications_section-title">{t('notifications.new')}</h2>
             {renderNotifications(newNotifications, 'user')}
             {renderNotifications(newNotifications, 'system')}
           </>
@@ -145,9 +147,9 @@ function Notifications() {
       </section>
 
       <section className="notifications_section">
-        <h2 className="notifications_section-title   notifications_section_electricboogaloo"> Arhivate
+        <h2 className="notifications_section-title   notifications_section_electricboogaloo"> {t('notifications.archived')}
           <button className="btn btn--secondary toggle" onClick={() => setShowArchived(prev => !prev)}>
-          {showArchived ? 'Ascunde' : 'Arată'}
+          {showArchived ? t('notifications.toggle_hide') : t('notifications.toggle_show')}
           </button>
         </h2>
 

@@ -1,9 +1,10 @@
-/* Notifications Page — Responsabil: Dinu */
-/* Adaugă stilurile specifice aici */
-/* Notifications Page — Responsabil: Dinu */
-/* Adaugă stilurile specifice aici *//* --- Header Styling --- */
+/* ============================================
+   Notifications Page
+   ============================================ */
+
+/* ── Page wrapper ── */
 .notifications_header {
-  padding: var(--space-xl) 0 var(--space-md);
+  padding: var(--space-2xl) 0 var(--space-lg);
   text-align: center;
 }
 
@@ -27,35 +28,86 @@
   50% { transform: rotate(0deg); }
 }
 
+/* ── Sections ── */
+.notifications_section {
+  margin-bottom: var(--space-2xl);
+}
 
+.notifications_section-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
+  color: var(--text-secondary);
+}
+
+.notifications_section-title.notifications_section_electricboogaloo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  margin-top: var(--space-lg);
+  border-bottom: 1px solid var(--color-gray-700);
+}
+
+.toggle {
+  margin-left: auto;
+}
+
+/* ── Group titles (De la utilizatori, Sistem) ── */
+.notifications_group-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-md);
+  padding-left: 4px;
+}
+
+/* ── Card list ── */
 .notifications_list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
+/* ── Individual notification card ── */
 .notification {
-  display: flex; /* astea 2 pun btn-ele de accept/refuz la dreapta*/
-  justify-content: space-between;/* ^^^^^^*/
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, rgba(0,0,0,0.06));
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
 }
 
+.notification:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
 
+/* ── Unread state ── */
 .notification-unread {
   border-left: 4px solid var(--color-primary);
   background: var(--color-primary-subtle);
 }
 
+/* ── Content block ── */
 .notification_content {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  flex: 1;
+  min-width: 0;
 }
 
 .notification_text {
   font-size: var(--font-size-base);
+  font-weight: 500;
   color: var(--text-primary);
+  line-height: 1.5;
 }
 
 .notification_time {
@@ -63,48 +115,42 @@
   color: var(--text-muted);
 }
 
-
+/* ── Action buttons ── */
 .notification_actions {
   display: flex;
   gap: var(--space-sm);
+  flex-shrink: 0;
 }
 
+.notification_actions .btn {
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
 
+/* ── Empty state ── */
 .notifications_empty {
   text-align: center;
-  margin-top: var(--space-2xl);
+  padding: var(--space-2xl) 0;
   color: var(--text-muted);
+  font-size: var(--font-size-base);
 }
 
-.notifications_section {
-  margin-bottom: var(--space-2xl);
+/* ── Responsive tweaks ── */
+@media (max-width: 600px) {
+  .notification {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .notification_actions {
+    width: 100%;
+  }
+
+  .notification_actions .btn {
+    flex: 1;
+    text-align: center;
+  }
 }
-
-
-/* pt textul "Noi"/"Arhivate"*/
-.notifications_section-title {
-  font-size: var(--font-size-xl);
-  margin-bottom: var(--space-md);
-  color: var(--text-secondary);
-}
-
-.notifications_section-title.notifications_section_electricboogaloo {
-  display: flex;
-    align-items: flex-end;
-
-  /* pentru linie*/
-    padding-bottom: 4px;            
-      line-height: 1;
-    border-bottom: 1px solid var(--color-gray-700);
-}
-
-.toggle {
-  margin-left: auto;
-}
-/* nu mi-a iesit asta
-.notifications_section_header_cu_btn {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-} */ 

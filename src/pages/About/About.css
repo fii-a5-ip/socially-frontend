@@ -1,0 +1,182 @@
+.about-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-default);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+}
+
+/* Hero Section */
+.about-hero {
+  padding: 8rem 2rem 5rem 2rem;
+  background: linear-gradient(to bottom, var(--bg-card), var(--bg-default));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.about-hero-content {
+  max-width: 800px;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+  background-color: rgba(239, 106, 55, 0.1);
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(239, 106, 55, 0.2);
+}
+
+.about-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.about-subtitle {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* Features / How it works */
+.about-features {
+  padding: 6rem 2rem;
+}
+
+.section-heading {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.section-heading h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.section-heading p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.feature-card {
+  background-color: var(--bg-card);
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid var(--border-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  border-color: var(--color-primary-light);
+}
+
+html[data-theme="dark"] .feature-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.feature-icon-wrapper {
+  background-color: rgba(239, 106, 55, 0.1);
+  width: 60px;
+  height: 60px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.feature-icon {
+  color: var(--color-primary);
+}
+
+.feature-card h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.feature-card p {
+  color: var(--text-muted);
+  line-height: 1.5;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Manifesto Section */
+.about-manifesto {
+  padding: 2rem 2rem 6rem 2rem;
+}
+
+.manifesto-card {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 4rem;
+  border-radius: 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.manifesto-icon {
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.manifesto-card h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.manifesto-card p {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+  opacity: 0.95;
+}
+
+@media (max-width: 768px) {
+  .manifesto-card {
+    padding: 3rem 1.5rem;
+  }
+  
+  .manifesto-card h2 {
+    font-size: 1.8rem;
+  }
+  
+  .about-hero {
+    padding: 6rem 1.5rem 4rem 1.5rem;
+  }
+}

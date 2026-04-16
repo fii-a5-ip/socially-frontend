@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 import './SoloDiscovering.css';
 
 // ==========================================
@@ -61,6 +62,7 @@ const CATEGORIES = ["Toate", "Restaurante", "Cafenele", "Parcuri", "Muzee"];
 // 2. Componenta: DiscoveryScreen (Swipe Logica)
 // ==========================================
 function DiscoveryScreen({ location, onAction, onOpenDetails }) {
+  const { t } = useTranslation();
   const [animationClass, setAnimationClass] = useState("");
 
   const handleAction = (action, e) => {
@@ -77,11 +79,11 @@ function DiscoveryScreen({ location, onAction, onOpenDetails }) {
     return (
       <div className="sd-no-more fade-in">
         <span className="sd-no-more-icon">🎉</span>
-        <h3>Ai văzut tot!</h3>
-        <p>Nu mai există locații noi din această categorie.</p>
+        <h3>{t('solo.no_more_title')}</h3>
+        <p>{t('solo.no_more_desc')}</p>
         <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '16px' }}>
           <button className="btn btn--secondary" onClick={() => onAction(null, 'reset')}>
-            Reia locații trecute
+            {t('solo.reset_btn')}
           </button>
         </div>
       </div>
@@ -129,12 +131,13 @@ function DiscoveryScreen({ location, onAction, onOpenDetails }) {
 // 3. Componenta: FavoritesScreen
 // ==========================================
 function FavoritesScreen({ likedPlaces, onRemove, onOpenDetails }) {
+  const { t } = useTranslation();
   if (likedPlaces.length === 0) {
     return (
       <div className="sd-no-more">
         <span className="sd-no-more-icon">📭</span>
-        <h3>Nicio locație salvată</h3>
-        <p>Apasă ♥️ pe carduri pentru a le salva în Colecția ta.</p>
+        <h3>{t('solo.no_saved_title')}</h3>
+        <p>{t('solo.no_saved_desc')}</p>
       </div>
     );
   }
@@ -158,7 +161,7 @@ function FavoritesScreen({ likedPlaces, onRemove, onOpenDetails }) {
                 onRemove(place.id);
               }}
             >
-              Șterge
+              {t('solo.delete')}
             </button>
           </div>
         </div>
@@ -171,6 +174,7 @@ function FavoritesScreen({ likedPlaces, onRemove, onOpenDetails }) {
 // 4. Componenta: PlaceDetails (Pagina Extinsă)
 // ==========================================
 function PlaceDetails({ place, onClose }) {
+  const { t } = useTranslation();
   if (!place) return null;
 
   const handleOpenMaps = () => {
@@ -201,7 +205,7 @@ function PlaceDetails({ place, onClose }) {
           <div className="sd-pd-info-row">
             <span className="icon">📅</span>
             <div>
-              <strong>Interval Orar:</strong>
+              <strong>{t('solo.schedule')}</strong>
               <p>{place.schedule}</p>
             </div>
           </div>
@@ -209,7 +213,7 @@ function PlaceDetails({ place, onClose }) {
           <div className="sd-pd-info-row sd-clickable-address" onClick={handleOpenMaps}>
             <span className="icon" style={{ color: 'var(--color-primary)' }}>📍</span>
             <div>
-              <strong>Adresa completă (Click pt. Hartă):</strong>
+              <strong>{t('solo.address')}</strong>
               <p className="sd-address-link">{place.address}</p>
             </div>
           </div>
@@ -226,7 +230,7 @@ function PlaceDetails({ place, onClose }) {
       {/* Footer Fixed Action */}
       <div className="sd-pd-footer-action">
         <button className="btn btn--primary btn--full sd-pd-reserve-btn" onClick={() => alert('Acțiune Rezervare Placeholder')}>
-          Rezervă Loc
+          {t('solo.reserve')}
         </button>
       </div>
     </div>
@@ -237,6 +241,7 @@ function PlaceDetails({ place, onClose }) {
 // 5. Root Component: SoloDiscovering
 // ==========================================
 function SoloDiscovering() {
+  const { t } = useTranslation();
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'saved'
   const [activeCategory, setActiveCategory] = useState("Toate");
   const [selectedPlace, setSelectedPlace] = useState(null); // Place pentru pagina extinsă
@@ -318,19 +323,19 @@ function SoloDiscovering() {
 
       {/* Header General */}
       <header className="sd-header">
-        <h1 className="sd-title">Descoperă</h1>
+        <h1 className="sd-title">{t('solo.title')}</h1>
         <div className="sd-toggle">
           <button
             className={`sd-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
             onClick={() => setViewMode('list')}
           >
-            Explorează
+            {t('solo.explore')}
           </button>
           <button
             className={`sd-toggle-btn ${viewMode === 'saved' ? 'active' : ''}`}
             onClick={() => setViewMode('saved')}
           >
-            Salvate {likedPlaces.length > 0 && `(${likedPlaces.length})`}
+            {t('solo.saved')} {likedPlaces.length > 0 && `(${likedPlaces.length})`}
           </button>
         </div>
       </header>
