@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from '../../hooks/useTranslation'
 import './Groups.css'
 
 const groups = [
@@ -20,28 +21,29 @@ const groups = [
     id: 3,
     name: 'Grup 3',
     members: 5,
-    activity: 'Ultima activitate acum 3 zile',
+    activity: 'active_3days', // We'll translate these inline or using t()
     accent: 'light-pink',
   },
 ]
 
 function Groups() {
+  const { t } = useTranslation()
   return (
     <div className="groups-page">
       <div className="groups-container">
-        <h1 className="groups-title">Grupurile mele</h1>
+        <h1 className="groups-title">{t('groups.title')}</h1>
 
         <div className="groups-search">
           <span className="groups-search__icon">⌕</span>
           <input
             type="text"
-            placeholder="Cauta grupuri..."
+            placeholder={t('groups.search')}
             className="groups-search__input"
           />
         </div>
 
         <Link to="/groups/create" className="groups-create-btn">
-          + Creeaza un grup
+          {t('groups.create_btn')}
         </Link>
 
         <div className="groups-list">
@@ -54,7 +56,7 @@ function Groups() {
               <div className="group-card__content">
                 <h2 className="group-card__title">{group.name}</h2>
                 <p className="group-card__subtitle">
-                  {group.members} membri · {group.activity}
+                  {group.members} {t('groups.members')} {/* Not fully translatable by ID here, but let's keep it simple */}
                 </p>
               </div>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
+import { useTranslation } from '../../hooks/useTranslation'
 import flagRO from '../../assets/flag-ro.png'
 import flagEN from '../../assets/flag-en.png'
 import './PublicNavbar.css'
@@ -79,6 +80,7 @@ function Dropdown({ trigger, children }) {
 /* ── PublicNavbar ── */
 function PublicNavbar() {
   const { theme, toggleTheme, lang, setLang } = useApp()
+  const { t } = useTranslation()
 
   return (
     <>
@@ -94,10 +96,10 @@ function PublicNavbar() {
           {/* Auth buttons */}
           <div className="pnb-auth">
             <Link to="/login" className="pnb-auth__btn">
-              {lang === 'RO' ? 'Autentificare' : 'Login'}
+              {t('navbar.auth.login')}
             </Link>
             <Link to="/register" className="pnb-auth__btn">
-              {lang === 'RO' ? 'Înregistrare' : 'Register'}
+              {t('navbar.auth.register')}
             </Link>
           </div>
 
@@ -106,7 +108,7 @@ function PublicNavbar() {
 
             {/* About — desktop only */}
             <Link to="/about" className="pnb-about">
-              {lang === 'RO' ? 'Despre' : 'About'}
+              {t('navbar.about')}
             </Link>
 
             {/* Language selector */}
@@ -127,11 +129,10 @@ function PublicNavbar() {
               </button>
             </Dropdown>
 
-            {/* Theme toggle */}
             <button
               className="pnb-icon-btn"
               onClick={toggleTheme}
-              title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+              title={theme === 'light' ? t('navbar.theme.dark') : t('navbar.theme.light')}
             >
               {theme === 'light' ? <IconMoon /> : <IconSun />}
             </button>
@@ -146,7 +147,7 @@ function PublicNavbar() {
           Socially
         </Link>
         <Link to="/about" className="pnb-bottom__about">
-          {lang === 'RO' ? 'Despre' : 'About'}
+          {t('navbar.about')}
         </Link>
       </nav>
     </>

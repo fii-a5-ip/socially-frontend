@@ -12,8 +12,8 @@ import {
   Activity as ActivityIcon,
   Users
 } from "lucide-react";
-/* eslint-disable-next-line no-unused-vars */
 import { motion, AnimatePresence } from "motion/react";
+import { useTranslation } from "../../hooks/useTranslation";
 import "./GroupDetail.css";
 
 const initialActivities = [
@@ -98,6 +98,7 @@ const mockMembers = [
 ];
 
 function GroupDetail() {
+  const { t } = useTranslation();
   const { groupId } = useParams();
   const [activities, setActivities] = useState(initialActivities);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -152,13 +153,13 @@ function GroupDetail() {
           {/* Participants Section */}
           <div className="gd-card gd-members-section">
             <div className="gd-members-header">
-              <h2>Membrii grupului</h2>
+              <h2>{t('groupdetail.members_title')}</h2>
               <button 
                 onClick={() => setIsModalOpen(true)}
                 className="gd-members-view-all"
               >
                 <Users className="icon-sm" />
-                Vezi toți membrii
+                {t('groupdetail.view_all')}
               </button>
             </div>
 
@@ -181,14 +182,14 @@ function GroupDetail() {
                 <div className="gd-member-avatar invite">
                   <span>+</span>
                 </div>
-                <span className="gd-member-name text-invite">Invită</span>
+                <span className="gd-member-name text-invite">{t('groupdetail.invite')}</span>
               </button>
             </div>
           </div>
 
           {/* Activities Header */}
           <div className="gd-activities-header">
-            <h2>Activități propuse</h2>
+            <h2>{t('groupdetail.proposed_activities')}</h2>
             <div className="gd-ai-badge">
               <Sparkles className="icon-sm" />
               AI Matched
@@ -225,13 +226,13 @@ function GroupDetail() {
                     {activity.isWinning && (
                       <div className="gd-winning-badge">
                         <Trophy className="icon-sm" />
-                        Activitate Câștigătoare
+                        {t('groupdetail.winning_activity')}
                       </div>
                     )}
 
                     <div className="gd-score-badge">
                       <Sparkles className="icon-xs" />
-                      Scor AI: {activity.score}%
+                      {t('groupdetail.ai_score')} {activity.score}%
                     </div>
                   </div>
 
@@ -257,14 +258,14 @@ function GroupDetail() {
                     <div className="gd-event-profile">
                       <div className="gd-event-profile-header">
                         <ActivityIcon className="icon-sm" />
-                        <span>Profilul & Preferințele Tale</span>
+                        <span>{t('groupdetail.profile_prefs')}</span>
                       </div>
                       <div className="gd-attributes-list">
                         {activity.attributes.map((attr, idx) => (
                           <div key={idx} className="gd-attribute-item">
                             <div className="gd-attribute-labels">
                               <span>{attr.name}</span>
-                              <span>{attr.percentage}% Match</span>
+                              <span>{attr.percentage}% {t('groupdetail.match')}</span>
                             </div>
                             <div className="gd-attribute-bar-bg">
                               <motion.div
@@ -285,8 +286,8 @@ function GroupDetail() {
                       {/* Dynamic Progress Bar */}
                       <div className="gd-vote-progress-area">
                         <div className="gd-vote-progress-header">
-                          <span className="label">Rezultatele Votului</span>
-                          <span className="count">{totalVotes} Voturi</span>
+                          <span className="label">{t('groupdetail.vote_results')}</span>
+                          <span className="count">{totalVotes} {t('groupdetail.votes')}</span>
                         </div>
                         
                         <div className="gd-vote-bar-container">
@@ -418,8 +419,8 @@ function GroupDetail() {
             >
               <div className="gd-modal-header">
                 <div>
-                  <h2>Toți Membrii</h2>
-                  <p>{totalMembers} membri în grup</p>
+                  <h2>{t('groupdetail.modal_title')}</h2>
+                  <p>{totalMembers} {t('groupdetail.modal_members')}</p>
                 </div>
                 <button onClick={() => setIsModalOpen(false)} className="gd-close-btn">
                   <X className="icon" />
@@ -440,7 +441,7 @@ function GroupDetail() {
                       <h4 className={member.isReal ? 'real' : 'placeholder'}>
                         {member.name}
                       </h4>
-                      <span>MEMBRU {member.id}</span>
+                      <span>{t('groupdetail.modal_member_label')} {member.id}</span>
                     </div>
                   </div>
                 ))}
@@ -449,7 +450,7 @@ function GroupDetail() {
                   <div className="gd-modal-invite-icon">
                     <span>+</span>
                   </div>
-                  <span className="gd-modal-invite-text">Invită un prieten nou</span>
+                  <span className="gd-modal-invite-text">{t('groupdetail.invite_new')}</span>
                 </button>
               </div>
             </motion.div>

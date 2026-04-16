@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from '../../hooks/useTranslation'
 import './ModeSelection.css'
 
 /**
@@ -20,6 +21,8 @@ const ArrowIcon = ({ stroke = 'var(--color-primary)' }) => (
 )
 
 function ModeSelection() {
+  const { t } = useTranslation()
+
   return (
     <div className="mode-selection">
       
@@ -28,14 +31,14 @@ function ModeSelection() {
         <header className="mode-selection__header" style={{ textAlign: "center", marginBottom: 40 }}>
           <p className="mode-selection__eyebrow" style={{
               color: 'var(--color-primary-dark)', fontWeight: 700, letterSpacing: 1, fontSize: 18, marginBottom: 8
-            }}>👋 Bun venit!</p>
+            }}>{t('mode.welcome')}</p>
           
           <h1 className="mode-selection__title">
-            Ce tip de explorator <span>ești?</span>
+            {t('mode.title1')}<span>{t('mode.title2')}</span>
           </h1>
           
           <p className="mode-selection__subtitle">
-            Alege o experiență socială sau una pentru aventurierii solitari. Schimbi oricând!
+            {t('mode.subtitle')}
           </p>
         </header>
 
@@ -60,20 +63,20 @@ function ModeSelection() {
             <span className="mode-selection__card-tag" style={{
                 background: 'var(--color-primary)', color: "white", borderRadius: "1em",
                 fontWeight: 600, padding: "4px 16px", fontSize: "0.85rem", marginBottom: 12
-              }}>Social</span>
+              }}>{t('mode.groups.tag')}</span>
             
             <h2 style={{ fontSize: 26, margin: "4px 0 11px", fontWeight: 700, color: 'var(--text-primary)' }}>
-              Grupuri
+              {t('mode.groups.title')}
             </h2>
             <p style={{ color: 'var(--text-secondary)', minHeight: 54, fontSize: '0.95rem' }}>
-              Organizează ieșiri cu prietenii, planifică activități și rămâi conectat cu toată gașca!
+              {t('mode.groups.desc')}
             </p>
             
             <div className="mode-selection__arrow" style={{
                 display: "flex", alignItems: "center", gap: 7, marginTop: 22,
                 fontWeight: 600, color: 'var(--color-primary-dark)', fontSize: 16
               }}>
-              Explorează <ArrowIcon stroke="var(--color-primary-dark)" />
+              {t('mode.groups.btn')} <ArrowIcon stroke="var(--color-primary-dark)" />
             </div>
           </Link>
 
@@ -92,20 +95,20 @@ function ModeSelection() {
             <span className="mode-selection__card-tag" style={{
                 background: 'var(--color-accent)', color: 'var(--text-primary)', borderRadius: "1em",
                 fontWeight: 600, padding: "4px 16px", fontSize: "0.85rem", marginBottom: 12
-              }}>Aventură</span>
+              }}>{t('mode.solo.tag')}</span>
             
             <h2 style={{ fontSize: 26, margin: "4px 0 11px", fontWeight: 700, color: 'var(--text-primary)' }}>
-              Solo Discovering
+              {t('mode.solo.title')}
             </h2>
             <p style={{ color: 'var(--text-secondary)', minHeight: 54, fontSize: '0.95rem' }}>
-              Descoperă locuri, oameni și experiențe noi în propriul ritm, ca un explorator urban.
+              {t('mode.solo.desc')}
             </p>
             
             <div className="mode-selection__arrow" style={{
                 display: "flex", alignItems: "center", gap: 7, marginTop: 22,
                 fontWeight: 600, color: 'var(--color-accent-dark, var(--color-accent))', fontSize: 16
               }}>
-              Descoperă <ArrowIcon stroke="var(--color-accent-dark, var(--color-accent))" />
+              {t('mode.solo.btn')} <ArrowIcon stroke="var(--color-accent-dark, var(--color-accent))" />
             </div>
           </Link>
 
@@ -115,7 +118,7 @@ function ModeSelection() {
           textAlign: "center", margin: "26px 0 0", fontSize: 15,
           color: 'var(--text-muted)', fontWeight: 500
         }}>
-          Poți schimba modul oricând din meniu!
+          {t('mode.footer')}
         </div>
       </div>
     </div>

@@ -1,27 +1,16 @@
 import { Users, Heart, Sparkles, Zap } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
+import { useTranslation } from '../../hooks/useTranslation';
+
 import "./Landing.css";
 import heroImage from "./poza.png";
 
 // ==========================================
 // COMPONENTA: Hero
 // ==========================================
-function Hero({ language }) {
-    const translations = {
-        RO: {
-            title1: 'COMUNITATEA TA,',
-            title2: 'AMPLIFICATĂ',
-            description: 'Descoperă un loc unde conexiunile prosperă, ideile înfloresc și prieteniile se dezvoltă. Alătură-te nouă în construirea a ceva extraordinar împreună.'
-        },
-        EN: {
-            title1: 'YOUR COMMUNITY,',
-            title2: 'AMPLIFIED',
-            description: 'Discover a place where connections thrive, ideas flourish, and friendships bloom. Join us in building something extraordinary together.'
-        }
-    };
-
-    const t = translations[language] || translations['RO'];
+function Hero() {
+    const { t } = useTranslation();
 
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -33,13 +22,13 @@ function Hero({ language }) {
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
                 <div className="space-y-8">
                     <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[var(--text-primary)] leading-tight">
-                        {t.title1}
+                        {t('landing.hero.title1')}
                         <br />
-                        <span className="text-[var(--color-primary)]">{t.title2}</span>
+                        <span className="text-[var(--color-primary)]">{t('landing.hero.title2')}</span>
                     </h1>
 
                     <p className="text-lg sm:text-xl md:text-2xl text-[var(--text-primary)] opacity-80 max-w-3xl mx-auto">
-                        {t.description}
+                        {t('landing.hero.desc')}
                     </p>
                 </div>
             </div>
@@ -56,78 +45,46 @@ function Hero({ language }) {
 // ==========================================
 // COMPONENTA: Features
 // ==========================================
-function Features({ language }) {
-    const translations = {
-        RO: {
-            title: 'De ce să alegi',
-            subtitle: 'Tot ce ai nevoie pentru a construi și dezvolta comunitatea ta într-o singură platformă puternică',
-            features: [
-                {
-                    icon: Users,
-                    title: 'Conectează-te & Implică-te',
-                    description: 'Construiește relații semnificative cu persoane cu aceleași interese din întreaga lume.',
-                },
-                {
-                    icon: Heart,
-                    title: 'Împărtășește Pasiunea Ta',
-                    description: 'Exprimă-te liber și împărtășește ceea ce contează cel mai mult pentru tine cu comunitatea ta.',
-                },
-                {
-                    icon: Sparkles,
-                    title: 'Descoperă Conținut',
-                    description: 'Explorează conținut selectat adaptat intereselor tale și descoperă noi perspective.',
-                },
-                {
-                    icon: Zap,
-                    title: 'Actualizări în Timp Real',
-                    description: 'Rămâi conectat cu notificări instant și conversații în timp real.',
-                },
-            ]
-        },
-        EN: {
-            title: 'Why Choose',
-            subtitle: 'Everything you need to build and nurture your community in one powerful platform',
-            features: [
-                {
-                    icon: Users,
-                    title: 'Connect & Engage',
-                    description: 'Build meaningful relationships with like-minded individuals from around the world.',
-                },
-                {
-                    icon: Heart,
-                    title: 'Share Your Passion',
-                    description: 'Express yourself freely and share what matters most to you with your community.',
-                },
-                {
-                    icon: Sparkles,
-                    title: 'Discover Content',
-                    description: 'Explore curated content tailored to your interests and discover new perspectives.',
-                },
-                {
-                    icon: Zap,
-                    title: 'Real-time Updates',
-                    description: 'Stay connected with instant notifications and real-time conversations.',
-                },
-            ]
-        }
-    };
+function Features() {
+    const { t } = useTranslation();
 
-    const t = translations[language] || translations['RO'];
+    const features = [
+        {
+            icon: Users,
+            title: t('landing.feature1.title'),
+            description: t('landing.feature1.desc'),
+        },
+        {
+            icon: Heart,
+            title: t('landing.feature2.title'),
+            description: t('landing.feature2.desc'),
+        },
+        {
+            icon: Sparkles,
+            title: t('landing.feature3.title'),
+            description: t('landing.feature3.desc'),
+        },
+        {
+            icon: Zap,
+            title: t('landing.feature4.title'),
+            description: t('landing.feature4.desc'),
+        },
+    ];
 
     return (
         <section className="py-20 bg-[var(--bg-card)]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4">
-                        {t.title} <span className="text-[var(--color-primary)]">Socially</span>
+                        {t('landing.features.title')} <span className="text-[var(--color-primary)]">Socially</span>
                     </h2>
                     <p className="text-lg text-[var(--text-muted)] max-w-2xl mx-auto">
-                        {t.subtitle}
+                        {t('landing.features.subtitle')}
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {t.features.map((feature, index) => {
+                    {features.map((feature, index) => {
                         const Icon = feature.icon;
                         return (
                             <div
@@ -151,40 +108,25 @@ function Features({ language }) {
 // ==========================================
 // COMPONENTA: CTA (Call to Action)
 // ==========================================
-function CTA({ language }) {
-    const translations = {
-        RO: {
-            title: 'Gata să te Alături Comunității Noastre?',
-            description: 'Fii parte din ceva mai mare. Conectează-te cu mii de membri care împărtășesc interesele și pasiunile tale.',
-            button: 'Înregistrează-te Acum',
-            disclaimer: 'Nu este necesar card de credit • Gratuit pentru totdeauna • Anulare oricând'
-        },
-        EN: {
-            title: 'Ready to Join Our Community?',
-            description: 'Be part of something bigger. Connect with thousands of members who share your interests and passions.',
-            button: 'Sign Up Now',
-            disclaimer: 'No credit card required • Free forever • Cancel anytime'
-        }
-    };
-
-    const t = translations[language] || translations['RO'];
+function CTA() {
+    const { t } = useTranslation();
 
     return (
         <section className="py-20 bg-gradient-to-br from-[var(--color-primary-subtle)] via-[var(--bg-primary)] to-[var(--color-primary-subtle)]">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-6">
-                    {t.title}
+                    {t('landing.cta.title')}
                 </h2>
                 <p className="text-lg sm:text-xl text-[var(--text-muted)] mb-10 max-w-2xl mx-auto">
-                    {t.description}
+                    {t('landing.cta.desc')}
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <button className="w-full sm:w-auto px-10 py-4 rounded-full bg-[var(--color-primary)] text-[var(--text-inverse)] text-lg hover:opacity-90 transition-opacity shadow-lg hover:shadow-xl">
-                        {t.button}
+                        {t('landing.cta.btn')}
                     </button>
                 </div>
                 <p className="mt-8 text-sm text-[var(--text-muted)]">
-                    {t.disclaimer}
+                    {t('landing.cta.disclaimer')}
                 </p>
             </div>
         </section>
@@ -195,14 +137,12 @@ function CTA({ language }) {
 // COMPONENTA PRINCIPALĂ
 // ==========================================
 export default function Landing() {
-    const { lang } = useApp();
-
     return (
         <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-250">
             <main>
-                <Hero language={lang} />
-                <Features language={lang} />
-                <CTA language={lang} />
+                <Hero />
+                <Features />
+                <CTA />
             </main>
         </div>
     );

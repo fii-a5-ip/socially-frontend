@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-/* eslint-disable-next-line no-unused-vars */
 import { motion, AnimatePresence } from 'motion/react';
 import { Users, Info, Settings2, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useForm } from '../../hooks/useForm';
 import { validateRequired } from '../../utils/validation';
+import { useTranslation } from '../../hooks/useTranslation';
 
 import { Step1Details } from './components/Step1Details';
 import { Step2Members } from './components/Step2Members';
@@ -22,6 +22,7 @@ const validationRules = {
 };
 
 function CreateGroup() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [creationSuccess, setCreationSuccess] = useState(false);
@@ -65,25 +66,25 @@ function CreateGroup() {
         
         {/* Header simplu */}
         <div className="cg-header">
-          <h1 className="cg-page-title">Creează Grup</h1>
-          <p className="cg-page-subtitle">Configurează un spațiu nou pentru tine și prietenii tăi.</p>
+          <h1 className="cg-page-title">{t('creategroup.title')}</h1>
+          <p className="cg-page-subtitle">{t('creategroup.subtitle')}</p>
         </div>
 
         {/* Stepper Visualizer */}
         <div className="cg-stepper">
           <div className={`cg-step ${step >= 1 ? 'active' : ''}`}>
             <div className="cg-step-icon"><Settings2 size={18} /></div>
-            <span>Detalii</span>
+            <span>{t('creategroup.step_details')}</span>
           </div>
           <div className={`cg-stepper-line ${step >= 2 ? 'active' : ''}`}></div>
           <div className={`cg-step ${step >= 2 ? 'active' : ''}`}>
             <div className="cg-step-icon"><Users size={18} /></div>
-            <span>Membri</span>
+            <span>{t('creategroup.step_members')}</span>
           </div>
           <div className={`cg-stepper-line ${creationSuccess ? 'active' : ''}`}></div>
           <div className={`cg-step ${creationSuccess ? 'active' : ''}`}>
             <div className="cg-step-icon"><CheckCircle size={18} /></div>
-            <span>Complet</span>
+            <span>{t('creategroup.step_complete')}</span>
           </div>
         </div>
 
@@ -119,8 +120,8 @@ function CreateGroup() {
                 <div className="cg-success-icon-wrap">
                   <CheckCircle className="cg-success-icon" size={64} />
                 </div>
-                <h2>Grup Creat cu Succes!</h2>
-                <p>Noul tău grup este pregătit. Redirecționare...</p>
+                <h2>{t('creategroup.success_title')}</h2>
+                <p>{t('creategroup.success_desc')}</p>
                 <div className="cg-loader"></div>
               </motion.div>
             )}
@@ -131,7 +132,7 @@ function CreateGroup() {
             <div className="cg-controls">
               {step === 2 ? (
                 <button type="button" onClick={handlePrevStep} className="cg-btn cg-btn-secondary">
-                  <ArrowLeft size={18} /> Înapoi
+                  <ArrowLeft size={18} /> {t('creategroup.btn_back')}
                 </button>
               ) : (
                 <div></div> // vizual gol
@@ -139,11 +140,11 @@ function CreateGroup() {
               
               {step === 1 ? (
                 <button type="button" onClick={handleNextStep} className="cg-btn cg-btn-primary">
-                  Continuă <ArrowRight size={18} />
+                  {t('creategroup.btn_next')} <ArrowRight size={18} />
                 </button>
               ) : (
                 <button type="button" onClick={submitFinalGroup} className="cg-btn cg-btn-primary success-btn">
-                  Finalizează Grup <CheckCircle size={18} />
+                  {t('creategroup.btn_finish')} <CheckCircle size={18} />
                 </button>
               )}
             </div>
