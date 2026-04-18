@@ -12,7 +12,8 @@ import {
   Activity as ActivityIcon,
   Users
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from "../../hooks/useTranslation";
 import "./GroupDetail.css";
 

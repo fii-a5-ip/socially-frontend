@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import flagRO from '../../assets/flag-ro.png'
@@ -90,7 +90,6 @@ function NavBtn({ to, icon }) {
 function Navbar() {
   const { theme, toggleTheme, lang, setLang } = useApp()
   const { t } = useTranslation()
-  const navigate = useNavigate()
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)

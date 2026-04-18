@@ -1,5 +1,5 @@
 import { Users, Heart, Sparkles, Zap } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { Link } from 'react-router-dom';
 
 import { useTranslation } from '../../hooks/useTranslation';
 
