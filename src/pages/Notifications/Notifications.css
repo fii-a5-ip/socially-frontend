@@ -108,6 +108,7 @@
   font-weight: 500;
   color: var(--text-primary);
   line-height: 1.5;
+  gap: var(--space-md);
 }
 
 .notification_time {
@@ -154,3 +155,45 @@
     text-align: center;
   }
 }
+
+/*___ Cerc pentru pfp ___*/
+.notification_avatar {
+  width: 62px;
+  height: 62px; 
+  min-width: 62px; /*trebuie si asta aparent fiindca flex e un dezastru*/
+  border-radius: 50%; /* transforma patrat in cerc*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /*temporar*/
+  font-size:9px;
+
+}
+
+.notification--user .notification_avatar {
+  border: 3px solid var(--border-color);
+  overflow: hidden; /* ca sa fiu sigur*/
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.25);
+}
+
+.notification--system .notification_avatar {
+  font-size: 55px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);}
+
+/*___ Username + timestamp placement ___*/
+.notification_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-xs);
+}
+
+.notification_username {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-primary-dark); /* ce fel de "dark" este asta? lol*/
+}
+
+  .notification--system .notification_username
+  { color: var(--color-info);}

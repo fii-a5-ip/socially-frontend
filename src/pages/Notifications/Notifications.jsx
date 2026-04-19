@@ -66,8 +66,8 @@ function Notifications() {
     }
   ]);
 
-  // 🔹 NEW STATE
   const [showArchived, setShowArchived] = useState(false);
+  const [showUnarchived, setUnarchived] = useState(true);
 
   const handleAccept = (id) => {
     setNotifications(prev =>
@@ -94,18 +94,27 @@ function Notifications() {
 
           <div className="notifications_list">
             {filtered.map(notif => (
-              <div
-                key={notif.id}
-                className={`card notification 
+              <div     key={notif.id}      className={` card notification 
                   ${notif.isRead ? '' : 'notification-unread'} 
-                  ${notif.type == 'user' ? 'notification--user' : 'notification--system'} 
-                `}
-              >
-                <div className="notification_content">
-                  <p className="notification_text">{notif.text}</p>
-                  <span className="notification_time">{notif.time}</span>
+                  ${notif.type == 'user' ? 'notification--user' : 'notification--system'}  `} >
+
+                
+                <div className="notification_avatar">
+                  { notif.type === 'system' ? ( <span> ⚙️ </span>) : ( <div className="notification_avatar"> </div>)/* <img src= {notif.avatar}/> */  }
                 </div>
 
+                <div className="notification_content">
+                    <div className="notification_top">
+                      <class className="notification_username">                  
+                      { notif.type === 'system' ? "[system notif type]"  :   "[username]"/* <img src= {notif.avatar}/> */    } 
+                  </class>
+                    <span className="notification_time">{notif.time} </span>
+                  </div>
+                  <p className="notification_text">{notif.text}</p>
+                 
+                </div>
+
+                {/* BUTON ACCEPT/DECLINE */}
                 {(notif.hasActions && notif.isRead == false) && (
                   <div className="notification_actions">
                     <button
@@ -137,13 +146,19 @@ function Notifications() {
           <p className="notifications_empty">
             {t('notifications.empty')}
           </p>
-        ) : (
+        ) : ( 
           <>
-            <h2 className="notifications_section-title">{t('notifications.new')}</h2>
+            <h2 className="notifications_section-title notifications_section_electricboogaloo">{t('notifications.new')}
+          <button className="btn btn--secondary toggle" onClick={() => setUnarchived(prev => !prev)}>
+          {showArchived ? t('notifications.toggle_hide') : t('notifications.toggle_show')}
+          </button>
+            </h2>
+            {showUnarchived && ( 
+           <>
             {renderNotifications(newNotifications, 'user')}
             {renderNotifications(newNotifications, 'system')}
-          </>
-        )}
+           </> ) }
+       </> )  }
       </section>
 
       <section className="notifications_section">
@@ -158,7 +173,7 @@ function Notifications() {
             {renderNotifications(archivedNotifications, 'user')}
             {renderNotifications(archivedNotifications, 'system')}
           </>
-        )}
+        )  }
       </section>
     </div>
   );
