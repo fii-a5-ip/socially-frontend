@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import './SoloDiscovering.css';
 
@@ -171,9 +172,44 @@ function FavoritesScreen({ likedPlaces, onRemove, onOpenDetails }) {
 }
 
 // ==========================================
+// 3.5. Componenta: MyEventsScreen
+// ==========================================
+function MyEventsScreen({ events, onOpenDetails }) {
+  const { t } = useTranslation();
+  if (!events || events.length === 0) {
+    return (
+      <div className="sd-no-more fade-in">
+        <span className="sd-no-more-icon">📝</span>
+        <h3>{t('solo.my_events_empty_title')}</h3>
+        <p>{t('solo.my_events_empty_desc')}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="sd-favorites-grid fade-in">
+      {events.map(place => (
+        <div
+          key={place.id}
+          className="sd-fav-card"
+          onClick={() => onOpenDetails(place)}
+        >
+          <img src={place.image} alt={place.title} className="sd-fav-image" />
+          <div className="sd-fav-info">
+            <h4 className="sd-fav-title">{place.title}</h4>
+            <span className="sd-fav-category">{place.schedule}</span>
+            <span className="sd-fav-category" style={{marginTop: '4px', fontStyle: 'italic', color: 'var(--color-primary)'}}>{t('solo.organized_by_you')}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ==========================================
 // 4. Componenta: PlaceDetails (Pagina Extinsă)
 // ==========================================
-function PlaceDetails({ place, onClose }) {
+function PlaceDetails({ place, onClose, onCancel }) {
   const { t } = useTranslation();
   if (!place) return null;
 
@@ -187,7 +223,7 @@ function PlaceDetails({ place, onClose }) {
       {/* Imagine de sus tip Header și Buton Back */}
       <div className="sd-pd-header" style={{ backgroundImage: `url(${place.image})` }}>
         <button className="sd-pd-back-btn" onClick={onClose} aria-label="Înapoi">
-          &lt;
+          ✕
         </button>
         <div className="sd-pd-header-overlay"></div>
       </div>
@@ -196,14 +232,14 @@ function PlaceDetails({ place, onClose }) {
       <div className="sd-pd-content">
         <h1 className="sd-pd-title">{place.title}</h1>
         <div className="sd-pd-top-meta">
-          <span className="sd-pd-meta-item">⭐ {place.rating}</span>
-          <span className="sd-pd-meta-item">🚶 {place.distance}</span>
-          <span className="sd-pd-meta-item tag">{place.category}</span>
+          {place.rating && <span className="sd-pd-meta-badge rating">⭐ {place.rating}</span>}
+          {place.distance && <span className="sd-pd-meta-badge distance">🚶 {place.distance}</span>}
+          {place.category && <span className="sd-pd-meta-badge category">{place.category}</span>}
         </div>
 
-        <div className="sd-pd-info-block">
+        <div className="sd-pd-info-clean">
           <div className="sd-pd-info-row">
-            <span className="icon">📅</span>
+            <div className="icon">📅</div>
             <div>
               <strong>{t('solo.schedule')}</strong>
               <p>{place.schedule}</p>
@@ -211,15 +247,13 @@ function PlaceDetails({ place, onClose }) {
           </div>
 
           <div className="sd-pd-info-row sd-clickable-address" onClick={handleOpenMaps}>
-            <span className="icon" style={{ color: 'var(--color-primary)' }}>📍</span>
+            <div className="icon">📍</div>
             <div>
               <strong>{t('solo.address')}</strong>
               <p className="sd-address-link">{place.address}</p>
             </div>
           </div>
         </div>
-
-        <hr className="sd-pd-divider" />
 
         <div className="sd-pd-description">
           {place.longDescription}
@@ -229,9 +263,20 @@ function PlaceDetails({ place, onClose }) {
 
       {/* Footer Fixed Action */}
       <div className="sd-pd-footer-action">
-        <button className="btn btn--primary btn--full sd-pd-reserve-btn" onClick={() => alert('Acțiune Rezervare Placeholder')}>
-          {t('solo.reserve')}
-        </button>
+        {place.isMine ? (
+          <div className="sd-pd-action-group">
+            <Link to={`/discover/edit/${place.id}`} className="btn btn--primary sd-pd-edit-btn">
+              {t('solo.edit_event')}
+            </Link>
+            <button className="btn btn--secondary sd-pd-cancel-btn" onClick={() => onCancel(place.id)}>
+              {t('solo.cancel_event')} ✕
+            </button>
+          </div>
+        ) : (
+          <button className="btn btn--primary btn--full sd-pd-reserve-btn" onClick={() => alert('Acțiune Rezervare Placeholder')}>
+            {t('solo.reserve')}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -254,6 +299,11 @@ function SoloDiscovering() {
 
   const [dislikedIds, setDislikedIds] = useState(() => {
     const saved = localStorage.getItem('socially_dislikedIds');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [myEvents, setMyEvents] = useState(() => {
+    const saved = localStorage.getItem('socially_myEvents');
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -313,9 +363,20 @@ function SoloDiscovering() {
     setSelectedPlace(null);
   };
 
+  const removeFromMyEvents = (id) => {
+    setMyEvents(prev => {
+      const updated = prev.filter(place => place.id !== id);
+      localStorage.setItem('socially_myEvents', JSON.stringify(updated));
+      return updated;
+    });
+    if (selectedPlace && selectedPlace.id === id) {
+      closePlaceDetails();
+    }
+  };
+
   // Randare Modal de Detalii pe tot Spațiul (Z-Index sau overlay fix peste flux)
   if (selectedPlace) {
-    return <PlaceDetails place={selectedPlace} onClose={closePlaceDetails} />;
+    return <PlaceDetails place={selectedPlace} onClose={closePlaceDetails} onCancel={removeFromMyEvents} />;
   }
 
   return (
@@ -323,40 +384,60 @@ function SoloDiscovering() {
 
       {/* Header General */}
       <header className="sd-header">
-        <h1 className="sd-title">{t('solo.title')}</h1>
-        <div className="sd-toggle">
-          <button
-            className={`sd-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-            onClick={() => setViewMode('list')}
-          >
-            {t('solo.explore')}
-          </button>
-          <button
-            className={`sd-toggle-btn ${viewMode === 'saved' ? 'active' : ''}`}
-            onClick={() => setViewMode('saved')}
-          >
-            {t('solo.saved')} {likedPlaces.length > 0 && `(${likedPlaces.length})`}
-          </button>
+        <div className="sd-header-top">
+          <h1 className="sd-title">{t('solo.title')}</h1>
+          <Link to="/discover/create" className="sd-create-btn-small">
+            {t('solo.add_event')}
+          </Link>
+        </div>
+        <div className="sd-controls-row">
+          <div className="sd-toggle">
+            <button
+              className={`sd-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+            >
+              {t('solo.explore')}
+            </button>
+            <button
+              className={`sd-toggle-btn ${viewMode === 'saved' ? 'active' : ''}`}
+              onClick={() => setViewMode('saved')}
+            >
+              {t('solo.saved')} {likedPlaces.length > 0 && `(${likedPlaces.length})`}
+            </button>
+            <button
+              className={`sd-toggle-btn ${viewMode === 'mine' ? 'active' : ''}`}
+              onClick={() => setViewMode('mine')}
+            >
+              {t('solo.my_events')} {myEvents.length > 0 && `(${myEvents.length})`}
+            </button>
+          </div>
+
+          {/* Bara Filtrare Categorie */}
+          {viewMode === 'list' && (
+            <div className="sd-filters fade-in">
+              {CATEGORIES.map(category => (
+                <button
+                  key={category}
+                  className={`sd-filter-btn ${activeCategory === category ? 'active' : ''}`}
+                  onClick={() => setActiveCategory(category)}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </header>
 
-      {/* Bara Filtrare Categorie */}
-      {viewMode === 'list' && (
-        <div className="sd-filters fade-in">
-          {CATEGORIES.map(category => (
-            <button
-              key={category}
-              className={`sd-filter-btn ${activeCategory === category ? 'active' : ''}`}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* Switcher Vederi */}
       <div className="sd-content">
+        {viewMode === 'mine' && (
+          <MyEventsScreen
+            events={myEvents}
+            onOpenDetails={openPlaceDetails}
+          />
+        )}
+
         {viewMode === 'saved' && (
           <FavoritesScreen
             likedPlaces={likedPlaces}
