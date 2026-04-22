@@ -75,7 +75,7 @@ function Notifications() {
         notif.id == id ? { ...notif, isRead: true } : notif
       )
     );
-  };
+  };//
 
   const newNotifications = notifications.filter(notif => !notif.isRead);
   const archivedNotifications = notifications.filter(notif => notif.isRead);
@@ -100,7 +100,7 @@ function Notifications() {
 
                 
                 <div className="notification_avatar">
-                  { notif.type === 'system' ? ( <span> ⚙️ </span>) : ( <div className="notification_avatar"> </div>)/* <img src= {notif.avatar}/> */  }
+                  { notif.type === 'system' ? ( <span> ⚙️ </span>) : ( <span> 👤 </span>) /* (<img src= "https://tse2.mm.bing.net/th/id/OIP.ivROJMldRz-4M_M5rOWKgAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3/"> ) */  }
                 </div>
 
                 <div className="notification_content">
@@ -150,7 +150,7 @@ function Notifications() {
           <>
             <h2 className="notifications_section-title notifications_section_electricboogaloo">{t('notifications.new')}
           <button className="btn btn--secondary toggle" onClick={() => setUnarchived(prev => !prev)}>
-          {showArchived ? t('notifications.toggle_hide') : t('notifications.toggle_show')}
+          {showUnarchived ? t('notifications.toggle_hide') : t('notifications.toggle_show')}
           </button>
             </h2>
             {showUnarchived && ( 
