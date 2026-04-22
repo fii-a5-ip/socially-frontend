@@ -34,9 +34,9 @@ function Notifications() {
     },
     {
       id: 2,
-      type: 'system',
+      type: 'user',
       isRead: false,
-      text: 'Try 30 days of FREE premium Socially',
+      text: "Try 30 days of FREE premium Socially!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Socially!!!!! !!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!! Socially!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Socially!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Socially!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
       time: 'acum 10 minute',
       hasActions: false,
     },
@@ -107,14 +107,9 @@ function Notifications() {
                     <div className="notification_top">
                       <class className="notification_username">                  
                       { notif.type === 'system' ? "[system notif type]"  :   "[username]"/* <img src= {notif.avatar}/> */    } 
-                  </class>
-                    <span className="notification_time">{notif.time} </span>
-                  </div>
-                  <p className="notification_text">{notif.text}</p>
-                 
-                </div>
-
-                {/* BUTON ACCEPT/DECLINE */}
+                      <span className="notification_time"> {notif.time} </span>
+                      </class>
+                                      {/* BUTON ACCEPT/DECLINE */}
                 {(notif.hasActions && notif.isRead == false) && (
                   <div className="notification_actions">
                     <button
@@ -128,6 +123,12 @@ function Notifications() {
                     </button>
                   </div>
                 )}
+                  </div>
+                  <p className="notification_text">{notif.text}</p>
+                 
+                </div>
+
+
               </div>
             ))}
           </div>
