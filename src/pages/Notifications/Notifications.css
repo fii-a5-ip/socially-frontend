@@ -158,28 +158,36 @@
 
 /*___ Cerc pentru pfp ___*/
 .notification_avatar {
-  width: 62px;
-  height: 62px; 
-  min-width: 62px; /*trebuie si asta aparent fiindca flex e un dezastru*/
-  border-radius: 50%; /* transforma patrat in cerc*/
+  width: 70px;
+  height: 70px; 
+  min-width: 70px; /*trebuie si asta aparent fiindca flex e un dezastru*/
+  /*border-radius: 50%; /* transforma patrat in cerc*/
   display: flex;
   align-items: center;
   justify-content: center;
 
-  /*temporar*/
+  /*temporar* dadaddasdadas*/
   font-size:9px;
 
 }
 
 .notification--user .notification_avatar {
-  border: 3px solid var(--border-color);
+  border: 4px solid var(--border-color);
+  border-radius: 12px; /*patrat cu rounded corners */
   overflow: hidden; /* ca sa fiu sigur*/
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.25);
+
+  font-size: 50px;
+  padding-top: 4px; /*11px pentru ca emoji-ul sa se lipeasca de fundul casutei sale */
 }
+
+/*nu am testat foarte tare*/
+
 
 .notification--system .notification_avatar {
   font-size: 55px;
   text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);}
+
 
 /*___ Username + timestamp placement ___*/
 .notification_top {
