@@ -53,11 +53,38 @@ function CreateGroup() {
   };
 
   const submitFinalGroup = async () => {
-    setCreationSuccess(true);
-    // Simuleaza redirectionarea catre noul grup dupa putin timp
-    setTimeout(() => {
-      navigate('/groups/1');
-    }, 2500);
+    try {
+      const payload = {
+        name: values.name,
+        description: values.description,
+        imgLink: values.imageUrl, // Trimitem imaginea Base64
+        creatorUserId: 1, // HARDCODED: Trebuie înlocuit cu ID-ul user-ului logat când adăugați Auth
+        memberIds: values.members || []
+      };
+
+      const response = await fetch('http://localhost:8080/api/groups', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Eroare la crearea grupului');
+      }
+
+      const createdGroup = await response.json();
+      setCreationSuccess(true);
+      
+      setTimeout(() => {
+        navigate(`/groups/${createdGroup.id}`);
+      }, 2500);
+
+    } catch (error) {
+      console.error(error);
+      alert('A apărut o eroare la salvarea grupului.');
+    }
   };
 
   return (
