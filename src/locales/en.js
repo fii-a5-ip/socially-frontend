@@ -176,6 +176,12 @@ export const en = {
   'creategroup.btn_back': 'Back',
   'creategroup.btn_next': 'Continue',
   'creategroup.btn_finish': 'Finish Group',
+  'creategroup.invite_friends': 'Invite your friends',
+  'creategroup.selected': 'selected',
+  'creategroup.search_placeholder': 'Search by name, @username, or email...',
+  'creategroup.searching': 'Searching...',
+  'creategroup.search_empty': 'Search for friends to add to the group',
+  'creategroup.no_results': 'No results found for',
 
   // Solo Discovering
   'solo.title': 'Discover',

@@ -22,7 +22,7 @@ const PUBLIC_ROUTES = ['/', '/login', '/register', '/onboarding', '/about']
 
 function App() {
   const location = useLocation()
-  const isPublic = PUBLIC_ROUTES.includes(location.pathname)
+
   const { isLoggedIn } = useApp()
 
   useEffect(() => {
