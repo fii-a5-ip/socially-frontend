@@ -1,10 +1,12 @@
 import { useRef } from 'react'
 import { useForm } from '../../../hooks/useForm'
+import { useTranslation } from '../../../hooks/useTranslation'
 import { validateRequired, validateEmail } from '../../../utils/validation'
 import FormInput from '../../../components/FormInput/FormInput'
 
 function ProfileEditForm({ initialData, onSave, onCancel }) {
   const fileInputRef = useRef(null)
+  const { t } = useTranslation()
 
   const { values, errors, touched, handleChange, handleBlur, handleSubmit, setValues } = useForm(
     initialData,
@@ -37,7 +39,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
 
   return (
     <div className="profile-edit-form">
-      <h2 className="section-title">Editează Profil</h2>
+      <h2 className="section-title">{t('profile.edit.title')}</h2>
 
       <div className="avatar-box">
         <div className="avatar-display" style={{ overflow: 'hidden' }}>
@@ -47,7 +49,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
             '👤'
           )}
         </div>
-        <button type="button" className="btn-upload" onClick={handleUploadClick}>Schimbă Poza</button>
+        <button type="button" className="btn-upload" onClick={handleUploadClick}>{t('profile.edit.change_photo')}</button>
         <input
           type="file"
           ref={fileInputRef}
@@ -59,7 +61,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
 
       <form onSubmit={handleSubmit}>
         <FormInput
-          label="Nume Complet"
+          label={t('profile.edit.fullname')}
           name="nume"
           value={values.nume}
           error={errors.nume}
@@ -69,7 +71,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
         />
 
         <FormInput
-          label="Email"
+          label={t('profile.edit.email')}
           name="email"
           value={values.email}
           error={errors.email}
@@ -80,7 +82,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
 
         <div className="form-group" style={{ marginBottom: '15px' }}>
           <label className="input-label">
-            Bio (max 50 caractere)
+            {t('profile.edit.bio_label')}
           </label>
           <div className="bio-container">
             <textarea
@@ -90,7 +92,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
               onChange={handleChange}
               onKeyDown={handleBioKeyDown}
               maxLength="50"
-              placeholder="Spune-ne ceva despre tine..."
+              placeholder={t('profile.edit.bio_placeholder')}
             />
             <span className="bio-counter">{values.bio.length}/50</span>
           </div>
@@ -98,7 +100,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
 
         <div className="form-group">
           <label className="input-label">
-            Buget Per Ieșire: <span style={{ fontWeight: 'bold' }}>{values.buget === '1000' ? 'Fără limită' : values.buget + ' RON'}</span>
+            {t('profile.edit.budget_label')} <span style={{ fontWeight: 'bold' }}>{values.buget === '1000' ? t('profile.edit.budget_nolimit') : values.buget + ' RON'}</span>
           </label>
           <input
             type="range"
@@ -119,8 +121,8 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
         </div>
 
         <div className="form-actions">
-          <button type="submit" className="btn-save">Salvează Modificările</button>
-          <button type="button" className="btn-cancel" onClick={onCancel}>Anulează</button>
+          <button type="submit" className="btn-save">{t('profile.edit.save')}</button>
+          <button type="button" className="btn-cancel" onClick={onCancel}>{t('profile.edit.cancel')}</button>
         </div>
       </form>
     </div>
