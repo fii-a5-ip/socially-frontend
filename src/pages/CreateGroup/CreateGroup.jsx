@@ -11,6 +11,8 @@ import { Step1Details } from './components/Step1Details';
 import { Step2Members } from './components/Step2Members';
 import './CreateGroup.css';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const initialValues = {
   name: '',
   description: '',
@@ -63,7 +65,7 @@ function CreateGroup() {
         memberIds: values.members || []
       };
 
-      const response = await fetch('http://localhost:8080/api/groups', {
+      const response = await fetch(`${API_URL}/api/groups`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

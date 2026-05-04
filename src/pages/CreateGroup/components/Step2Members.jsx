@@ -4,6 +4,8 @@ import { motion } from 'motion/react';
 import { Search, CheckCircle2, UserPlus, Loader2, XCircle } from 'lucide-react';
 import { useTranslation } from '../../../hooks/useTranslation';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 export function Step2Members({ setValues }) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,7 +22,7 @@ export function Step2Members({ setValues }) {
       }
       setIsLoading(true);
       try {
-        const response = await fetch(`http://localhost:8080/api/users/search?query=${encodeURIComponent(searchTerm)}`);
+        const response = await fetch(`${API_URL}/api/users/search?query=${encodeURIComponent(searchTerm)}`);
         if (response.ok) {
           const data = await response.json();
           setFriendsList(data);

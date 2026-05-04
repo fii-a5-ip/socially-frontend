@@ -44,6 +44,19 @@ Mergi în browser la adresa indicată (de obicei **[http://localhost:5173/](http
 
 ---
 
+## 🔐 Variabile de Mediu (.env)
+
+Pentru ca Frontend-ul să poată comunica cu Backend-ul, trebuie să configurezi URL-ul API-ului:
+
+1.  Creează un fișier numit **`.env`** în rădăcina proiectului (copiază conținutul din `.env.example`).
+2.  Adaugă următoarea linie pentru dezvoltarea locală:
+    ```env
+    VITE_API_URL=http://localhost:8080
+    ```
+3.  **NOTĂ:** În producție (Vercel), această variabilă se setează din dashboard-ul platformei, nu în cod.
+
+---
+
 ## 🌿 Cum interacționezi cu GitHub (Git Workflow)
 
 Pentru că lucrăm în echipă, **NU trebuie să scrii cod direct pe ramura `main`**. Procedura corectă pentru a lua o pagină la care să lucrezi este următoarea:
