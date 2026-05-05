@@ -185,7 +185,9 @@ function CreateEvent() {
                   <ArrowLeft size={18} /> {t('createevent.btn_back')}
                 </button>
               ) : (
-                <div></div> // vizual gol
+                <button type="button" onClick={() => navigate('/discover')} className="ce-btn ce-btn-secondary">
+                    <ArrowLeft size={18} /> {t('createevent.btn_back')}
+                </button>
               )}
               
               {step === 1 ? (

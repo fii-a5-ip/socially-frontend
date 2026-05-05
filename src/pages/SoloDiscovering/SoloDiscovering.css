@@ -63,6 +63,7 @@
     transform: translateY(-50%) scale(1.05);
 }
 
+/* --- Controls row (toggle + searchbar pe același rând) --- */
 .sd-controls-row {
     display: flex;
     align-items: center;
@@ -71,11 +72,276 @@
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-bottom: var(--space-xs); /* slight bottom padding for scroll area */
+}
+.sd-controls-row::-webkit-scrollbar { display: none; }
+
+/* --- Searchbar row (input + km + zile + buton filtre) --- */
+.sd-searchbar-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding-right: 12px;
+    flex: 1;
+    min-width: 0;
 }
 
-.sd-controls-row::-webkit-scrollbar {
-    display: none;
+.sd-searchbar-main {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-full);
+    padding: 0 var(--space-sm) 0 var(--space-md);
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    transition: border-color 0.2s ease;
+}
+.sd-searchbar-main:focus-within { border-color: var(--color-primary); }
+
+.sd-searchbar-icon {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    opacity: 0.45;
+}
+
+.sd-searchbar-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    padding: 9px 0;
+}
+.sd-searchbar-input::placeholder { color: var(--text-muted); }
+
+/* --- Câmpuri inline km / zile --- */
+.sd-inline-param {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-full);
+    padding: 0 10px;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease;
+}
+.sd-inline-param:focus-within { border-color: var(--color-primary); }
+
+.sd-inline-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: none;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.sd-inline-input {
+    width: 36px;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    padding: 9px 0;
+    text-align: center;
+}
+
+/* --- Buton filtre --- */
+.sd-filter-toggle-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+.sd-filter-toggle-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary-dark);
+}
+.sd-filter-toggle-btn.has-filters {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+.sd-filter-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: var(--color-primary-dark);
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Filter Panel (sliding drawer) --- */
+.sd-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 999998;
+    backdrop-filter: blur(2px);
+}
+
+.sd-filter-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100dvh;
+    width: min(340px, 88vw);
+    background-color: var(--bg-card);
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
+    transform: translateX(105%);
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.sd-filter-panel.open {
+    transform: translateX(0);
+}
+
+.sd-filter-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-xl) var(--space-xl) var(--space-md);
+    flex-shrink: 0;
+}
+
+.sd-filter-panel-title {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.sd-filter-panel-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+}
+
+.sd-filter-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-lg) var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.sd-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.sd-filter-group-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.sd-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.sd-filter-chip {
+    padding: 7px 16px;
+    border-radius: var(--radius-full);
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    transition: all 0.18s ease;
+}
+
+.sd-filter-chip:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary-dark);
+}
+
+.sd-filter-chip.active {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+    font-weight: 600;
+}
+
+.sd-filter-panel-footer {
+    display: flex;
+    gap: var(--space-sm);
+    padding: var(--space-lg) var(--space-xl);
+    padding-bottom: max(var(--space-lg), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.sd-filter-clear-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-full);
+    border: 1.5px solid var(--border-color);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    transition: all 0.18s ease;
+}
+
+.sd-filter-clear-btn:hover {
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.sd-filter-apply-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-primary);
+    color: white;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    border: none;
+    transition: background-color 0.18s ease;
+}
+
+.sd-filter-apply-btn:hover {
+    background-color: var(--color-primary-dark);
 }
 
 .sd-toggle {
@@ -102,32 +368,7 @@
     box-shadow: var(--shadow-sm);
 }
 
-/* --- Filters Navigation --- */
-.sd-filters {
-    display: flex;
-    gap: var(--space-sm);
-    margin: 0; /* reset margin since we are in the row */
-    padding: 0;
-    flex-shrink: 0;
-}
 
-.sd-filter-btn {
-    padding: var(--space-sm) var(--space-lg);
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-full);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--text-secondary);
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.sd-filter-btn.active {
-    background-color: var(--color-primary-dark);
-    color: var(--color-white);
-    border-color: var(--color-primary-dark);
-}
 
 
 
@@ -595,23 +836,64 @@
 @media (max-width: 768px) {
     /* 1. Header & Typography */
     .sd-title {
-        font-size: 2.4rem; /* Scaled down from 3.2rem */
+        font-size: 2.4rem;
     }
     .sd-create-btn-small {
         padding: 6px 12px;
         font-size: 0.85rem;
     }
-    
-    /* 2. Controls Row (Toggle & Filters) */
+
+    /* 2. Pe mobile: toggle sus, searchbar singur pe rândul 2, restul pe rândul 3 */
     .sd-controls-row {
-        margin: 0 -1rem; /* push to edges */
-        padding: 0 1rem; /* keep content inside */
-        width: calc(100% + 2rem);
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-sm);
     }
-    
-    /* 3. PlaceDetails Modal */
+
+    /* Searchbar-ul ocupă toată lățimea, singur pe rândul lui */
+    .sd-searchbar-row {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+    }
+
+    .sd-searchbar-main {
+        width: 100%;
+        flex: none;
+        order: -1; /* searchbar-ul apare primul */
+    }
+
+    /* km, zile și butonul filtre merg pe rândul 3, sub searchbar */
+    .sd-inline-param {
+        flex-shrink: 0;
+    }
+
+    /* Butoanele toggle ocupă toată lățimea */
+    .sd-toggle {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    /* 3. Filter panel — deasupra footer-ului, nu pe tot ecranul */
+    .sd-filter-panel {
+        top: 0;
+        height: 100dvh;
+        /* Asigurăm că e deasupra footer-ului */
+        z-index: 300;
+    }
+
+    .sd-panel-overlay {
+        z-index: 100;
+    }
+
+    /* Footer-ul nu se vede prin filter panel */
+    .sd-filter-panel-footer {
+        padding-bottom: max(var(--space-xl), calc(env(safe-area-inset-bottom) + 80px));
+    }
+
+    /* 4. PlaceDetails Modal */
     .sd-pd-header {
-        height: 220px; /* Leave more room for content below */
+        height: 220px;
     }
     .sd-pd-title {
         font-size: 1.8rem;
