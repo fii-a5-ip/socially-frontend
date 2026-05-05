@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import "./Login.css";
+import { GoogleLogin } from "@react-oauth/google";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -10,14 +11,39 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-  };
+  try {
+    const response = await fetch("http://localhost:8080/api/v1/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Login failed");
+    }
+
+    const data = await response.json();
+
+    console.log(data); // vezi ce vine de la backend
+
+    document.cookie = `token=${data.jwtToken}; path=/; max-age=86400`;
+
+    alert("Login reușit!");
+  } catch (err) {
+    alert("Email sau parolă greșită");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="login-page">
@@ -85,9 +111,38 @@ function Login() {
 
             <div className="login-divider">sau</div>
 
-            <button className="login-google">
-              Conectare cu Google
-            </button>
+            <GoogleLogin
+  onSuccess={async (credentialResponse) => {
+    try {
+      const response = await fetch("http://localhost:8080/api/v1/auth/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: credentialResponse.credential,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Google login failed");
+      }
+
+      const data = await response.json();
+
+      console.log(data);
+
+      localStorage.setItem("token", data.token);
+
+      alert("Login cu Google reușit!");
+    } catch (err) {
+      alert("Eroare la login cu Google");
+    }
+  }}
+  onError={() => {
+    alert("Google login failed");
+  }}
+/>
           </form>
 
           <p className="login-footer">
