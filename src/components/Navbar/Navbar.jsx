@@ -100,7 +100,7 @@ function Navbar() {
       {/* Top bar */}
       <nav className="nb-top">
         <div className="nb-top__inner">
-
+                  <Link to="/" className="nb-logo">Socially</Link>
           <div className="nb-top__nav">
             <NavBtn to="/" icon={<IconHome />} />
             <NavBtn to="/mode" icon={<IconUsers />} />
@@ -136,13 +136,13 @@ function Navbar() {
             <Dropdown trigger={
               <button className="nb-icon-btn"><IconSettings /></button>
             }>
-              <Link className="nb-dropdown__item" to="/settings/privacy">
+              <Link className="nb-dropdown__item" to="/privacy">
                 {t('navbar.privacy')}
               </Link>
-              <Link className="nb-dropdown__item" to="/settings/help">
+              <Link className="nb-dropdown__item" to="/help">
                 {t('navbar.help')}
               </Link>
-              <Link className="nb-dropdown__item" to="/settings/about">
+              <Link className="nb-dropdown__item" to="/about">
                 {t('navbar.settings_about')}
               </Link>
             </Dropdown>

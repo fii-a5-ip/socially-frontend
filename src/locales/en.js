@@ -223,5 +223,25 @@ export const en = {
   'createevent.form.date': 'Date and Time',
   'createevent.form.date_ph': 'e.g. 10:00 - 18:00 or Saturday, 20:00',
   'createevent.form.address': 'Address',
-  'createevent.form.address_ph': 'Enter full address'
+  'createevent.form.address_ph': 'Enter full address',
+
+   // Privacy Page
+  'privacy.title': 'Your Privacy',
+  'privacy.subtitle': 'Full transparency on how we protect the Socially community data.',
+  'privacy.card1.title': 'Data Protection',
+  'privacy.card1.desc': 'Your personal information is encrypted and stored securely.',
+  'privacy.card2.title': 'AI Usage',
+  'privacy.card2.desc': 'Your preferences are used exclusively for relevant recommendations.',
+  'privacy.card3.title': 'Total Control',
+  'privacy.card3.desc': 'You decide what information is visible to other members.',
+
+  // Help Page
+  'help.title': 'How can we help you?',
+  'help.subtitle': 'Quick guides and answers for the Socially experience.',
+  'help.card1.title': 'What is the AI Score?',
+  'help.card1.desc': 'A compatibility indicator between your preferences and locations.',
+  'help.card2.title': 'How do I propose a location?',
+  'help.card2.desc': 'Use the "+" button in the Discover section.',
+  'help.card3.title': 'Report Issues',
+  'help.card3.desc': 'Contact us via email at the address: sociallyteam@gmail.com.'
 };
