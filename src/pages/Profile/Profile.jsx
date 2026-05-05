@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProfileEditForm from './components/ProfileEditForm'
 import ProfileView from './components/ProfileView'
 import { useNavigate } from 'react-router-dom'
@@ -14,27 +14,89 @@ function Profile() {
   const navigate = useNavigate()
 
   const [profileData, setProfileData] = useState({
-    nume: 'Ștefan XNS',
-    email: 'stefan.xns@exemplu.com',
+    nume: '',
+    email: '',
     bio: '',
     buget: '200',
     avatarUrl: null
   })
 
-  const activitatiComplete = [
-    '⚽ Fotbal Sintetic - 02 Apr',
-    '🍔 Burger Van - 28 Mar',
-    '🍿 Dune: Part Two - 20 Mar',
-    '☕ Coffee Time - 15 Mar',
-    '🎳 Bowling Night - 10 Mar',
-    '🍕 Pizza Party - 05 Mar'
-  ]
+  const [groupsCount, setGroupsCount] = useState(0)
+  const [activitatiComplete, setActivitatiComplete] = useState([])
+  const [totalOutings, setTotalOutings] = useState(0)
+  const [aiScore, setAiScore] = useState(0)
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/users/me')
+      .then(res => res.json())
+      .then(data => {
+        let n = ''
+        if (data.firstname) n += data.firstname
+        if (data.lastname) n += ' ' + data.lastname
+
+        setProfileData({
+          nume: n,
+          email: data.email,
+          bio: data.bio,
+          buget: data.buget || '200',
+          avatarUrl: data.avatarUrl || null
+        })
+
+        if (data.aiScore) setAiScore(data.aiScore)
+        if (data.totalOutings) setTotalOutings(data.totalOutings)
+      })
+      .catch(e => console.log(e))
+
+    fetch('http://localhost:8080/api/groups')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length) {
+          setGroupsCount(data.length)
+        } else {
+          setGroupsCount(0)
+        }
+      })
+      .catch(e => console.log(e))
+
+    fetch('http://localhost:8080/api/activities/history')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length) {
+          setActivitatiComplete(data)
+          setTotalOutings(data.length)
+        } else {
+          setActivitatiComplete([])
+          setTotalOutings(0)
+        }
+      })
+      .catch(e => console.log(e))
+  }, [])
+
+
 
   const deAfisat = istoricExtins ? activitatiComplete : activitatiComplete.slice(0, 3)
 
   const handleSave = (newProfileData) => {
-    setProfileData(newProfileData)
-    setIsEditing(false)
+    let splitName = newProfileData.nume.split(' ')
+    let bodyData = {
+      firstname: splitName[0],
+      lastname: splitName.slice(1).join(' '),
+      bio: newProfileData.bio
+    }
+
+    fetch('http://localhost:8080/api/users/me', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bodyData)
+    })
+      .then(res => res.json())
+      .then(data => {
+        setProfileData(newProfileData)
+        setIsEditing(false)
+      })
+      .catch(e => console.log(e))
   }
 
   const handleCancel = () => {
@@ -76,8 +138,8 @@ function Profile() {
           <aside className="profile-sidebar">
             <div className="profile-section">
               <h3 className="side-title">{t('profile.stats.title')}</h3>
-              <div className="stat-row"><span>{t('profile.stats.active_groups')}</span> <strong>4</strong></div>
-              <div className="stat-row"><span>{t('profile.stats.total_outings')}</span> <strong>12</strong></div>
+              <div className="stat-row"><span>{t('profile.stats.active_groups')}</span> <strong>{groupsCount}</strong></div>
+              <div className="stat-row"><span>{t('profile.stats.total_outings')}</span> <strong>{totalOutings}</strong></div>
               <div className="stat-row">
                 <span>
                   {t('profile.stats.ai_score')}
@@ -86,7 +148,7 @@ function Profile() {
                     <span className="ai-tooltip-text">{t('profile.stats.ai_tooltip')}</span>
                   </span>
                 </span>
-                <strong>98%</strong>
+                <strong>{aiScore}%</strong>
               </div>
             </div>
 
