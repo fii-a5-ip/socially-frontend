@@ -75,10 +75,13 @@
   min-height: 120px;
 
   display: flex;
+
+  position: relative;
   
   align-items:flex-start;
   gap: var(--space-lg);
   padding: var(--space-lg) var(--space-xl);
+  
   border-radius: var(--radius-lg);
   background: var(--bg-card);
   border: 1px solid var(--border-color, rgba(0,0,0,0.06));
@@ -92,7 +95,7 @@
 }
 
 .notification:hover .notification_text {
-  max-height: 500px; /* big enough to fit most text */
+  max-height: 300em; /* big enough to fit most text */
 }
 
 /* ── Unread state ── */
@@ -120,7 +123,7 @@
 
 
   /*testing pentru expansiune casutei la hover*/
-  max-height: calc(1.5em * 3); /* (line-height) x (number of lines) */
+  max-height: 4.5em; /* (line-height) x (number of lines) */
   overflow: hidden;
 
   word-break: break-word;
@@ -185,7 +188,7 @@
   min-width: 70px; /*trebuie si asta aparent fiindca flex e un dezastru*/
   /*border-radius: 50%; /* transforma patrat in cerc*/
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 
   /*temporar* dadaddasdadas*/
@@ -200,14 +203,19 @@
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.25);
 
   font-size: 50px;
-  padding-top: 4px; /*11px pentru ca emoji-ul sa se lipeasca de fundul casutei sale */
+  padding-top: 2x; /*11px pentru ca emoji-ul sa se lipeasca de fundul casutei sale */
 }
 
 /*nu am testat foarte tare*/
 
+.notification_avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .notification--system .notification_avatar {
-  font-size: 55px;
+  font-size: 60px;
   text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);}
 
 
@@ -217,6 +225,8 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: var(--space-xs);
+  gap: var(--space-md);
+  flex-wrap: nowrap;
 }
 
 .notification_username {
