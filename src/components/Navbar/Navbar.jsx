@@ -91,6 +91,8 @@ function Navbar() {
   const { theme, toggleTheme, lang, setLang } = useApp()
   const { t } = useTranslation()
 
+
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])

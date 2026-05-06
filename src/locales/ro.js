@@ -194,6 +194,12 @@ export const ro = {
   'creategroup.btn_back': 'Înapoi',
   'creategroup.btn_next': 'Continuă',
   'creategroup.btn_finish': 'Finalizează Grup',
+  'creategroup.invite_friends': 'Invită-ți prietenii',
+  'creategroup.selected': 'selectați',
+  'creategroup.search_placeholder': 'Caută după nume, @username, sau email...',
+  'creategroup.searching': 'Se caută...',
+  'creategroup.search_empty': 'Caută prieteni pentru a-i adăuga în grup',
+  'creategroup.no_results': 'Nu s-au găsit rezultate după',
 
   // Solo Discovering
   'solo.title': 'Descoperă',
