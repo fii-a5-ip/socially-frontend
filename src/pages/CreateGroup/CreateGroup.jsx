@@ -8,11 +8,10 @@ import { useForm } from '../../hooks/useForm';
 import { validateRequired } from '../../utils/validation';
 import { useTranslation } from '../../hooks/useTranslation';
 
+import { API_URL } from '../../api/config';
 import { Step1Details } from './components/Step1Details';
 import { Step2Members } from './components/Step2Members';
 import './CreateGroup.css';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const initialValues = {
   name: '',
