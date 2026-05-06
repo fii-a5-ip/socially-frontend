@@ -1,2 +1,950 @@
-/* SoloDiscovering Page — Responsabili: Antonio + Pavel */
-/* Adaugă stilurile specifice aici */
+/* ========================================
+   Solo Discovering — Component Styles
+   ======================================== */
+
+/* ── CSS custom properties pentru înălțimile fixe ── */
+:root {
+  --sd-header-approx-h: 180px;   /* estimare header desktop */
+  --sd-footer-approx-h: 64px;    /* nav/footer global */
+}
+
+.solo-discovering {
+  display: flex;
+  flex-direction: column;
+  /* Ocupăm tot viewport-ul minus footer-ul global */
+  height: calc(100dvh - var(--sd-footer-approx-h, 64px));
+  overflow: hidden;
+  padding-top: var(--space-md);
+  background-color: var(--bg-primary);
+}
+
+/* --- Header & Toggle --- */
+.sd-header {
+  flex-shrink: 0;           /* header NU se strânge */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-2xl);
+  margin-bottom: var(--space-lg);
+  padding: 0 var(--space-md);
+}
+
+.sd-header-top {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sd-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-align: center;
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+.sd-create-btn-small {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  color: var(--color-primary-dark);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 2px solid var(--color-primary);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(255, 140, 122, 0.1);
+}
+
+.sd-create-btn-small:hover {
+  background: var(--color-primary-subtle);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* --- Controls row (toggle + searchbar pe același rând) --- */
+.sd-controls-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sd-controls-row::-webkit-scrollbar { display: none; }
+
+/* --- Searchbar row (input + km + zile + buton filtre) --- */
+.sd-searchbar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-right: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sd-searchbar-main {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 0 var(--space-sm) 0 var(--space-md);
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  transition: border-color 0.2s ease;
+}
+.sd-searchbar-main:focus-within { border-color: var(--color-primary); }
+
+.sd-searchbar-icon {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  opacity: 0.45;
+}
+
+.sd-searchbar-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  padding: 9px 0;
+}
+.sd-searchbar-input::placeholder { color: var(--text-muted); }
+
+/* --- Câmpuri inline km / zile --- */
+.sd-inline-param {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 0 10px;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease;
+}
+.sd-inline-param:focus-within { border-color: var(--color-primary); }
+
+.sd-inline-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.sd-inline-input {
+  width: 36px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  padding: 9px 0;
+  text-align: center;
+}
+
+/* --- Buton filtre --- */
+.sd-filter-toggle-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.sd-filter-toggle-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+.sd-filter-toggle-btn.has-filters {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+.sd-filter-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: var(--color-primary-dark);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Filter Panel (sliding drawer) --- */
+.sd-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 999998;
+  backdrop-filter: blur(2px);
+}
+
+.sd-filter-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100dvh;
+  width: min(340px, 88vw);
+  background-color: var(--bg-card);
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
+  transform: translateX(105%);
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.sd-filter-panel.open {
+  transform: translateX(0);
+}
+
+.sd-filter-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-xl) var(--space-xl) var(--space-md);
+  flex-shrink: 0;
+}
+
+.sd-filter-panel-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sd-filter-panel-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+}
+
+.sd-filter-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-lg) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.sd-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.sd-filter-group-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.sd-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.sd-filter-chip {
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: all 0.18s ease;
+}
+
+.sd-filter-chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+
+.sd-filter-chip.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+  font-weight: 600;
+}
+
+.sd-filter-panel-footer {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-xl);
+  padding-bottom: max(var(--space-lg), env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.sd-filter-clear-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: all 0.18s ease;
+}
+
+.sd-filter-clear-btn:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.sd-filter-apply-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  border: none;
+  transition: background-color 0.18s ease;
+}
+
+.sd-filter-apply-btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+/* --- Toggle --- */
+.sd-toggle {
+  display: flex;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.sd-toggle-btn {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.sd-toggle-btn.active {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================
+   CONTENT AREA — inima fix-ului de layout
+   flex-grow: 1 + overflow: hidden => umple exact spațiul rămas
+   ============================================================ */
+.sd-content {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;          /* permite scroll în saved/my events */
+  position: relative;
+  background-color: var(--bg-primary); /* elimină zona albă */
+}
+
+/* ============================================================
+   CARD CONTAINER — centrare + card responsive
+   ============================================================ */
+.sd-cards-container {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+  padding: var(--space-md);
+  overflow: hidden;
+}
+
+/* --- Discovery Card --- */
+.sd-card {
+  /* lățime adaptivă, cu maxim confortabil */
+  width: 100%;
+  max-width: 420px;
+
+  /* ── ÎNĂLȚIMEA RESPONSIVĂ ──
+     Folosim min() ca să nu depășim niciodată spațiul disponibil.
+     - max-height: 100% => nu iese din .sd-cards-container
+     - clamp: pe ecrane mici rămâne mic, pe ecrane mari crește decent */
+  max-height: 100%;
+  height: auto;
+
+  background-color: var(--bg-card);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  transition: transform var(--transition-base), opacity var(--transition-base);
+  will-change: transform, opacity;
+  cursor: pointer;
+
+  /* card e un flex column: imaginea + info + actions */
+  display: flex;
+  flex-direction: column;
+}
+
+.swipe-left {
+  transform: translateX(-150%) rotate(-15deg);
+  opacity: 0;
+}
+
+.swipe-right {
+  transform: translateX(150%) rotate(15deg);
+  opacity: 0;
+}
+
+/* Imaginea: înălțime mai mică, astfel încât categoria + descrierea să fie mereu vizibile */
+.sd-card-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(130px, 22vh, 200px);
+  flex-shrink: 0;
+}
+
+.sd-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sd-card-badge {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.sd-card-info {
+  padding: var(--space-md) var(--space-lg);
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sd-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xs);
+}
+
+.sd-card-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sd-card-rating {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-warning);
+}
+
+.sd-card-schedule {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.sd-card-category {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  color: var(--text-inverse);
+  background-color: var(--color-primary-dark);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.sd-card-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Înălțime fixă = 2 linii exacte, indiferent de conținut */
+  height: calc(1.5em * 2);
+  flex-shrink: 0;
+}
+
+.sd-card-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl);
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+  flex-shrink: 0;
+}
+
+.sd-action-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-md);
+  border: 2px solid var(--border-color);
+  transition: all var(--transition-fast);
+  z-index: 10;
+  position: relative;
+}
+
+.sd-action-btn.dislike { color: var(--color-error); }
+.sd-action-btn.like    { color: var(--color-success); }
+
+/* --- Favorites / MyEvents Grid --- */
+.sd-favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: var(--space-lg);
+  width: 100%;
+  padding: var(--space-md);
+}
+
+.sd-fav-card {
+  display: flex;
+  flex-direction: row;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+}
+
+.sd-fav-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.sd-fav-info {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.sd-fav-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.sd-fav-schedule {
+  font-size: calc(var(--font-size-xs) - 1px);
+  color: var(--text-muted);
+}
+
+.sd-fav-category {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.sd-fav-remove-btn {
+  align-self: flex-start;
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  background: none;
+  border: none;
+  padding: 0;
+  font-weight: 500;
+}
+
+/* --- PlaceDetailView (Full Screen) --- */
+.sd-place-details {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100dvh;
+  background-color: var(--bg-primary);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sd-pd-header {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.sd-pd-header-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 40%, rgba(0,0,0,0.1) 100%);
+}
+
+.sd-pd-back-btn {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top));
+  left: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.25);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: background-color 0.2s ease;
+}
+.sd-pd-back-btn:active {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.sd-pd-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: var(--space-xl);
+  padding-bottom: 120px;
+  background-color: var(--bg-card);
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+  margin-top: -30px;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.sd-pd-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.sd-pd-top-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-2xl);
+}
+
+.sd-pd-meta-badge {
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary-dark);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sd-pd-meta-badge.rating   { background-color: #FFF3E0; color: #E65100; }
+.sd-pd-meta-badge.distance { background-color: #E3F2FD; color: #1565C0; }
+.sd-pd-meta-badge.category { background-color: var(--color-primary-subtle); color: var(--color-primary-dark); }
+
+.sd-pd-info-clean {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.sd-pd-info-row {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+
+.sd-pd-info-row .icon {
+  font-size: 1.5rem;
+  background-color: var(--bg-secondary);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-dark);
+}
+
+.sd-pd-info-row strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.sd-pd-info-row p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.sd-clickable-address {
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+.sd-clickable-address:active { opacity: 0.7; }
+.sd-address-link { color: var(--text-muted); }
+
+.sd-pd-description {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.sd-pd-footer-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: var(--space-lg) var(--space-xl);
+  padding-bottom: max(var(--space-md), env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--bg-card) 60%, transparent 100%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.sd-pd-reserve-btn {
+  pointer-events: auto;
+  height: 56px;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 15px var(--color-primary-glow);
+}
+
+.sd-pd-action-group {
+  display: flex;
+  gap: var(--space-md);
+  pointer-events: auto;
+}
+
+.sd-pd-edit-btn {
+  flex: 1;
+  padding: 16px 0;
+  text-align: center;
+  text-decoration: none;
+  border-radius: var(--radius-full);
+}
+
+.sd-pd-cancel-btn {
+  flex: 1;
+  border-color: #ff4d4d;
+  color: #ff4d4d;
+}
+
+/* Utils */
+.fade-in      { animation: fadeIn var(--transition-base) forwards; }
+.fade-in-fast { animation: fadeIn var(--transition-fast) forwards; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Empty State */
+.sd-no-more {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--text-muted);
+}
+
+.sd-no-more-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.sd-no-more h3 {
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-sm);
+}
+
+/* ============================================================
+   RESPONSIVE — Mobile (≤ 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Footerul global pe mobile e de obicei mai înalt (tab bar) */
+  :root {
+    --sd-footer-approx-h: 80px;
+  }
+
+  /* 1. Typography */
+  .sd-title {
+    font-size: 2.4rem;
+  }
+  .sd-create-btn-small {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  /* 2. Layout header — toggle sus, searchbar jos */
+  .sd-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+  }
+
+  .sd-searchbar-row {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .sd-searchbar-main {
+    width: 100%;
+    flex: none;
+    order: -1;
+  }
+
+  .sd-inline-param { flex-shrink: 0; }
+
+  .sd-toggle {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  /* 3. Card — imaginea mai mică pe telefon */
+  .sd-card-image-wrapper {
+    height: clamp(110px, 18vh, 160px);
+  }
+
+  .sd-card-actions {
+    padding: var(--space-xs) var(--space-lg) var(--space-sm);
+  }
+
+  .sd-action-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.3rem;
+  }
+
+  /* 4. Filter panel */
+  .sd-filter-panel {
+    top: 0;
+    height: 100dvh;
+    z-index: 300;
+  }
+
+  .sd-panel-overlay { z-index: 100; }
+
+  .sd-filter-panel-footer {
+    padding-bottom: max(var(--space-xl), calc(env(safe-area-inset-bottom) + 80px));
+  }
+
+  /* 5. PlaceDetails */
+  .sd-pd-header  { height: 220px; }
+  .sd-pd-title   { font-size: 1.8rem; }
+
+  .sd-pd-action-group {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .sd-pd-edit-btn,
+  .sd-pd-cancel-btn {
+    height: 48px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ============================================================
+   Ecrane foarte mici (≤ 380px) — telefoane compacte
+   ============================================================ */
+@media (max-width: 380px) {
+  .sd-title { font-size: 1.9rem; }
+
+  .sd-card-image-wrapper {
+    height: clamp(100px, 16vh, 140px);
+  }
+
+  .sd-card-info {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .sd-card-title { font-size: var(--font-size-base); }
+}
+
+/* ============================================================
+   Ecrane mari (≥ 1200px) — lăsăm cardul să respire
+   ============================================================ */
+@media (min-width: 1200px) {
+  .sd-card {
+    max-width: 460px;
+  }
+
+  .sd-card-image-wrapper {
+    height: clamp(180px, 26vh, 240px);
+  }
+}

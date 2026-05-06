@@ -1,52 +1,52 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
+import { useTranslation } from '../../hooks/useTranslation';
+import { API_URL } from '../../api/config';
+import { useApp } from '../../context/AppContext';
 import './Register.css';
 
 const Register = () => {
-    const [isLoading, setIsLoading] = useState(false);
-    // [ADĂUGAT PENTRU BACKEND]: Stare pentru a ține minte URL-ul generat al pozei de profil pentru preview
-    const [avatarPreview, setAvatarPreview] = useState(null);
+    const { t } = useTranslation();
+    const { login } = useApp();
+    const navigate = useNavigate();
     const fileInputRef = useRef(null);
+    const [avatarPreview, setAvatarPreview] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleAvatarClick = () => {
-        fileInputRef.current?.click();
+        fileInputRef.current.click();
     };
 
-    const handleAvatarChange = (e) => {
+    const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             console.log("Avatar selectat:", file.name);
-            // [ADĂUGAT PENTRU BACKEND]: Generează un link local pentru a afișa imediat poza selectată
             setAvatarPreview(URL.createObjectURL(file));
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
 
-        // [ADĂUGAT PENTRU BACKEND]: Extragem automat datele din formular pe baza atributelor `name` de la <input>
         const formData = new FormData(e.target);
 
-        // [ADĂUGAT PENTRU BACKEND]: Validăm dacă parolele coincid
         if (formData.get("password") !== formData.get("confirmPassword")) {
             alert("Parolele nu coincid!");
             setIsLoading(false);
             return;
         }
 
-        // [ADĂUGAT PENTRU BACKEND]: Creăm obiectul exact cum a cerut colegul
         const payload = {
             username: formData.get("username"),
             password: formData.get("password"),
-            fullname: formData.get("fullName"), // Transformăm din "fullName" (html) în "fullname" (JSON backend)
+            fullname: formData.get("fullname"),
             email: formData.get("email")
         };
 
-        // OBSERVATIE: Din moment ce backend-ul dorește JSON, poza (Avatarul) nu se poate trimite ușor pe această rută.
-        // Va trebui uploadată ulterior printr-o altă viitoare rută (ex: /api/v1/users/avatar)
-
-        // [ADĂUGAT PENTRU BACKEND: SCHIMBAT PE NOUA RUTĂ ȘI FORMAT JSON]
-        fetch('/api/v1/auth/register', {
+        fetch(`${API_URL}/api/v1/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -54,71 +54,69 @@ const Register = () => {
             body: JSON.stringify(payload)
         })
             .then(async response => {
-                // Verificăm dacă avem 200 OK
                 if (!response.ok) {
-                    // Dacă nu, prindem excepțiile de la backend (ex: username deja luat, email invalid)
                     const errorText = await response.text();
                     let errorMessage = "Eroare la înregistrare!";
-
                     try {
-                        // Dacă backend-ul trimite eroarea ca JSON
                         const errorJson = JSON.parse(errorText);
                         errorMessage = errorJson.message || errorText;
                     } catch (e) {
-                        // Dacă o trimite direct ca text
+                        console.error("Eroare la parsarea JSON-ului (eroare):", e);
                         errorMessage = errorText;
                     }
-
                     throw new Error(errorMessage);
                 }
 
-                // Avem 200 OK, citim răspunsul (care ar trebui să conțină JWT-ul)
                 const textResponse = await response.text();
                 try {
                     return textResponse ? JSON.parse(textResponse) : {};
                 } catch (e) {
-                    return { token: textResponse }; // Dacă trimite token-ul curat, ca String
+                    console.error("Eroare la parsarea JSON-ului (succes):", e);
+                    return { token: textResponse };
                 }
             })
             .then(data => {
                 setIsLoading(false);
 
-                // Salvăm JWT-ul primit în Cookie. Backend-ul întoarce un câmp numit "jwtToken"
-                const jwtToken = data.jwtToken;
+                const jwtToken = data.jwtToken || data.token;
                 if (jwtToken) {
-                    // Setăm stocarea în Cookie, valabil 24 ore (86400 secunde) pe tot site-ul (path=/)
                     document.cookie = `jwt_token=${jwtToken}; path=/; max-age=86400; SameSite=Strict`;
-                    console.log("JWT salvat cu succes în cookie!");
+                    localStorage.setItem('token', jwtToken);
+                    console.log("JWT salvat cu succes!");
                     
-                    // Opțional: dacă vreți, puteți salva și restul datelor din JSON în localStorage / cookie pentru a le folosi în aplicație
                     if (data.username) localStorage.setItem("current_username", data.username);
                     if (data.id) localStorage.setItem("current_userid", data.id);
                 }
 
-                // Avem fișier de poză selectat? Dacă da, trimitem imediat cererea secundară.
                 const avatarFile = fileInputRef.current?.files[0];
                 if (jwtToken && avatarFile) {
                     const avatarData = new FormData();
                     avatarData.append('avatar', avatarFile);
 
-                    fetch('/api/v1/users/avatar', {
+                    fetch(`${API_URL}/api/v1/users/avatar`, {
                         method: 'POST',
                         headers: {
-                            'Authorization': `Bearer ${jwtToken}` // Punem JWT-ul ca să știe backend-ul a cui e poza
-                            // La FormData NU se pune Content-Type manual
+                            'Authorization': `Bearer ${jwtToken}`
                         },
                         body: avatarData
                     })
                         .then(() => {
-                            window.location.href = '/'; // Navigăm după ce s-a pus și poza
+                            login();
+                            navigate('/onboarding');
                         })
                         .catch(err => {
                             console.error("Eroare la upload avatar:", err);
-                            window.location.href = '/'; // Ne ducem totuși pe home
+                            login();
+                            navigate('/onboarding');
                         });
                 } else {
-                    // Dacă nu a pus poză, pur și simplu navigăm
-                    window.location.href = '/';
+                    if(jwtToken) {
+                        login();
+                        navigate('/onboarding');
+                    } else {
+                        alert("Cont creat! Acum te poți autentifica.");
+                        navigate('/login');
+                    }
                 }
             })
             .catch(error => {
@@ -128,65 +126,26 @@ const Register = () => {
             });
     };
 
-    // [ADĂUGAT PENTRU BACKEND]: Metoda pentru Google Register
-    const handleGoogleRegister = (googleToken) => {
-        setIsLoading(true);
-
-        const payload = {
-            token: googleToken
-        };
-
-        fetch('/api/v1/auth/google', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        })
-            .then(async response => {
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error("Eroare trimitere Token Google către Backend: " + errorText);
-                }
-
-                const textResponse = await response.text();
-                try { return textResponse ? JSON.parse(textResponse) : {}; }
-                catch (e) { return { token: textResponse }; }
-            })
-            .then(data => {
-                setIsLoading(false);
-                const jwtToken = data.jwtToken;
-                if (jwtToken) {
-                    document.cookie = `jwt_token=${jwtToken}; path=/; max-age=86400; SameSite=Strict`;
-                    if (data.username) localStorage.setItem("current_username", data.username);
-                    if (data.id) localStorage.setItem("current_userid", data.id);
-                }
-                window.location.href = '/';
-            })
-            .catch(error => {
-                console.error("Eroare Google:", error);
-                alert(error.message);
-                setIsLoading(false);
-            });
-    };
-
-    // Funcție provizorie pe buton până instalezi librăria Google SDK
     const triggerTemporaryGoogleLogic = () => {
-        alert("Punctul de intrare pregătit! Aici trebuie să folosim librăria de la Google pentru a primi tokenul 'eyJhbGci...' și apoi să apelăm `handleGoogleRegister(token)`");
+        alert("Aici trebuie să folosim librăria de la Google pentru a primi tokenul și apoi să apelăm `handleGoogleRegister(token)`");
     };
 
     return (
         <div className="register-page">
             <div className="register-container">
-
-                <div className="left-panel">
+                {/* Panel Stânga */}
+                <motion.div 
+                    className="left-panel"
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <div className="brand">SOCIALLY</div>
                     <div className="left-content">
-                        <h1>Join thousands of users</h1>
-
-
+                        <h1>{t('register.join')}</h1>
+                        <p>Alătură-te comunității noastre și începe să explorezi evenimente unice.</p>
+                        
                         <div className="social-sync">
-                            <span className="social-divider"></span>
-                            {/* [ADĂUGAT PENTRU BACKEND]: Declanșatorul pentru Auth-ul cu Google */}
                             <button className="social-btn" type="button" onClick={triggerTemporaryGoogleLogic}>
                                 <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -194,100 +153,113 @@ const Register = () => {
                                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                                 </svg>
-                                Continue with Google or other socials
+                                {t('register.google')}
                             </button>
+                            <div className="social-divider">SAU</div>
                         </div>
                     </div>
-                </div>
+                    <div className="footer-copyright">
+                        {t('footer.copyright')}
+                    </div>
+                </motion.div>
 
-                <div className="right-panel">
+                {/* Panel Dreapta */}
+                <motion.div 
+                    className="right-panel"
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
                     <div className="right-header">
                         <div>
-                            <h2>Create Your Account</h2>
-                            <p>Let's get you set up</p>
+                            <h2>{t('register.title')}</h2>
+                            <p>{t('register.subtitle')}</p>
                         </div>
                     </div>
 
-                    <div className="form-card">
-                        <div className="profile-upload-section">
-                            <div className="profile-avatar" onClick={handleAvatarClick}>
+                    <motion.div 
+                        className="form-card"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3, duration: 0.5 }}
+                    >
+                        <div className="profile-upload-section" onClick={handleAvatarClick}>
+                            <div className="profile-avatar">
                                 {avatarPreview ? (
-                                    <img src={avatarPreview} alt="Preview" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                    <img src={avatarPreview} alt="Avatar Preview" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                                 ) : (
-                                    <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                 )}
                                 <div className="upload-icon">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                 </div>
                             </div>
-                            <p className="upload-text">Upload a profile picture (max 5MB)</p>
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleAvatarChange}
+                            <p className="upload-text">{t('register.upload')}</p>
+                            <input 
+                                type="file" 
+                                ref={fileInputRef} 
+                                onChange={handleFileChange} 
+                                style={{ display: 'none' }} 
                                 accept="image/*"
-                                style={{ display: 'none' }}
+                                name="avatar-file"
                             />
                         </div>
 
-                        {/* [ADĂUGAT PENTRU BACKEND]: Am pus onSubmit={handleSubmit} pe formular și atribute 'name' pe fiecare input */}
                         <form className="register-form" onSubmit={handleSubmit}>
                             <div className="form-row">
                                 <div className="input-group">
                                     <label>
                                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                        Full Name *
+                                        {t('register.fullname')}
                                     </label>
-                                    <input type="text" name="fullName" placeholder="Enter your full name" required />
+                                    <input type="text" name="fullname" placeholder={t('register.fullname_ph')} required />
                                 </div>
                                 <div className="input-group">
                                     <label>
-                                        <span className="at-symbol">@</span> Username *
+                                        <span className="at-symbol">@</span> {t('register.username')}
                                     </label>
-                                    <input type="text" name="username" placeholder="Enter your username" required />
+                                    <input type="text" name="username" placeholder={t('register.username_ph')} required />
                                 </div>
                             </div>
 
                             <div className="input-group">
                                 <label>
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                    Email Address *
+                                    {t('register.email')}
                                 </label>
-                                <input type="email" name="email" placeholder="your.email@example.com" required />
+                                <input type="email" name="email" placeholder={t('register.email_ph')} required />
                             </div>
 
                             <div className="form-row">
                                 <div className="input-group">
                                     <label>
                                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                        Password *
+                                        {t('register.pass')}
                                     </label>
-                                    <input type="password" name="password" placeholder="Enter your password" required minLength="6" />
+                                    <input type="password" name="password" placeholder={t('register.pass_ph')} required minLength="6" />
                                 </div>
                                 <div className="input-group">
                                     <label>
                                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                        Confirm Password *
+                                        {t('register.pass_conf')}
                                     </label>
-                                    <input type="password" name="confirmPassword" placeholder="Confirm your password" required minLength="6" />
+                                    <input type="password" name="confirmPassword" placeholder={t('register.pass_conf_ph')} required minLength="6" />
                                 </div>
                             </div>
 
                             <div className="checkbox-group">
                                 <input type="checkbox" id="terms" required />
-                                <label htmlFor="terms">Accept <span className="terms-highlight">termenii și condițiile</span></label>
+                                <label htmlFor="terms">
+                                    {t('register.terms')} <span className="terms-highlight">Termenii și Condițiile</span>
+                                </label>
                             </div>
 
-                            <button
-                                type="submit"
-                                className={`submit-btn ${isLoading ? 'loading' : ''}`}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Creating Account...' : 'Create Account'}
+                            <button className="submit-btn" disabled={isLoading}>
+                                {isLoading ? t('register.btn_loading') : t('register.btn')}
                             </button>
                         </form>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </div>
         </div>
     );

@@ -44,6 +44,19 @@ Mergi în browser la adresa indicată (de obicei **[http://localhost:5173/](http
 
 ---
 
+## 🔐 Variabile de Mediu (.env)
+
+Pentru ca Frontend-ul să poată comunica cu Backend-ul, trebuie să configurezi URL-ul API-ului:
+
+1.  Creează un fișier numit **`.env`** în rădăcina proiectului (copiază conținutul din `.env.example`).
+2.  Adaugă următoarea linie pentru dezvoltarea locală:
+    ```env
+    VITE_API_URL=http://localhost:8080
+    ```
+3.  **NOTĂ:** În producție (Vercel), această variabilă se setează din dashboard-ul platformei, nu în cod.
+
+---
+
 ## 🌿 Cum interacționezi cu GitHub (Git Workflow)
 
 Pentru că lucrăm în echipă, **NU trebuie să scrii cod direct pe ramura `main`**. Procedura corectă pentru a lua o pagină la care să lucrezi este următoarea:
@@ -80,5 +93,30 @@ Acum ramura ta a ajuns pe GitHub. Intră pe GitHub-ul proiectului și apasă pe 
 - **`src/pages/`** - Aici vei găsi un folder creat deja pentru pagina ta (ex: Login, Register, Groups). Intră acolo și editează fișierele `NumePagina.jsx` și `NumePagina.css`.
 - **`src/components/`** - Aici sunt butoane, bare de navigare sau input-uri refolosibile. 
 - **`src/index.css`** - Aici este design-ul vizual al aplicației (nu prea e nevoie să modifici aici, folosește variabilele deja existente).
+
+---
+
+## 🎨 Design System & Stiluri (Vanilla CSS)
+
+Pentru a ne asigura că tot proiectul arată premium (și că funcțiile precum **Light/Dark Mode** se aplică automat), respectăm următoarele reguli:
+- **Fără culori hardcodate**: Niciodată nu folosi culori precum `background-color: #D98A55`. Folosește **variabilele noastre globale** din `index.css` (ex: `var(--bg-primary)`, `var(--text-primary)`, `var(--color-primary)` etc.).
+- **Fără clase Tailwind implicite**: Proiectul nostru este pe „Vanilla CSS”. Asta înseamnă că structura paginilor pe care lucrați (`.jsx` + `.css`) trebuie să respecte CSS curat, standard. Dacă ai lucrat un design concept folosind clase de tailwind (`bg-[#eee...]`), trebuie să îl transpilezi vizual la arhitectura noastră înainte de comitere pentru ca design-ul să nu fie orfan.
+
+---
+
+## ⚠️ Code Quality & Erori Frecvente (Lint & Build)
+
+Pentru ca ramura principală (`main`) să nu se strice niciodată, trebuie să devii sigur pe ceea ce pushezi:
+- **Regula Linting-ului (Niciun warning la PR!)**: Înainte de orice comitere, rulează `npm run lint`. Remediază erorile apărute (ex: dependințe lipsă din `useEffect`, sau adăugarea importurilor). 
+- **Verificarea Build-ului**: Cel mai periculos bug este importarea unor funcții sau imagini care nu există în proiect (de ex: componente descărcate sau rătăcite dintr-un alt proiect). Ca să te asiguri de asta, rulează neapărat `npm run build` o singură dată pe local înainte de a deschide Pull Request-ul. Dacă dă eroare, repara-l.
+- **Integrarea înainte de Push**: Înainte de a considera branch-ul finalizat, dă un `git merge main` în interiorul branch-ului tău. Rezolvă conflictele dacă există; abia apoi deschide Pull Request.
+
+---
+
+## 🤖 Best Practices & Generare de Cod (AI ajutător)
+
+Suntem încurajați să fim eficienți. Dacă vrei să generezi implementări cu asistenți AI (ChatGPT, GitHub Copilot etc):
+- **Citește și analizează codul**: Nu da niciodată copy-paste pe nevăzute. Chiar dacă botul îți dă cod funcțional, **trebuie neapărat să-l înțelegi**.
+- **Păstrează coerența cu proiectul**: AI-ul nu își dă mereu seama de structura din `index.css` sau de faptul că noi scriem pe `.jsx` folosind `lucide-react` pentru iconițe și CSS Vanilla. Corectează tot codul primit ca să fuzioneze perfect cu ghidurile detaliate mai sus.
 
 Succes la codat! 🚀
