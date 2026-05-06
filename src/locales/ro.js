@@ -265,9 +265,7 @@ export const ro = {
   'createevent.form.date_ph': 'ex. 10:00 - 18:00 sau Sâmbătă, 20:00',
   'createevent.form.address': 'Adresă',
   'createevent.form.address_ph': 'Introdu adresa completă',
-  'createevent.step_details': 'DETALII',
-  'createevent.step_logistics': 'LOGISTICĂ',
-  'createevent.step_complete': 'FINALIZARE',
+
 
   // Privacy Page
   'privacy.title': 'Confidențialitate',

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import './SoloDiscovering.css';
@@ -253,7 +253,6 @@ function PlaceDetails({ place, onClose, onCancel }) {
 // ==========================================
 function SoloDiscovering() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const [viewMode, setViewMode] = useState('list');
   const [selectedPlace, setSelectedPlace] = useState(null);
