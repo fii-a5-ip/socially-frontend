@@ -127,13 +127,13 @@ const Register = () => {
                                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                         {t('register.fullname')}
                                     </label>
-                                    <input type="text" placeholder={t('register.fullname_ph')} required />
+                                    <input type="text" name="fullname" placeholder={t('register.fullname_ph')} required />
                                 </div>
                                 <div className="input-group">
                                     <label>
                                         <span className="at-symbol">@</span> {t('register.username')}
                                     </label>
-                                    <input type="text" placeholder={t('register.username_ph')} required />
+                                    <input type="text" name="username" placeholder={t('register.username_ph')} required />
                                 </div>
                             </div>
 
@@ -142,7 +142,7 @@ const Register = () => {
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                                     {t('register.email')}
                                 </label>
-                                <input type="email" placeholder={t('register.email_ph')} required />
+                                <input type="email" name="email" placeholder={t('register.email_ph')} required />
                             </div>
 
                             <div className="form-row">
@@ -151,7 +151,7 @@ const Register = () => {
                                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                         {t('register.pass')}
                                     </label>
-                                    <input type="password" placeholder={t('register.pass_ph')} required minLength="6" />
+                                    <input type="password" name="password" placeholder={t('register.pass_ph')} required minLength="6" />
                                 </div>
                                 <div className="input-group">
                                     <label>
