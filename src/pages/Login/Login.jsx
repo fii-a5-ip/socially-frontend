@@ -51,12 +51,16 @@ function Login() {
       navigate('/mode'); // Mergem la selecția modului
     } catch (err) {
       console.error(err);
-      alert(t('login.error_message') || "Email sau parolă greșită");
-    } finally {
+      alert(t('login.error_message') || "Email sau parolă greșită");    } finally {
       setIsLoading(false);
     }
   };
 
+  const handleDevLogin = () => {
+    localStorage.setItem("token", "dev-token-bypass");
+    login();
+    navigate('/mode');
+  };
 
   return (
     <div className="login-page">
@@ -162,7 +166,12 @@ function Login() {
                 }}
               />
             </div>
+
+            <button type="button" onClick={handleDevLogin} className="dev-bypass-btn">
+              🔓 Bypass Login (Dev)
+            </button>
           </form>
+
 
           <p className="login-footer">
             {t('login.register_prompt')} <Link to="/register">{t('login.register_link')}</Link>
