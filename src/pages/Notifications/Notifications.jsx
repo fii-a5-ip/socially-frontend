@@ -12,59 +12,62 @@
  * - Design responsive
  */
 
+
+/*De la Backend*/
+import { definetelyRealNotifs } from './DateFalselol.js';
+import { useEffect, useState } from "react";
+import axios from "axios";
+const API = import.meta.env.VITE_API_URL;
+console.log("API:", API);
+console.log(typeof t);
+
 import './Notifications.css'
-import { useState } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const test_Date= new Date();
 var check  = false;
 const test_Time= test_Date.getHours() + ':' + test_Date.getMinutes();
 
+/*Asta Ramane aici temporar*/
 function Notifications() {
-  const { t } = useTranslation();
 
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'user',
-      isRead: true,
-      text: 'Bairam',
-      time: test_Time,
-      hasActions: false,
-    },
-    {
-      id: 2,
-      type: 'user',
-      isRead: false,
-      text: "Try 30 days of FREE premium Socially!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Socially!!!!! !!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!! Socially!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Socially!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Socially!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
-      time: 'acum 10 minute',
-      hasActions: false,
-    },
-    {
-      id: 3,
-      type: 'user',
-      isRead: false,
-      text: 'hai la gratar sau cv',
-      time: 'ieri',
-      hasActions: true,
-    },
-    {
-      id: 4,
-      type: 'system',
-      isRead: true,
-      text: 'Profilul tău a fost actualizat',
-      time: 'acum 2 minute',
-      hasActions: false,
-    },
-    {
-      id: 666,
-      type: 'system',
-      isRead: false,
-      text: 'Profilul tău a fost actualizat',
-      time: 'acum 2 zile',
-      hasActions: false,
-    }
-  ]);
+  const { t } = useTranslation();
+ 
+  const [notifications, setNotifications] = useState([]);
+
+  const userTypes = ["GROUP_INVITE"]; const systemTypes = ["OUTGOING_UPDATE", "REMINDER"];
+
+  const isSystemType = (type) => systemTypes.includes(type)// GROUPD_INVITE va fi system type
+
+  useEffect(() => { setNotifications(definetelyRealNotifs);}, []);
+
+  /*colectez datele "reale" aici:
+
+
+  useEffect(() => {
+  axios.get('/api/notifications')
+    .then(res => {
+
+      console.log("RAW RESPONSE:", res.data); //temporar
+
+      const mapped = res.data.map(n => ({
+        id: n.id,
+        actorUserId: n.actorUserId,
+        type: n.type,// GROUP_INVITE ; OUTGOING_UPDATE ; REMINDER
+        text: n.message, //fostul content
+        time: new Date(n.createdAt),
+        isRead: n.read,
+        referenceId: n.referenceId, //
+        referenceType: n.referenceType, //
+        hasActions: n.type === "GROUP_INVITE"
+      }));
+
+      setNotifications(mapped);
+    })
+    .catch(err => console.error(err));
+}, []);
+
+*/
 
   const [showArchived, setShowArchived] = useState(false);
   const [showUnarchived, setUnarchived] = useState(true);
@@ -80,14 +83,16 @@ function Notifications() {
   const newNotifications = notifications.filter(notif => !notif.isRead);
   const archivedNotifications = notifications.filter(notif => notif.isRead);
 
-  const renderNotifications = (list, type) => {
-    var filtered = list.filter(notif => notif.type == type);
+  const renderNotifications = (list, type_de_verificat) => {
+  const filtered = list.filter(notif =>
+    type_de_verificat.includes(notif.type)
+);
 
-    if (filtered.length !== 0 && check == false)
+    if (filtered.length === 0 ) return null; //poate introduc un mesaj de bun venit
       return (
         <>
           <h3 className="notifications_group-title">
-            {type == 'user'
+            {type_de_verificat == 'user'
               ? t('notifications.group_users')
               : t('notifications.group_system')}
           </h3>
@@ -96,19 +101,21 @@ function Notifications() {
             {filtered.map(notif => (
               <div     key={notif.id}      className={` card notification 
                   ${notif.isRead ? '' : 'notification-unread'} 
-                  ${notif.type == 'user' ? 'notification--user' : 'notification--system'}  `} >
+                  ${!isSystemType(notif.type) ? 'notification--user' : 'notification--system'}  `} >
 
                 
                 <div className="notification_avatar">
-                  { notif.type === 'system' ? ( <span> ⚙️ </span>) : ( <span> 👤 </span>) /* (<img src= "https://tse2.mm.bing.net/th/id/OIP.ivROJMldRz-4M_M5rOWKgAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3/"> ) */  }
+                    {notif.id === 1 && (<img src="https://people.com/thmb/rqeA7q27K9xxwiOB3IryaCl2hUE=/1080x720/filters:no_upscale():max_bytes(150000):strip_icc():focal(734x309:736x311)/keanu-reeves-110325-248bc604f7ed4bc0b7ff4159c7ced811.jpg"/>)}
+                  {notif.id !=1 && (isSystemType(notif.type) ? ( <span> ⚙️ </span>) : ( <span> 👤 </span>) )
+                  /* (<img src= "https://tse2.mm.bing.net/th/id/OIP.ivROJMldRz-4M_M5rOWKgAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3/"> ) */  }
                 </div>
 
                 <div className="notification_content">
                     <div className="notification_top">
-                      <class className="notification_username">                  
-                      { notif.type === 'system' ? "[system notif type]"  :   "[username]"/* <img src= {notif.avatar}/> */    } 
-                      <span className="notification_time"> {notif.time} </span>
-                      </class>
+                      <div className="notification_username">                  
+                      { isSystemType(notif.type) ? "[system notif type] - "  :   notif.userId  + " - " /* <img src= {notif.avatar}/> */    } 
+                      <span className="notification_time"> {notif.time.toLocaleString()} </span>
+                      </div>
                                       {/* BUTON ACCEPT/DECLINE */}
                 {(notif.hasActions && notif.isRead == false) && (
                   <div className="notification_actions">
@@ -156,8 +163,8 @@ function Notifications() {
             </h2>
             {showUnarchived && ( 
            <>
-            {renderNotifications(newNotifications, 'user')}
-            {renderNotifications(newNotifications, 'system')}
+            {renderNotifications(newNotifications, userTypes)}
+            {renderNotifications(newNotifications, systemTypes)}
            </> ) }
        </> )  }
       </section>
@@ -171,8 +178,8 @@ function Notifications() {
 
         {showArchived && (
           <>
-            {renderNotifications(archivedNotifications, 'user')}
-            {renderNotifications(archivedNotifications, 'system')}
+            {renderNotifications(archivedNotifications, userTypes)}
+            {renderNotifications(archivedNotifications, systemTypes)}
           </>
         )  }
       </section>
