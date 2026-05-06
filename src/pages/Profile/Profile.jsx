@@ -105,6 +105,8 @@ function Profile() {
               <div className="admin-actions">
                 <button type="button" className="btn-secondary-profile">{t('profile.account.change_pass')}</button>
                 <button type="button" className="btn-logout" onClick={handleLogout}>{t('profile.account.logout')}</button>
+
+
               </div>
             </div>
           </aside>
