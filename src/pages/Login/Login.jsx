@@ -1,7 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import { useApp } from "../../context/AppContext";
+
 import { useTranslation } from "../../hooks/useTranslation";
 import { API_URL } from "../../api/config";
 import "./Login.css";
@@ -49,16 +52,25 @@ function Login() {
       navigate('/mode'); // Mergem la selecția modului
     } catch (err) {
       console.error(err);
-      alert(t('login.error_message') || "Email sau parolă greșită");
-    } finally {
+      alert(t('login.error_message') || "Email sau parolă greșită");    } finally {
       setIsLoading(false);
     }
   };
 
+  const handleDevLogin = () => {
+    localStorage.setItem("token", "dev-token-bypass");
+    login();
+    navigate('/mode');
+  };
 
   return (
     <div className="login-page">
-      <div className="login-wrapper">
+      <motion.div 
+        className="login-wrapper"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="login-header">
           <h1 className="login-title">{t('login.title')}</h1>
           <p className="login-subtitle">{t('login.subtitle')}</p>
@@ -155,14 +167,20 @@ function Login() {
                 }}
               />
             </div>
+
+            <button type="button" onClick={handleDevLogin} className="dev-bypass-btn">
+              🔓 Bypass Login (Dev)
+            </button>
           </form>
+
 
           <p className="login-footer">
             {t('login.register_prompt')} <Link to="/register">{t('login.register_link')}</Link>
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
+
   );
 }
 
