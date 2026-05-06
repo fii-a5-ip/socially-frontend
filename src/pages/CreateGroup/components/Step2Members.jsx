@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 /* eslint-disable-next-line no-unused-vars */
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Search, CheckCircle2, UserPlus, Loader2, XCircle } from 'lucide-react';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { API_URL } from '../../../api/config';
