@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Info, Settings2, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useForm } from '../../hooks/useForm';
 import { validateRequired } from '../../utils/validation';

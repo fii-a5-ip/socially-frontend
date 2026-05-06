@@ -1,6 +1,6 @@
 import React from 'react';
 /* eslint-disable-next-line no-unused-vars */
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { MapPin, Image as ImageIcon, PartyPopper, Utensils, Coffee } from 'lucide-react';
 import FormInput from '../../../components/FormInput/FormInput';
 import { FormTextArea } from './FormTextArea';

@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import { Coffee, MapPin, Music, Utensils, Beer, Gamepad2, ArrowRight } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import './Onboarding.css';
 

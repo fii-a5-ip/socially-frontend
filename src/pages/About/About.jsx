@@ -1,7 +1,5 @@
 import React from 'react';
-// eslint-disable-next-line no-unused-vars
 
-import { motion } from 'motion/react';
 import { Users, Cpu, Rocket, CalendarHeart } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import './About.css';
