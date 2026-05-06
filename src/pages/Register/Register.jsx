@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useTranslation } from '../../hooks/useTranslation';
 import { API_URL } from '../../api/config';
 import { useApp } from '../../context/AppContext';
@@ -76,34 +77,63 @@ const Register = () => {
     return (
         <div className="register-page">
             <div className="register-container">
-                <div className="register-card">
-                    <div className="register-left">
-                        <div className="register-left-content">
-                            <h2>{t('register.join')}</h2>
-                            <button className="google-auth-btn">
-                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="Google" />
+                {/* Panel Stânga */}
+                <motion.div 
+                    className="left-panel"
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <div className="brand">SOCIALLY</div>
+                    <div className="left-content">
+                        <h1>{t('register.join')}</h1>
+                        <p>Alătură-te comunității noastre și începe să explorezi evenimente unice.</p>
+                        
+                        <div className="social-sync">
+                            <button className="social-btn">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="Google" width="20" />
                                 {t('register.google')}
                             </button>
+                            <div className="social-divider">SAU</div>
+                        </div>
+                    </div>
+                    <div className="footer-copyright">
+                        {t('footer.copyright')}
+                    </div>
+                </motion.div>
+
+                {/* Panel Dreapta */}
+                <motion.div 
+                    className="right-panel"
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <div className="right-header">
+                        <div>
+                            <h2>{t('register.title')}</h2>
+                            <p>{t('register.subtitle')}</p>
                         </div>
                     </div>
 
-                    <div className="register-right">
-                        <div className="register-header">
-                            <h1>{t('register.title')}</h1>
-                            <p>{t('register.subtitle')}</p>
-                        </div>
-
-                        <div className="avatar-upload-section" onClick={handleAvatarClick}>
-                            <div className="avatar-preview">
+                    <motion.div 
+                        className="form-card"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3, duration: 0.5 }}
+                    >
+                        <div className="profile-upload-section" onClick={handleAvatarClick}>
+                            <div className="profile-avatar">
                                 {avatarPreview ? (
-                                    <img src={avatarPreview} alt="Avatar Preview" />
+                                    <img src={avatarPreview} alt="Avatar Preview" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                                 ) : (
-                                    <div className="avatar-placeholder">
-                                        <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" strokeWidth="1" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                    </div>
+                                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                 )}
+                                <div className="upload-icon">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                </div>
                             </div>
-                            <p>{t('register.upload')}</p>
+                            <p className="upload-text">{t('register.upload')}</p>
                             <input 
                                 type="file" 
                                 ref={fileInputRef} 
@@ -157,21 +187,22 @@ const Register = () => {
                             </div>
 
                             <div className="checkbox-group">
-                                <label className="custom-checkbox">
-                                    <input type="checkbox" required />
-                                    <span className="checkmark"></span>
-                                    {t('register.terms')}
+                                <input type="checkbox" id="terms" required />
+                                <label htmlFor="terms">
+                                    {t('register.terms')} <span className="terms-highlight">Termenii și Condițiile</span>
                                 </label>
                             </div>
 
-                            <button className="register-submit-btn" disabled={isLoading}>
+                            <button className="submit-btn" disabled={isLoading}>
                                 {isLoading ? t('register.btn_loading') : t('register.btn')}
                             </button>
                         </form>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </div>
         </div>
+
+
     );
 };
 

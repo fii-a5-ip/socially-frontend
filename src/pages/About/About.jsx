@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Users, Cpu, Rocket, CalendarHeart } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useTranslation } from '../../hooks/useTranslation';
 import './About.css';
 
