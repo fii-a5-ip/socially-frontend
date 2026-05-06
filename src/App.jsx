@@ -25,6 +25,8 @@ const PUBLIC_ROUTES = ['/', '/login', '/register', '/onboarding', '/about']
 
 function App() {
   const location = useLocation()
+
+
   const { isLoggedIn } = useApp()
 
   useEffect(() => {

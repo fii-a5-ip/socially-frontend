@@ -55,8 +55,11 @@ export function Step1Details({ values, errors, touched, handleChange, handleBlur
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
                 const file = e.target.files[0];
-                const previewUrl = URL.createObjectURL(file);
-                setValues(prev => ({ ...prev, imageUrl: previewUrl }));
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setValues(prev => ({ ...prev, imageUrl: reader.result }));
+                };
+                reader.readAsDataURL(file);
               }
             }}
           />
