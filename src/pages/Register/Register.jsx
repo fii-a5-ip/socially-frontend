@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
+import { API_URL } from '../../api/config';
 import './Register.css';
 
 const Register = () => {
@@ -40,7 +41,7 @@ const Register = () => {
         // }
 
         // 2. Facem cererea către server
-        fetch('http://localhost:8080/api/register', {
+        fetch(`${API_URL}/api/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', // Se lasă dacă trimiți json curat
