@@ -3,7 +3,9 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import { useTranslation } from "../../hooks/useTranslation";
+import { API_URL } from "../../api/config";
 import "./Login.css";
+import { GoogleLogin } from "@react-oauth/google";
 
 function Login() {
   const { login } = useApp();
@@ -15,16 +17,42 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      login();
-      navigate('/mode');
+    try {
+      const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          rememberMe: rememberMe
+        }),
 
-    }, 1500);
+
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const data = await response.json();
+      
+      // Salvăm token-ul (folosim localStorage pentru consistență)
+      localStorage.setItem("token", data.jwtToken || data.token);
+      
+      login(); // Actualizăm starea globală
+      navigate('/mode'); // Mergem la selecția modului
+    } catch (err) {
+      console.error(err);
+      alert(t('login.error_message') || "Email sau parolă greșită");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -94,9 +122,39 @@ function Login() {
 
             <div className="login-divider">sau</div>
 
-            <button className="login-google">
-              Conectare cu Google
-            </button>
+            <div className="google-login-container">
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  try {
+                    const response = await fetch(`${API_URL}/api/v1/auth/google`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        token: credentialResponse.credential,
+                      }),
+                    });
+
+                    if (!response.ok) {
+                      throw new Error("Google login failed");
+                    }
+
+                    const data = await response.json();
+                    localStorage.setItem("token", data.token || data.jwtToken);
+                    
+                    login();
+                    navigate('/mode');
+                  } catch (err) {
+                    console.error(err);
+                    alert("Eroare la login cu Google");
+                  }
+                }}
+                onError={() => {
+                  alert("Google login failed");
+                }}
+              />
+            </div>
           </form>
 
           <p className="login-footer">

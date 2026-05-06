@@ -18,11 +18,15 @@ import SoloDiscovering from './pages/SoloDiscovering/SoloDiscovering'
 import Profile from './pages/Profile/Profile'
 import { useApp } from './context/AppContext'
 import './App.css'
+import Privacy from './pages/Privacy/Privacy'
+import Help from './pages/Help/Help'
 
 const PUBLIC_ROUTES = ['/', '/login', '/register', '/onboarding', '/about']
 
 function App() {
   const location = useLocation()
+
+
   const { isLoggedIn } = useApp()
 
   useEffect(() => {
@@ -48,6 +52,8 @@ function App() {
           <Route path="/discover/create" element={<CreateEvent />} />
           <Route path="/discover/edit/:id" element={<CreateEvent />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/help" element={<Help />} />
         </Routes>
       </main>
       <Footer />

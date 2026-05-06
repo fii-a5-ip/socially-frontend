@@ -194,6 +194,12 @@ export const ro = {
   'creategroup.btn_back': 'Înapoi',
   'creategroup.btn_next': 'Continuă',
   'creategroup.btn_finish': 'Finalizează Grup',
+  'creategroup.invite_friends': 'Invită-ți prietenii',
+  'creategroup.selected': 'selectați',
+  'creategroup.search_placeholder': 'Caută după nume, @username, sau email...',
+  'creategroup.searching': 'Se caută...',
+  'creategroup.search_empty': 'Caută prieteni pentru a-i adăuga în grup',
+  'creategroup.no_results': 'Nu s-au găsit rezultate după',
 
   // Solo Discovering
   'solo.title': 'Descoperă',
@@ -257,5 +263,28 @@ export const ro = {
   'createevent.form.date': 'Dată și Oră',
   'createevent.form.date_ph': 'ex. 10:00 - 18:00 sau Sâmbătă, 20:00',
   'createevent.form.address': 'Adresă',
-  'createevent.form.address_ph': 'Introdu adresa completă'
+  'createevent.form.address_ph': 'Introdu adresa completă',
+  'createevent.step_details': 'DETALII',
+  'createevent.step_logistics': 'LOGISTICĂ',
+  'createevent.step_complete': 'FINALIZARE',
+
+  // Privacy Page
+  'privacy.title': 'Confidențialitate',
+  'privacy.subtitle': 'Transparență totală despre cum protejăm datele comunității Socially.',
+  'privacy.card1.title': 'Protecția Datelor',
+  'privacy.card1.desc': 'Informațiile tale personale sunt criptate și stocate în siguranță.',
+  'privacy.card2.title': 'Utilizare AI',
+  'privacy.card2.desc': 'Preferințele tale sunt folosite exclusiv pentru recomandări relevante.',
+  'privacy.card3.title': 'Control Total',
+  'privacy.card3.desc': 'Tu decizi ce informații sunt vizibile pentru alți membri.',
+
+  // Help Page
+  'help.title': 'Cum te putem ajuta?',
+  'help.subtitle': 'Ghiduri rapide și răspunsuri pentru experiența Socially.',
+  'help.card1.title': 'Ce este Scorul AI?',
+  'help.card1.desc': 'Indicator de compatibilitate între preferințele tale și locații.',
+  'help.card2.title': 'Cum propun o locație?',
+  'help.card2.desc': 'Folosește butonul "+" din secțiunea Descoperă.',
+  'help.card3.title': 'Raportare Probleme',
+  'help.card3.desc': 'Contactează-ne direct la adresa: sociallyteam@gmail.com.'
 };
