@@ -11,6 +11,7 @@ import ModeSelection from './pages/ModeSelection/ModeSelection'
 import Groups from './pages/Groups/Groups'
 import GroupDetail from './pages/GroupDetail/GroupDetail'
 import CreateGroup from './pages/CreateGroup/CreateGroup'
+import CreateEvent from './pages/CreateEvent/CreateEvent'
 import Onboarding from './pages/Onboarding/Onboarding'
 import About from './pages/About/About'
 import SoloDiscovering from './pages/SoloDiscovering/SoloDiscovering'
@@ -22,6 +23,7 @@ const PUBLIC_ROUTES = ['/', '/login', '/register', '/onboarding', '/about']
 
 function App() {
   const location = useLocation()
+
 
   const { isLoggedIn } = useApp()
 
@@ -45,6 +47,8 @@ function App() {
           <Route path="/groups/:groupId" element={<GroupDetail />} />
           <Route path="/groups/create" element={<CreateGroup />} />
           <Route path="/discover" element={<SoloDiscovering />} />
+          <Route path="/discover/create" element={<CreateEvent />} />
+          <Route path="/discover/edit/:id" element={<CreateEvent />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </main>

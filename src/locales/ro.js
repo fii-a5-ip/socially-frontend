@@ -128,6 +128,24 @@ export const ro = {
   'profile.account.deactivate': 'Dezactivează contul',
   'profile.account.logout': 'Deconectare',
 
+  'profile.edit.title': 'Editează Profil',
+  'profile.edit.change_photo': 'Schimbă Poza',
+  'profile.edit.fullname': 'Nume Complet',
+  'profile.edit.email': 'Email',
+  'profile.edit.bio_label': 'Bio (max 50 caractere)',
+  'profile.edit.bio_placeholder': 'Spune-ne ceva despre tine...',
+  'profile.edit.budget_label': 'Buget Per Ieșire:',
+  'profile.edit.budget_nolimit': 'Fără limită',
+  'profile.edit.save': 'Salvează Modificările',
+  'profile.edit.cancel': 'Anulează',
+  'profile.view.title': 'Date Personale',
+  'profile.view.edit_btn': '✏️ Editează',
+  'profile.view.fullname': 'Nume Complet',
+  'profile.view.email': 'Email',
+  'profile.view.bio': 'Bio',
+  'profile.view.bio_empty': 'Adaugă o scurtă descriere apăsând editează...',
+  'profile.view.budget': 'Buget Per Ieșire',
+
   // Groups
   'groups.title': 'Grupurile mele',
   'groups.search': 'Caută grupuri...',
@@ -152,7 +170,7 @@ export const ro = {
   'groupdetail.modal_members': 'membri în grup',
   'groupdetail.modal_member_label': 'MEMBRU',
   'groupdetail.invite_new': 'Invită un prieten nou',
-  
+
   // Notifications
   'notifications.title': 'Notificări',
   'notifications.empty': 'Nu ai notificări noi.',
@@ -187,6 +205,13 @@ export const ro = {
   'solo.title': 'Descoperă',
   'solo.explore': 'Explorează',
   'solo.saved': 'Salvate',
+  'solo.my_events': 'Evenimente Create',
+  'solo.my_events_empty_title': 'Nu ai adăugat niciun eveniment',
+  'solo.my_events_empty_desc': 'Orice eveniment vei crea folosind butonul + Add va apărea aici.',
+  'solo.organized_by_you': 'Organizat de tine',
+  'solo.cancel_event': 'Anulează Eveniment',
+  'solo.edit_event': 'Editează',
+  'solo.filter_all': 'Toate',
   'solo.no_more_title': 'Ai văzut tot!',
   'solo.no_more_desc': 'Nu mai există locații noi din această categorie.',
   'solo.reset_btn': 'Reia locații trecute',
@@ -195,5 +220,29 @@ export const ro = {
   'solo.delete': 'Șterge',
   'solo.schedule': 'Interval Orar:',
   'solo.address': 'Adresa completă (Click pt. Hartă):',
-  'solo.reserve': 'Rezervă Loc'
+  'solo.reserve': 'Rezervă Loc',
+  'solo.add_event': '+ Adaugă',
+
+  // Create Event
+  'createevent.title': 'Creează Eveniment',
+  'createevent.subtitle': 'Propune un loc nou sau un eveniment de neuitat pentru comunitate.',
+  'createevent.btn_next': 'Următorul pas',
+  'createevent.btn_back': 'Înapoi',
+  'createevent.btn_finish': 'Finalizează',
+  'createevent.success_title': 'Eveniment creat!',
+  'createevent.success_desc': 'Locația este publică. Sperăm să se alăture câți mai mulți!',
+  'createevent.edit_title': 'Editează Evenimentul',
+  'createevent.edit_subtitle': 'Actualizează informațiile locației tale.',
+  'createevent.edit_success_title': 'Actualizat cu succes!',
+  'createevent.edit_success_desc': 'Modificările au fost publicate.',
+  'createevent.form.name': 'Nume Eveniment',
+  'createevent.form.name_ph': 'ex. Hang Out & Study',
+  'createevent.form.desc': 'Descriere',
+  'createevent.form.desc_ph': 'Oferă câteva detalii atractive...',
+  'createevent.form.location': 'Locație',
+  'createevent.form.location_ph': 'ex. Cafenea Zbor Hub',
+  'createevent.form.date': 'Dată și Oră',
+  'createevent.form.date_ph': 'ex. 10:00 - 18:00 sau Sâmbătă, 20:00',
+  'createevent.form.address': 'Adresă',
+  'createevent.form.address_ph': 'Introdu adresa completă'
 };

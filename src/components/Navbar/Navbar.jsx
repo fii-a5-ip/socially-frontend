@@ -92,6 +92,7 @@ function Navbar() {
   const { t } = useTranslation()
 
 
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
