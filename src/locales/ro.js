@@ -238,6 +238,7 @@ export const ro = {
   'solo.filter_cultura': 'Cultură',
   'solo.filter_relaxare': 'Relaxare',
   'solo.filter_educatie': 'Educație',
+  'solo.searching_backend': 'Se caută evenimente prin AI...',
 
   // Create Event
   'createevent.title': 'Creează Eveniment',

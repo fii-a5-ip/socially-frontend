@@ -95,7 +95,6 @@ function CreateEvent() {
           return; 
       }
 
-
     try {
       const existing = JSON.parse(localStorage.getItem('socially_myEvents') || '[]');
       const newEvent = {
@@ -116,7 +115,7 @@ function CreateEvent() {
       if (isEditMode) {
         const targetIndex = existing.findIndex(e => e.id === Number(id));
         if (targetIndex !== -1) {
-          newEvent.image = existing[targetIndex].image; // keep original image
+          newEvent.image = existing[targetIndex].image;
           existing[targetIndex] = newEvent;
           localStorage.setItem('socially_myEvents', JSON.stringify(existing));
         }
@@ -128,11 +127,12 @@ function CreateEvent() {
     }
 
     setCreationSuccess(true);
-    // Simuleaza redirectionarea catre discover dupa putin timp
     setTimeout(() => {
       navigate('/discover');
     }, 2500);
   };
+
+
 
   return (
     <div className="ce-page">
@@ -166,7 +166,15 @@ function CreateEvent() {
         <div className="ce-card">
           <AnimatePresence mode="wait">
             {!creationSuccess ? (
-              <motion.div key={`step-${step}`} className="ce-step-wrapper">
+              <motion.div 
+                key={`step-${step}`} 
+                className="ce-step-wrapper"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+
                 {step === 1 && (
                   <Step1Details 
                     values={values} 

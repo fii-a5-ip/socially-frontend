@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import './SoloDiscovering.css';
 
+
 // ==========================================
 // 1. Mock Data
 // ==========================================
@@ -265,6 +266,7 @@ function SoloDiscovering() {
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [appliedSearch, setAppliedSearch] = useState('');
 
+
   const [likedPlaces, setLikedPlaces] = useState(() => {
     const s = localStorage.getItem('socially_likedPlaces');
     return s ? JSON.parse(s) : [];
@@ -278,8 +280,7 @@ function SoloDiscovering() {
     return s ? JSON.parse(s) : [];
   });
 
-  // Cardurile afișate NU sunt afectate de filtrele de search —
-  // doar excludem ce userul a dat like/dislike deja
+  // Cardurile afișate
   const availablePlaces = useMemo(() => {
       // 1. Excludem ce userul a dat like/dislike deja
       let filteredList = MOCK_LOCATIONS.filter(loc =>
@@ -298,6 +299,7 @@ function SoloDiscovering() {
 
       return filteredList;
     }, [likedPlaces, dislikedIds, appliedSearch]);
+
 
   const handleCardAction = (location, action) => {
     if (action === 'reset') { setDislikedIds([]); return; }
@@ -336,11 +338,12 @@ function SoloDiscovering() {
               document.body.style.overflow = '';
           }
 
-          // Cleanup function pentru când componenta este demontată
           return () => {
               document.body.style.overflow = '';
           };
       }, [isFilterPanelOpen]);
+
+
 
   if (selectedPlace) {
     return <PlaceDetails place={selectedPlace} onClose={() => setSelectedPlace(null)} onCancel={(id) => {
@@ -430,6 +433,7 @@ function SoloDiscovering() {
           </div>
         )}
       </div>
+
 
       <FilterPanel
         isOpen={isFilterPanelOpen}
