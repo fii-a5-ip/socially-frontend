@@ -155,7 +155,6 @@ const Register = () => {
                                 </svg>
                                 {t('register.google')}
                             </button>
-                            <div className="social-divider">SAU</div>
                         </div>
                     </div>
                     <div className="footer-copyright">
