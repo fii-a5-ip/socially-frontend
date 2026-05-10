@@ -4,18 +4,22 @@ import ProfileView from './components/ProfileView'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { useTranslation } from '../../hooks/useTranslation'
+import { API_URL } from '../../api/config'
 import './Profile.css'
+import flagRO from '../../assets/flag-ro.png'
+import flagEN from '../../assets/flag-en.png'
 
 function Profile() {
   const { t } = useTranslation()
   const [istoricExtins, setIstoricExtins] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const { logout } = useApp()
+  const { logout, lang, setLang } = useApp()
   const navigate = useNavigate()
+  const token = localStorage.getItem('token')
 
   const [profileData, setProfileData] = useState({
-    nume: '',
-    email: '',
+    nume: localStorage.getItem("current_fullname") || localStorage.getItem("current_username") || '',
+    email: localStorage.getItem("current_email") || '',
     bio: '',
     buget: '200',
     avatarUrl: null
@@ -27,76 +31,94 @@ function Profile() {
   const [aiScore, setAiScore] = useState(0)
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/users/me')
+    if (!token) return
+
+    // Fetch user info
+    fetch(`${API_URL}/api/users/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
       .then(res => res.json())
       .then(data => {
-        let n = ''
-        if (data.firstname) n += data.firstname
-        if (data.lastname) n += ' ' + data.lastname
+        let n = data.fullname || ''
+        if (!n && (data.firstname || data.lastname)) {
+          n = `${data.firstname || ''} ${data.lastname || ''}`.trim()
+        }
 
-        setProfileData({
-          nume: n,
-          email: data.email,
-          bio: data.bio,
-          buget: data.buget || '200',
-          avatarUrl: data.avatarUrl || null
-        })
+        setProfileData(prev => ({
+          ...prev,
+          nume: n || prev.nume,
+          email: data.email || prev.email,
+          bio: data.bio || prev.bio,
+          buget: data.buget || prev.buget,
+          avatarUrl: data.avatarUrl || prev.avatarUrl
+        }))
 
         if (data.aiScore) setAiScore(data.aiScore)
         if (data.totalOutings) setTotalOutings(data.totalOutings)
       })
-      .catch(e => console.log(e))
+      .catch(e => {
+        console.error('Error fetching user (endpoint might not exist):', e)
+        // Daca pica, pastram datele din localStorage care sunt deja in state
+      })
 
-    fetch('http://localhost:8080/api/groups')
+    // Fetch groups count
+    fetch(`${API_URL}/api/groups`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
       .then(res => res.json())
       .then(data => {
-        if (data && data.length) {
+        if (Array.isArray(data)) {
           setGroupsCount(data.length)
-        } else {
-          setGroupsCount(0)
         }
       })
-      .catch(e => console.log(e))
+      .catch(e => console.error('Error fetching groups:', e))
 
-    fetch('http://localhost:8080/api/activities/history')
+    // Fetch history
+    fetch(`${API_URL}/api/activities/history`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
       .then(res => res.json())
       .then(data => {
-        if (data && data.length) {
+        if (Array.isArray(data)) {
           setActivitatiComplete(data)
           setTotalOutings(data.length)
-        } else {
-          setActivitatiComplete([])
-          setTotalOutings(0)
         }
       })
-      .catch(e => console.log(e))
-  }, [])
+      .catch(e => console.error('Error fetching history:', e))
+  }, [token])
 
 
 
   const deAfisat = istoricExtins ? activitatiComplete : activitatiComplete.slice(0, 3)
 
   const handleSave = (newProfileData) => {
+    if (!token) return
+
     let splitName = newProfileData.nume.split(' ')
     let bodyData = {
       firstname: splitName[0],
       lastname: splitName.slice(1).join(' '),
-      bio: newProfileData.bio
+      bio: newProfileData.bio,
+      buget: newProfileData.buget
     }
 
-    fetch('http://localhost:8080/api/users/me', {
+    fetch(`${API_URL}/api/users/me`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(bodyData)
     })
-      .then(res => res.json())
-      .then(data => {
+      .then(res => {
+        if (!res.ok) throw new Error('Save failed')
+        return res.json()
+      })
+      .then(() => {
         setProfileData(newProfileData)
         setIsEditing(false)
       })
-      .catch(e => console.log(e))
+      .catch(e => console.error('Error saving profile:', e))
   }
 
   const handleCancel = () => {
@@ -155,11 +177,37 @@ function Profile() {
             <div className="profile-section">
               <h3 className="side-title">{t('profile.history.title')}</h3>
               <ul className="history-list">
-                {deAfisat.map((act, i) => <li key={i}>{act}</li>)}
+                {deAfisat.length > 0 ? (
+                  deAfisat.map((act, i) => <li key={i}>{act}</li>)
+                ) : (
+                  <li className="history-empty">Nu există activități recente.</li>
+                )}
               </ul>
-              <button type="button" className="btn-history-more" onClick={() => setIstoricExtins(!istoricExtins)}>
-                {istoricExtins ? t('profile.history.less') : t('profile.history.more')}
-              </button>
+              {activitatiComplete.length > 3 && (
+                <button type="button" className="btn-history-more" onClick={() => setIstoricExtins(!istoricExtins)}>
+                  {istoricExtins ? t('profile.history.less') : t('profile.history.more')}
+                </button>
+              )}
+            </div>
+
+            <div className="profile-section">
+              <h3 className="side-title">🌐 {lang === 'RO' ? 'Limbă' : 'Language'}</h3>
+              <div className="lang-selector-profile">
+                <button 
+                  className={`lang-option ${lang === 'RO' ? 'active' : ''}`} 
+                  onClick={() => setLang('RO')}
+                >
+                  <img src={flagRO} alt="RO" />
+                  <span>Română</span>
+                </button>
+                <button 
+                  className={`lang-option ${lang === 'EN' ? 'active' : ''}`} 
+                  onClick={() => setLang('EN')}
+                >
+                  <img src={flagEN} alt="EN" />
+                  <span>English</span>
+                </button>
+              </div>
             </div>
 
             <div className="profile-section">
