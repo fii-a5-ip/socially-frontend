@@ -1,40 +1,124 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProfileEditForm from './components/ProfileEditForm'
 import ProfileView from './components/ProfileView'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { useTranslation } from '../../hooks/useTranslation'
+import { API_URL } from '../../api/config'
 import './Profile.css'
+import flagRO from '../../assets/flag-ro.png'
+import flagEN from '../../assets/flag-en.png'
 
 function Profile() {
   const { t } = useTranslation()
   const [istoricExtins, setIstoricExtins] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const { logout } = useApp()
+  const { logout, lang, setLang } = useApp()
   const navigate = useNavigate()
+  const token = localStorage.getItem('token')
 
   const [profileData, setProfileData] = useState({
-    nume: 'Ștefan XNS',
-    email: 'stefan.xns@exemplu.com',
+    nume: localStorage.getItem("current_fullname") || localStorage.getItem("current_username") || '',
+    email: localStorage.getItem("current_email") || '',
     bio: '',
     buget: '200',
     avatarUrl: null
   })
 
-  const activitatiComplete = [
-    '⚽ Fotbal Sintetic - 02 Apr',
-    '🍔 Burger Van - 28 Mar',
-    '🍿 Dune: Part Two - 20 Mar',
-    '☕ Coffee Time - 15 Mar',
-    '🎳 Bowling Night - 10 Mar',
-    '🍕 Pizza Party - 05 Mar'
-  ]
+  const [groupsCount, setGroupsCount] = useState(0)
+  const [activitatiComplete, setActivitatiComplete] = useState([])
+  const [totalOutings, setTotalOutings] = useState(0)
+  const [aiScore, setAiScore] = useState(0)
+
+  useEffect(() => {
+    if (!token) return
+
+    // Fetch user info
+    fetch(`${API_URL}/api/users/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        let n = data.fullname || ''
+        if (!n && (data.firstname || data.lastname)) {
+          n = `${data.firstname || ''} ${data.lastname || ''}`.trim()
+        }
+
+        setProfileData(prev => ({
+          ...prev,
+          nume: n || prev.nume,
+          email: data.email || prev.email,
+          bio: data.bio || prev.bio,
+          buget: data.buget || prev.buget,
+          avatarUrl: data.avatarUrl || prev.avatarUrl
+        }))
+
+        if (data.aiScore) setAiScore(data.aiScore)
+        if (data.totalOutings) setTotalOutings(data.totalOutings)
+      })
+      .catch(e => {
+        console.error('Error fetching user (endpoint might not exist):', e)
+        // Daca pica, pastram datele din localStorage care sunt deja in state
+      })
+
+    // Fetch groups count
+    fetch(`${API_URL}/api/groups`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setGroupsCount(data.length)
+        }
+      })
+      .catch(e => console.error('Error fetching groups:', e))
+
+    // Fetch history
+    fetch(`${API_URL}/api/activities/history`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setActivitatiComplete(data)
+          setTotalOutings(data.length)
+        }
+      })
+      .catch(e => console.error('Error fetching history:', e))
+  }, [token])
+
+
 
   const deAfisat = istoricExtins ? activitatiComplete : activitatiComplete.slice(0, 3)
 
   const handleSave = (newProfileData) => {
-    setProfileData(newProfileData)
-    setIsEditing(false)
+    if (!token) return
+
+    let splitName = newProfileData.nume.split(' ')
+    let bodyData = {
+      firstname: splitName[0],
+      lastname: splitName.slice(1).join(' '),
+      bio: newProfileData.bio,
+      buget: newProfileData.buget
+    }
+
+    fetch(`${API_URL}/api/users/me`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(bodyData)
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Save failed')
+        return res.json()
+      })
+      .then(() => {
+        setProfileData(newProfileData)
+        setIsEditing(false)
+      })
+      .catch(e => console.error('Error saving profile:', e))
   }
 
   const handleCancel = () => {
@@ -76,8 +160,8 @@ function Profile() {
           <aside className="profile-sidebar">
             <div className="profile-section">
               <h3 className="side-title">{t('profile.stats.title')}</h3>
-              <div className="stat-row"><span>{t('profile.stats.active_groups')}</span> <strong>4</strong></div>
-              <div className="stat-row"><span>{t('profile.stats.total_outings')}</span> <strong>12</strong></div>
+              <div className="stat-row"><span>{t('profile.stats.active_groups')}</span> <strong>{groupsCount}</strong></div>
+              <div className="stat-row"><span>{t('profile.stats.total_outings')}</span> <strong>{totalOutings}</strong></div>
               <div className="stat-row">
                 <span>
                   {t('profile.stats.ai_score')}
@@ -86,18 +170,44 @@ function Profile() {
                     <span className="ai-tooltip-text">{t('profile.stats.ai_tooltip')}</span>
                   </span>
                 </span>
-                <strong>98%</strong>
+                <strong>{aiScore}%</strong>
               </div>
             </div>
 
             <div className="profile-section">
               <h3 className="side-title">{t('profile.history.title')}</h3>
               <ul className="history-list">
-                {deAfisat.map((act, i) => <li key={i}>{act}</li>)}
+                {deAfisat.length > 0 ? (
+                  deAfisat.map((act, i) => <li key={i}>{act}</li>)
+                ) : (
+                  <li className="history-empty">Nu există activități recente.</li>
+                )}
               </ul>
-              <button type="button" className="btn-history-more" onClick={() => setIstoricExtins(!istoricExtins)}>
-                {istoricExtins ? t('profile.history.less') : t('profile.history.more')}
-              </button>
+              {activitatiComplete.length > 3 && (
+                <button type="button" className="btn-history-more" onClick={() => setIstoricExtins(!istoricExtins)}>
+                  {istoricExtins ? t('profile.history.less') : t('profile.history.more')}
+                </button>
+              )}
+            </div>
+
+            <div className="profile-section">
+              <h3 className="side-title">🌐 {lang === 'RO' ? 'Limbă' : 'Language'}</h3>
+              <div className="lang-selector-profile">
+                <button 
+                  className={`lang-option ${lang === 'RO' ? 'active' : ''}`} 
+                  onClick={() => setLang('RO')}
+                >
+                  <img src={flagRO} alt="RO" />
+                  <span>Română</span>
+                </button>
+                <button 
+                  className={`lang-option ${lang === 'EN' ? 'active' : ''}`} 
+                  onClick={() => setLang('EN')}
+                >
+                  <img src={flagEN} alt="EN" />
+                  <span>English</span>
+                </button>
+              </div>
             </div>
 
             <div className="profile-section">
