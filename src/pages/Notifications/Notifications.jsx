@@ -15,8 +15,8 @@
 
 /*De la Backend*/
 import { definetelyRealNotifs } from './DateFalselol.js';
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
+// import axios from "axios";
 const API = import.meta.env.VITE_API_URL;
 console.log("API:", API);
 console.log(typeof t);
@@ -24,22 +24,20 @@ console.log(typeof t);
 import './Notifications.css'
 import { useTranslation } from '../../hooks/useTranslation';
 
-const test_Date= new Date();
-var check  = false;
-const test_Time= test_Date.getHours() + ':' + test_Date.getMinutes();
+// const test_Date= new Date();
+// var check  = false;
+// const test_Time= test_Date.getHours() + ':' + test_Date.getMinutes();
 
 /*Asta Ramane aici temporar*/
 function Notifications() {
 
   const { t } = useTranslation();
  
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState(definetelyRealNotifs);
 
   const userTypes = ["GROUP_INVITE"]; const systemTypes = ["OUTGOING_UPDATE", "REMINDER"];
 
   const isSystemType = (type) => systemTypes.includes(type)// GROUPD_INVITE va fi system type
-
-  useEffect(() => { setNotifications(definetelyRealNotifs);}, []);
 
   /*colectez datele "reale" aici:
 
