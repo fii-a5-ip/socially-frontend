@@ -86,6 +86,8 @@ const Register = () => {
                     
                     if (data.username) localStorage.setItem("current_username", data.username);
                     if (data.id) localStorage.setItem("current_userid", data.id);
+                    if (data.email) localStorage.setItem("current_email", data.email);
+                    if (data.fullname) localStorage.setItem("current_fullname", data.fullname);
                 }
 
                 const avatarFile = fileInputRef.current?.files[0];

@@ -86,7 +86,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
           <div className="bio-container">
             <textarea
               name="bio"
-              className="form-textarea"
+              className="profile-text"
               value={values.bio}
               onChange={handleChange}
               onKeyDown={handleBioKeyDown}
