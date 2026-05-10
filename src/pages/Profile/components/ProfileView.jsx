@@ -11,8 +11,8 @@ function ProfileView({ data, onEdit }) {
 
       <div className="avatar-box">
         <div className="avatar-display" style={{ overflow: 'hidden' }}>
-          {data.avatarUrl ? (
-            <img src={data.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          {data.avatar ? (
+            <img src={data.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             '👤'
           )}

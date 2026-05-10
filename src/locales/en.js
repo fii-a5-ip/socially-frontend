@@ -194,6 +194,12 @@ export const en = {
   'creategroup.btn_back': 'Back',
   'creategroup.btn_next': 'Continue',
   'creategroup.btn_finish': 'Finish Group',
+  'creategroup.invite_friends': 'Invite your friends',
+  'creategroup.selected': 'selected',
+  'creategroup.search_placeholder': 'Search by name, @username, or email...',
+  'creategroup.searching': 'Searching...',
+  'creategroup.search_empty': 'Search for friends to add to the group',
+  'creategroup.no_results': 'No results found for',
 
   // Solo Discovering
   'solo.title': 'Discover',
@@ -216,13 +222,29 @@ export const en = {
   'solo.address': 'Full address (Click for Map):',
   'solo.reserve': 'Reserve Place',
   'solo.add_event': '+ Add',
+  'solo.search_placeholder': 'Search...',
+  'solo.km_label': 'Km',
+  'solo.days_label': 'Days',
+  'solo.filters_title': 'Filters',
+  'solo.filters_reset': 'Reset',
+  'solo.filters_apply': 'Apply',
+  'solo.filter_group_location': 'Location type',
+  'solo.filter_group_activity': 'Activity',
+  'solo.filter_restaurante': 'Restaurants',
+  'solo.filter_cafenele': 'Cafés',
+  'solo.filter_parcuri': 'Parks',
+  'solo.filter_muzee': 'Museums',
+  'solo.filter_sport': 'Sport',
+  'solo.filter_cultura': 'Culture',
+  'solo.filter_relaxare': 'Relaxation',
+  'solo.filter_educatie': 'Education',
 
   // Create Event
   'createevent.title': 'Create Event',
   'createevent.subtitle': 'Propose a new place or an unforgettable event for the community.',
   'createevent.step_details': 'Details',
   'createevent.step_logistics': 'Logistics',
-  'createevent.step_complete': 'Complete',
+  'createevent.step_complete': 'Finished',
   'createevent.success_title': 'Event created!',
   'createevent.success_desc': 'The location is public. We hope many will join!',
   'createevent.btn_next': 'Next step',
@@ -241,5 +263,25 @@ export const en = {
   'createevent.form.date': 'Date and Time',
   'createevent.form.date_ph': 'e.g. 10:00 - 18:00 or Saturday, 20:00',
   'createevent.form.address': 'Address',
-  'createevent.form.address_ph': 'Enter full address'
+  'createevent.form.address_ph': 'Enter full address',
+
+   // Privacy Page
+  'privacy.title': 'Your Privacy',
+  'privacy.subtitle': 'Full transparency on how we protect the Socially community data.',
+  'privacy.card1.title': 'Data Protection',
+  'privacy.card1.desc': 'Your personal information is encrypted and stored securely.',
+  'privacy.card2.title': 'AI Usage',
+  'privacy.card2.desc': 'Your preferences are used exclusively for relevant recommendations.',
+  'privacy.card3.title': 'Total Control',
+  'privacy.card3.desc': 'You decide what information is visible to other members.',
+
+  // Help Page
+  'help.title': 'How can we help you?',
+  'help.subtitle': 'Quick guides and answers for the Socially experience.',
+  'help.card1.title': 'What is the AI Score?',
+  'help.card1.desc': 'A compatibility indicator between your preferences and locations.',
+  'help.card2.title': 'How do I propose a location?',
+  'help.card2.desc': 'Use the "+" button in the Discover section.',
+  'help.card3.title': 'Report Issues',
+  'help.card3.desc': 'Contact us via email at the address: sociallyteam@gmail.com.'
 };

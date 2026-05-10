@@ -194,6 +194,12 @@ export const ro = {
   'creategroup.btn_back': 'Înapoi',
   'creategroup.btn_next': 'Continuă',
   'creategroup.btn_finish': 'Finalizează Grup',
+  'creategroup.invite_friends': 'Invită-ți prietenii',
+  'creategroup.selected': 'selectați',
+  'creategroup.search_placeholder': 'Caută după nume, @username, sau email...',
+  'creategroup.searching': 'Se caută...',
+  'creategroup.search_empty': 'Caută prieteni pentru a-i adăuga în grup',
+  'creategroup.no_results': 'Nu s-au găsit rezultate după',
 
   // Solo Discovering
   'solo.title': 'Descoperă',
@@ -216,10 +222,30 @@ export const ro = {
   'solo.address': 'Adresa completă (Click pt. Hartă):',
   'solo.reserve': 'Rezervă Loc',
   'solo.add_event': '+ Adaugă',
+  'solo.search_placeholder': 'Caută...',
+  'solo.km_label': 'Km',
+  'solo.days_label': 'Zile',
+  'solo.filters_title': 'Filtre',
+  'solo.filters_reset': 'Resetează',
+  'solo.filters_apply': 'Aplică',
+  'solo.filter_group_location': 'Tip locație',
+  'solo.filter_group_activity': 'Activitate',
+  'solo.filter_restaurante': 'Restaurante',
+  'solo.filter_cafenele': 'Cafenele',
+  'solo.filter_parcuri': 'Parcuri',
+  'solo.filter_muzee': 'Muzee',
+  'solo.filter_sport': 'Sport',
+  'solo.filter_cultura': 'Cultură',
+  'solo.filter_relaxare': 'Relaxare',
+  'solo.filter_educatie': 'Educație',
+  'solo.searching_backend': 'Se caută evenimente prin AI...',
 
   // Create Event
   'createevent.title': 'Creează Eveniment',
   'createevent.subtitle': 'Propune un loc nou sau un eveniment de neuitat pentru comunitate.',
+  'createevent.step_details': 'Detalii',
+  'createevent.step_logistics': 'Logistici',
+  'createevent.step_complete': 'Finalizat',
   'createevent.btn_next': 'Următorul pas',
   'createevent.btn_back': 'Înapoi',
   'createevent.btn_finish': 'Finalizează',
@@ -238,5 +264,26 @@ export const ro = {
   'createevent.form.date': 'Dată și Oră',
   'createevent.form.date_ph': 'ex. 10:00 - 18:00 sau Sâmbătă, 20:00',
   'createevent.form.address': 'Adresă',
-  'createevent.form.address_ph': 'Introdu adresa completă'
+  'createevent.form.address_ph': 'Introdu adresa completă',
+
+
+  // Privacy Page
+  'privacy.title': 'Confidențialitate',
+  'privacy.subtitle': 'Transparență totală despre cum protejăm datele comunității Socially.',
+  'privacy.card1.title': 'Protecția Datelor',
+  'privacy.card1.desc': 'Informațiile tale personale sunt criptate și stocate în siguranță.',
+  'privacy.card2.title': 'Utilizare AI',
+  'privacy.card2.desc': 'Preferințele tale sunt folosite exclusiv pentru recomandări relevante.',
+  'privacy.card3.title': 'Control Total',
+  'privacy.card3.desc': 'Tu decizi ce informații sunt vizibile pentru alți membri.',
+
+  // Help Page
+  'help.title': 'Cum te putem ajuta?',
+  'help.subtitle': 'Ghiduri rapide și răspunsuri pentru experiența Socially.',
+  'help.card1.title': 'Ce este Scorul AI?',
+  'help.card1.desc': 'Indicator de compatibilitate între preferințele tale și locații.',
+  'help.card2.title': 'Cum propun o locație?',
+  'help.card2.desc': 'Folosește butonul "+" din secțiunea Descoperă.',
+  'help.card3.title': 'Raportare Probleme',
+  'help.card3.desc': 'Contactează-ne direct la adresa: sociallyteam@gmail.com.'
 };

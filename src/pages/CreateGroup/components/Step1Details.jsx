@@ -1,6 +1,6 @@
 import React from 'react';
 /* eslint-disable-next-line no-unused-vars */
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { MapPin, Image as ImageIcon, PartyPopper, Utensils, Coffee } from 'lucide-react';
 import FormInput from '../../../components/FormInput/FormInput';
 import { FormTextArea } from './FormTextArea';
@@ -55,8 +55,11 @@ export function Step1Details({ values, errors, touched, handleChange, handleBlur
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
                 const file = e.target.files[0];
-                const previewUrl = URL.createObjectURL(file);
-                setValues(prev => ({ ...prev, imageUrl: previewUrl }));
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setValues(prev => ({ ...prev, imageUrl: reader.result }));
+                };
+                reader.readAsDataURL(file);
               }
             }}
           />

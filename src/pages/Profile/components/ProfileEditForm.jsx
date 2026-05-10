@@ -11,30 +11,29 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
   const { values, errors, touched, handleChange, handleBlur, handleSubmit, setValues } = useForm(
     initialData,
     {
-      nume: (v) => validateRequired(v, 'Numele'),
-      email: (v) => validateEmail(v),
+      nume: (v) => validateRequired(v, t('profile.edit.fullname')),
+      email: (v) => validateEmail(v, t('profile.edit.email')),
     },
-    (validValues) => {
-      onSave(validValues)
-    }
+    onSave
   )
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      const url = URL.createObjectURL(file)
-      setValues((prev) => ({ ...prev, avatarUrl: url }))
-    }
+  const handleUploadClick = () => {
+    fileInputRef.current.click()
   }
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click()
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setValues((prev) => ({ ...prev, avatar: reader.result }))
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   const handleBioKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-    }
+    if (e.key === 'Enter') e.preventDefault()
   }
 
   return (
@@ -43,8 +42,8 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
 
       <div className="avatar-box">
         <div className="avatar-display" style={{ overflow: 'hidden' }}>
-          {values.avatarUrl ? (
-            <img src={values.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          {values.avatar ? (
+            <img src={values.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             '👤'
           )}
@@ -53,9 +52,9 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
         <input
           type="file"
           ref={fileInputRef}
-          onChange={handleImageChange}
-          accept="image/*"
+          onChange={handleFileChange}
           style={{ display: 'none' }}
+          accept="image/*"
         />
       </div>
 
@@ -87,7 +86,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
           <div className="bio-container">
             <textarea
               name="bio"
-              className="profile-text"
+              className="form-textarea"
               value={values.bio}
               onChange={handleChange}
               onKeyDown={handleBioKeyDown}
@@ -105,19 +104,18 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
           <input
             type="range"
             name="buget"
-            min="0" max="1000" step="50"
-            list="budget-steps"
-            className="profile-slider"
+            className="form-range"
+            min="0"
+            max="1000"
+            step="50"
             value={values.buget}
             onChange={handleChange}
           />
-          <datalist id="budget-steps">
-            <option value="0"></option>
-            <option value="250"></option>
-            <option value="500"></option>
-            <option value="750"></option>
-            <option value="1000"></option>
-          </datalist>
+          <div className="range-labels">
+            <span>0 RON</span>
+            <span>500 RON</span>
+            <span>{t('profile.edit.budget_nolimit')}</span>
+          </div>
         </div>
 
         <div className="form-actions">
