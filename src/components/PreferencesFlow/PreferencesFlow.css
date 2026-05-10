@@ -1,0 +1,96 @@
+.preferences-flow-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: var(--space-lg);
+  background-color: var(--bg-primary);
+}
+
+.preferences-card {
+  width: 100%;
+  max-width: 550px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* Progress bar styling */
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-primary-subtle);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
+}
+
+.step-counter {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: right;
+  letter-spacing: 0.5px;
+}
+
+/* Maintains a fixed height so the card does not jump when animating between steps */
+.step-content {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.preference-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  height: 100%;
+  justify-content: space-between;
+}
+
+.step-question {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+/* Input styles aligned with index.css variables */
+.step-input {
+  width: 100%;
+  padding: var(--space-md);
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.step-input:focus {
+  border-color: var(--color-primary);
+  background-color: var(--bg-card);
+  box-shadow: 0 0 0 4px var(--color-primary-glow);
+}
+
+.step-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+/* Button override for positioning */
+.step-next-btn {
+  align-self: flex-end;
+  margin-top: var(--space-md);
+  font-size: var(--font-size-lg);
+  padding: var(--space-sm) var(--space-xl);
+}
