@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+
 import { Users, Info, Settings2, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from '../../hooks/useForm';
 import { validateRequired } from '../../utils/validation';
 import { useTranslation } from '../../hooks/useTranslation';
 
+import { API_URL } from '../../api/config';
 import { Step1Details } from './components/Step1Details';
 import { Step2Members } from './components/Step2Members';
 import './CreateGroup.css';
@@ -53,11 +56,38 @@ function CreateGroup() {
   };
 
   const submitFinalGroup = async () => {
-    setCreationSuccess(true);
-    // Simuleaza redirectionarea catre noul grup dupa putin timp
-    setTimeout(() => {
-      navigate('/groups/1');
-    }, 2500);
+    try {
+      const payload = {
+        name: values.name,
+        description: values.description,
+        imgLink: values.imageUrl, // Trimitem imaginea Base64
+        creatorUserId: 1, // HARDCODED: Trebuie înlocuit cu ID-ul user-ului logat când adăugați Auth
+        memberIds: values.members || []
+      };
+
+      const response = await fetch(`${API_URL}/api/groups`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Eroare la crearea grupului');
+      }
+
+      const createdGroup = await response.json();
+      setCreationSuccess(true);
+      
+      setTimeout(() => {
+        navigate(`/groups/${createdGroup.id}`);
+      }, 2500);
+
+    } catch (error) {
+      console.error(error);
+      alert('A apărut o eroare la salvarea grupului.');
+    }
   };
 
   return (
@@ -105,7 +135,6 @@ function CreateGroup() {
                 )}
                 {step === 2 && (
                   <Step2Members 
-                    values={values} 
                     setValues={setValues}
                   />
                 )}

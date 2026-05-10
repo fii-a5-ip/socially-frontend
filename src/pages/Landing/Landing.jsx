@@ -1,7 +1,9 @@
 import { Users, Heart, Sparkles, Zap } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { Link } from 'react-router-dom';
+
 
 import { useTranslation } from '../../hooks/useTranslation';
+import { useApp } from '../../context/AppContext';
 
 import "./Landing.css";
 import heroImage from "./poza.png";
@@ -111,6 +113,38 @@ function Features() {
 function CTA() {
     const { t } = useTranslation();
 
+    // Aici era secretul! Folosim "isLoggedIn"
+    const { isLoggedIn } = useApp();
+
+    // Dacă utilizatorul este logat, ascundem secțiunea complet
+    if (isLoggedIn) {
+        return null;
+    }
+
+    return (
+        <section className="py-20 bg-gradient-to-br from-[var(--color-primary-subtle)] via-[var(--bg-primary)] to-[var(--color-primary-subtle)]">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-6">
+                    {t('landing.cta.title')}
+                </h2>
+                <p className="text-lg sm:text-xl text-[var(--text-muted)] mb-10 max-w-2xl mx-auto">
+                    {t('landing.cta.desc')}
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <Link to="/register" className="w-full sm:w-auto px-10 py-4 rounded-full bg-[var(--color-primary)] text-[var(--text-inverse)] text-lg hover:opacity-90 transition-opacity shadow-lg hover:shadow-xl inline-block">
+                        {t('landing.cta.btn')}
+                    </Link>
+                </div>
+                <p className="mt-8 text-sm text-[var(--text-muted)]">
+                    {t('landing.cta.disclaimer')}
+                </p>
+            </div>
+        </section>
+    );
+}
+/*function CTA() {
+    const { t } = useTranslation();
+
     return (
         <section className="py-20 bg-gradient-to-br from-[var(--color-primary-subtle)] via-[var(--bg-primary)] to-[var(--color-primary-subtle)]">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -131,7 +165,7 @@ function CTA() {
             </div>
         </section>
     );
-}
+}*/
 
 // ==========================================
 // COMPONENTA PRINCIPALĂ

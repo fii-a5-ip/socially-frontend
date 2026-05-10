@@ -1,9 +1,14 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import { useApp } from "../../context/AppContext";
+
 import { useTranslation } from "../../hooks/useTranslation";
+import { API_URL } from "../../api/config";
 import "./Login.css";
+import { GoogleLogin } from "@react-oauth/google";
 
 function Login() {
   const { login } = useApp();
@@ -15,22 +20,63 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      login();
-      navigate('/mode');
+    try {
+      const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          rememberMe: rememberMe
+        }),
 
-    }, 1500);
+
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const data = await response.json();
+      
+      // Salvăm token-ul (folosim localStorage pentru consistență)
+      localStorage.setItem("token", data.jwtToken || data.token);
+      
+      // Salvăm și datele utilizatorului deoarece backend-ul curent nu are un endpoint /api/users/me
+      if (data.username) localStorage.setItem("current_username", data.username);
+      if (data.id) localStorage.setItem("current_userid", data.id);
+      if (data.email) localStorage.setItem("current_email", data.email);
+      if (data.fullname) localStorage.setItem("current_fullname", data.fullname);
+      
+      login(); // Actualizăm starea globală
+      navigate('/mode'); // Mergem la selecția modului
+    } catch (err) {
+      console.error(err);
+      alert(t('login.error_message') || "Email sau parolă greșită");    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const handleDevLogin = () => {
+    localStorage.setItem("token", "dev-token-bypass");
+    login();
+    navigate('/mode');
+  };
 
   return (
     <div className="login-page">
-      <div className="login-wrapper">
+      <motion.div 
+        className="login-wrapper"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="login-header">
           <h1 className="login-title">{t('login.title')}</h1>
           <p className="login-subtitle">{t('login.subtitle')}</p>
@@ -94,17 +140,53 @@ function Login() {
 
             <div className="login-divider">sau</div>
 
-            <button className="login-google">
-              Conectare cu Google
+            <div className="google-login-container">
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  try {
+                    const response = await fetch(`${API_URL}/api/v1/auth/google`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        token: credentialResponse.credential,
+                      }),
+                    });
+
+                    if (!response.ok) {
+                      throw new Error("Google login failed");
+                    }
+
+                    const data = await response.json();
+                    localStorage.setItem("token", data.token || data.jwtToken);
+                    
+                    login();
+                    navigate('/mode');
+                  } catch (err) {
+                    console.error(err);
+                    alert("Eroare la login cu Google");
+                  }
+                }}
+                onError={() => {
+                  alert("Google login failed");
+                }}
+              />
+            </div>
+
+            <button type="button" onClick={handleDevLogin} className="dev-bypass-btn">
+              🔓 Bypass Login (Dev)
             </button>
           </form>
+
 
           <p className="login-footer">
             {t('login.register_prompt')} <Link to="/register">{t('login.register_link')}</Link>
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
+
   );
 }
 
