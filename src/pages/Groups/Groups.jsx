@@ -1,33 +1,43 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from '../../hooks/useTranslation'
+import { getMyGroups } from '../../api/groupsApi'
 import './Groups.css'
-
-const groups = [
-  {
-    id: 1,
-    name: 'Grup 1',
-    members: 12,
-    activity: 'Activ acum',
-    accent: 'pink',
-  },
-  {
-    id: 2,
-    name: 'Grup 2',
-    members: 8,
-    activity: 'Activ ieri',
-    accent: 'orange',
-  },
-  {
-    id: 3,
-    name: 'Grup 3',
-    members: 5,
-    activity: 'active_3days', // We'll translate these inline or using t()
-    accent: 'light-pink',
-  },
-]
 
 function Groups() {
   const { t } = useTranslation()
+  const [groups, setGroups] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        const data = await getMyGroups()
+        setGroups(data)
+      } catch (err) {
+        setError(err.message || 'Nu s-au putut încărca grupurile')
+        console.error('Error loading groups:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchGroups()
+  }, [])
+
+  const filteredGroups = groups.filter((group) =>
+    group.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const getAccentColor = (index) => {
+    const colors = ['pink', 'orange', 'light-pink', 'blue', 'green']
+    return colors[index % colors.length]
+  }
+
   return (
     <div className="groups-page">
       <div className="groups-container">
@@ -39,6 +49,8 @@ function Groups() {
             type="text"
             placeholder={t('groups.search')}
             className="groups-search__input"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
@@ -46,24 +58,51 @@ function Groups() {
           {t('groups.create_btn')}
         </Link>
 
-        <div className="groups-list">
-          {groups.map((group) => (
-            <Link to={`/groups/${group.id}`} className="group-card" key={group.id}>
-              <div className={`group-card__icon group-card__icon--${group.accent}`}>
-                <span className="group-card__emoji">👥</span>
-              </div>
+        {isLoading && (
+          <div className="groups-loading">
+            <p>{t('common.loading') || 'Se încarcă...'}</p>
+          </div>
+        )}
 
-              <div className="group-card__content">
-                <h2 className="group-card__title">{group.name}</h2>
-                <p className="group-card__subtitle">
-                  {group.members} {t('groups.members')} {/* Not fully translatable by ID here, but let's keep it simple */}
-                </p>
-              </div>
+        {error && (
+          <div className="groups-error">
+            <p>{error}</p>
+          </div>
+        )}
 
-              <span className="group-card__arrow">›</span>
-            </Link>
-          ))}
-        </div>
+        {!isLoading && !error && filteredGroups.length === 0 && (
+          <div className="groups-empty">
+            <p>{searchQuery ? 'Nu s-au găsit grupuri' : 'Nu ai niciun grup'}</p>
+          </div>
+        )}
+
+        {!isLoading && !error && filteredGroups.length > 0 && (
+          <div className="groups-list">
+            {filteredGroups.map((group, index) => (
+              <Link to={`/groups/${group.id}`} className="group-card" key={group.id}>
+                <div className={`group-card__icon group-card__icon--${getAccentColor(index)}`}>
+                  {group.imgLink ? (
+                    <img src={group.imgLink} alt={group.name} className="group-card__image" />
+                  ) : (
+                    <span className="group-card__emoji">👥</span>
+                  )}
+                </div>
+
+                <div className="group-card__content">
+                  <h2 className="group-card__title">{group.name}</h2>
+                  <p className="group-card__subtitle">
+                    {group.memberIds.length} {t('groups.members')}
+                  </p>
+                  {group.desc && (
+                    <p className="group-card__description">{group.desc}</p>
+                  )}
+                </div>
+
+                <span className="group-card__arrow">›</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
