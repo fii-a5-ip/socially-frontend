@@ -17,6 +17,7 @@ function Profile() {
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
 
+<<<<<<< Updated upstream
   const [profileData, setProfileData] = useState({
     nume: localStorage.getItem("current_fullname") || localStorage.getItem("current_username") || '',
     email: localStorage.getItem("current_email") || '',
@@ -88,10 +89,43 @@ function Profile() {
   }, [token])
 
 
+=======
+  const [profileData, setProfileData] = useState(null)
 
-  const deAfisat = istoricExtins ? activitatiComplete : activitatiComplete.slice(0, 3)
+  const [userGroups, setUserGroups] = useState([])
+
+  const [userActivities, setUserActivities] = useState([])
+>>>>>>> Stashed changes
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/users/me')
+      .then(response => response.json())
+      .then(data => {
+        setProfileData({
+          nume: (data.firstName || '') + ' ' + (data.lastName || ''),
+          email: data.email || '',
+          bio: data.bio || '',
+          buget: '200',
+          avatarUrl: null
+        })
+      })
+      .catch(err => console.log('Eroare la preluare date profil', err))
+
+    fetch('http://localhost:8080/api/groups/my')
+      .then(response => response.json())
+      .then(data => setUserGroups(data))
+      .catch(err => console.log('Eroare la preluare grupuri', err))
+
+    fetch('http://localhost:8080/api/activities/my')
+      .then(response => response.json())
+      .then(data => setUserActivities(data))
+      .catch(err => console.log('Eroare la preluare activitati', err))
+  }, [])
+
+  const deAfisat = istoricExtins ? userActivities : userActivities.slice(0, 3)
 
   const handleSave = (newProfileData) => {
+<<<<<<< Updated upstream
     if (!token) return
 
     let splitName = newProfileData.nume.split(' ')
@@ -119,6 +153,34 @@ function Profile() {
         setIsEditing(false)
       })
       .catch(e => console.error('Error saving profile:', e))
+=======
+    const numeComplet = newProfileData.nume.trim().split(' ')
+    const fname = numeComplet[0] || ''
+    const lname = numeComplet.slice(1).join(' ') || ''
+
+    const payload = {
+      firstName: fname,
+      lastName: lname,
+      bio: newProfileData.bio
+    }
+
+    fetch('http://localhost:8080/api/users/me', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(response => {
+      if(response.ok) {
+        setProfileData(newProfileData)
+        setIsEditing(false)
+      } else {
+        console.log('Ceva n-a mers bine la salvarea datelor')
+      }
+    })
+    .catch(err => console.log('Eroare la trimitere date', err))
+>>>>>>> Stashed changes
   }
 
   const handleCancel = () => {
@@ -129,6 +191,10 @@ function Profile() {
     logout()
     window.scrollTo(0, 0)
     navigate('/')
+  }
+
+  if (!profileData) {
+    return <div>Se incarca profilul...</div>
   }
 
   return (
@@ -160,8 +226,13 @@ function Profile() {
           <aside className="profile-sidebar">
             <div className="profile-section">
               <h3 className="side-title">{t('profile.stats.title')}</h3>
+<<<<<<< Updated upstream
               <div className="stat-row"><span>{t('profile.stats.active_groups')}</span> <strong>{groupsCount}</strong></div>
               <div className="stat-row"><span>{t('profile.stats.total_outings')}</span> <strong>{totalOutings}</strong></div>
+=======
+              <div className="stat-row"><span>{t('profile.stats.active_groups')}</span> <strong>{userGroups.length}</strong></div>
+              <div className="stat-row"><span>{t('profile.stats.total_outings')}</span> <strong>12</strong></div>
+>>>>>>> Stashed changes
               <div className="stat-row">
                 <span>
                   {t('profile.stats.ai_score')}
@@ -172,7 +243,7 @@ function Profile() {
                 </span>
                 <strong>{aiScore}%</strong>
               </div>
-            </div>
+            </div >
 
             <div className="profile-section">
               <h3 className="side-title">{t('profile.history.title')}</h3>
@@ -219,10 +290,10 @@ function Profile() {
 
               </div>
             </div>
-          </aside>
-        </div>
-      </main>
-    </div>
+          </aside >
+        </div >
+      </main >
+    </div >
   )
 }
 
