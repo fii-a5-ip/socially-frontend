@@ -1,2 +1,239 @@
-/* Notifications Page — Responsabil: Dinu */
-/* Adaugă stilurile specifice aici */
+/* ============================================
+   Notifications Page
+   ============================================ */
+
+/* ── Page wrapper ── */
+.notifications_header {
+  padding: var(--space-2xl) 0 var(--space-lg);
+  text-align: center;
+}
+
+.notifications_title {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.notifications_accent {
+  font-size: var(--font-size-xl);
+  display: inline-block;
+  transform: rotate(15deg);
+  animation: gentle-ring 3s infinite ease-in-out;
+}
+
+@keyframes gentle-ring {
+  0%, 100% { transform: rotate(15deg); }
+  50% { transform: rotate(0deg); }
+}
+
+/* ── Sections ── */
+.notifications_section {
+  margin-bottom: var(--space-2xl);
+}
+
+.notifications_section-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
+  color: var(--text-secondary);
+}
+
+.notifications_section-title.notifications_section_electricboogaloo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  margin-top: var(--space-lg);
+  border-bottom: 1px solid var(--color-gray-700);
+}
+
+.toggle {
+  margin-left: auto;
+}
+
+/* ── Group titles (De la utilizatori, Sistem) ── */
+.notifications_group-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-md);
+  padding-left: 4px;
+}
+
+/* ── Card list ── */
+.notifications_list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* ── Individual notification card ── */
+.notification {
+  min-height: 120px;
+
+  display: flex;
+
+  position: relative;
+  
+  align-items:flex-start;
+  gap: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
+  
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, rgba(0,0,0,0.06));
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.notification:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+
+}
+
+.notification:hover .notification_text {
+  max-height: 300em; /* big enough to fit most text */
+}
+
+/* ── Unread state ── */
+.notification-unread {
+  border-left: 4px solid var(--color-primary);
+  background: var(--color-primary-subtle);
+}
+
+/* ── Content block ── */
+.notification_content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+  min-width: 0;
+  overflow: visible; /* poate e necesar*/
+}
+
+.notification_text {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+  /*gap: var(--space-md);*/
+
+
+  /*testing pentru expansiune casutei la hover*/
+  max-height: 4.5em; /* (line-height) x (number of lines) */
+  overflow: hidden;
+
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  transition: max-height 0.25s ease;
+
+}
+
+.notification_time {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* ── Action buttons ── */
+.notification_actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.notification_actions .btn {
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+/* ── Empty state ── */
+.notifications_empty {
+  text-align: center;
+  padding: var(--space-2xl) 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-base);
+}
+
+/* ── Responsive tweaks ── */
+@media (max-width: 600px) {
+  .notification {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .notification_actions {
+    width: 100%;
+    gap: var(--space-sm);
+   margin-top: var(--space-sm);
+  }
+
+  .notification_actions .btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/*___ Cerc pentru pfp ___*/
+.notification_avatar {
+  width: 70px;
+  height: 70px; 
+  min-width: 70px; /*trebuie si asta aparent fiindca flex e un dezastru*/
+  /*border-radius: 50%; /* transforma patrat in cerc*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /*temporar* dadaddasdadas*/
+  font-size:9px;
+
+}
+
+.notification--user .notification_avatar {
+  border: 4px solid var(--border-color);
+  border-radius: 12px; /*patrat cu rounded corners */
+  overflow: hidden; /* ca sa fiu sigur*/
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.25);
+
+  font-size: 50px;
+  padding-top: 2x; /*11px pentru ca emoji-ul sa se lipeasca de fundul casutei sale */
+}
+
+/*nu am testat foarte tare*/
+
+.notification_avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.notification--system .notification_avatar {
+  font-size: 60px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);}
+
+
+/*___ Username + timestamp placement ___*/
+.notification_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-xs);
+  gap: var(--space-md);
+  flex-wrap: nowrap;
+}
+
+.notification_username {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-primary-dark); /* ce fel de "dark" este asta? lol*/
+}
+
+  .notification--system .notification_username
+  { color: var(--color-info);}

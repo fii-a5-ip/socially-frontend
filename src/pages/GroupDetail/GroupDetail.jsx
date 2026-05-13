@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useParams, Link } from 'react-router-dom'
-import './GroupDetail.css'
-=======
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   Clock,
@@ -20,7 +16,6 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useTranslation } from "../../hooks/useTranslation";
-import { getGroupById } from "../../api/groupsApi";
 import "./GroupDetail.css";
 
 const initialActivities = [
@@ -103,83 +98,15 @@ const mockMembers = [
     isReal: false,
   },
 ];
->>>>>>> 9acf13d (implementat: integrare cu backend la pagina de acces grupuri)
 
-/**
- * GroupDetail — Pagina detaliată a unui grup.
- *
- * Responsabili: Daria + Sasha
- *
- * TODO:
- * - Header cu numele grupului, imagine, descriere
- * - Lista membrilor
- * - Feed de activitate / evenimente planificate
- * - Chat / discuții de grup
- * - Setări grup (pentru admin)
- * - Buton de părăsire grup
- * - Design responsive
- */
 function GroupDetail() {
-<<<<<<< HEAD
-  const { groupId } = useParams()
-
-  return (
-    <div className="page-skeleton">
-      <span className="page-skeleton__icon">📋</span>
-      <h1 className="page-skeleton__title">Detalii Grup</h1>
-      <p className="page-skeleton__subtitle">
-        Pagina grupului cu ID: <code>{groupId}</code> — în curs de dezvoltare
-      </p>
-      <span className="page-skeleton__assignee">👤 Responsabili: Daria + Sasha</span>
-      <span className="page-skeleton__route">Ruta: /groups/:groupId</span>
-      <Link to="/groups" className="btn btn--secondary" style={{ marginTop: '1.5rem' }}>
-        ← Înapoi la grupuri
-      </Link>
-    </div>
-  )
-=======
   const { t } = useTranslation();
   const { groupId } = useParams();
-  const [group, setGroup] = useState(null);
-  const [isLoadingGroup, setIsLoadingGroup] = useState(true);
-  const [groupError, setGroupError] = useState(null);
   const [activities, setActivities] = useState(initialActivities);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchGroup = async () => {
-      try {
-        setIsLoadingGroup(true);
-        setGroupError(null);
-        const data = await getGroupById(parseInt(groupId, 10));
-        setGroup(data);
-      } catch (err) {
-        setGroupError(err.message || 'Grupul nu a putut fi încărcat');
-        console.error('Error loading group:', err);
-      } finally {
-        setIsLoadingGroup(false);
-      }
-    };
-
-    if (groupId) {
-      fetchGroup();
-    }
-  }, [groupId]);
-
-  const groupName = group?.name || `Grup ${groupId || "1"}`;
-  const groupDesc = group?.desc || '';
-  const groupImage = group?.imgLink;
-  const memberIds = group?.memberIds || [];
-
-  // Mock members for now - in future these would come from the group data
-  const mockMembers = memberIds.slice(0, 4).map((id, index) => ({
-    id: id,
-    name: `Membru ${index + 1}`,
-    avatar: null,
-    isReal: false,
-  }));
-  
-  const totalMembers = memberIds.length;
+  const groupName = `Grup ${groupId || "1"}`;
+  const totalMembers = mockMembers.length;
 
   const handleVote = (activityId, vote) => {
     setActivities((prev) =>
@@ -224,40 +151,6 @@ function GroupDetail() {
             </Link>
             <h1 className="gd-title">{groupName}</h1>
           </div>
-
-          {/* Loading State */}
-          {isLoadingGroup && (
-            <div className="gd-loading">
-              <p>{t('common.loading') || 'Se încarcă...'}</p>
-            </div>
-          )}
-
-          {/* Error State */}
-          {groupError && !isLoadingGroup && (
-            <div className="gd-error">
-              <p>{groupError}</p>
-              <Link to="/groups" className="gd-error-back">
-                {t('common.back') || 'Înapoi la grupuri'}
-              </Link>
-            </div>
-          )}
-
-          {/* Content - only show when not loading and no error */}
-          {!isLoadingGroup && !groupError && group && (
-            <>
-              {/* Group Image */}
-              {groupImage && (
-                <div className="gd-group-image">
-                  <img src={groupImage} alt={group.name} />
-                </div>
-              )}
-
-              {/* Group Description */}
-              {groupDesc && (
-                <div className="gd-group-description">
-                  <p>{groupDesc}</p>
-                </div>
-              )}
 
           {/* Participants Section */}
           <div className="gd-card gd-members-section">
@@ -304,8 +197,7 @@ function GroupDetail() {
               AI Matched
             </div>
           </div>
-            </>
-          )}
+
           {/* Activities List */}
           <div className="gd-activities-list">
             {activities.map((activity, index) => {
@@ -569,7 +461,6 @@ function GroupDetail() {
       </AnimatePresence>
     </>
   );
->>>>>>> 9acf13d (implementat: integrare cu backend la pagina de acces grupuri)
 }
 
-export default GroupDetail
+export default GroupDetail;

@@ -151,3 +151,21 @@
   color: var(--color-primary-dark);
   font-weight: 600;
 }
+
+.dev-bypass-btn {
+  margin-top: 1rem;
+  background: transparent;
+  border: 1px dashed var(--color-primary);
+  color: var(--color-primary);
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.dev-bypass-btn:hover {
+  background: rgba(239, 106, 55, 0.05);
+  transform: translateY(-1px);
+}

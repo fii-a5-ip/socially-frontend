@@ -244,6 +244,26 @@ datalist {
     color: var(--text-primary);
 }
 
+.profile-edit-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-range {
+    width: 100%;
+    margin-top: 10px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+}
+
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
 /* SIDEBAR CSS */
 .side-title {
     margin-bottom: 15px;
@@ -414,4 +434,63 @@ datalist {
     .btn-logout {
         padding: 12px;
     }
+}
+
+/* LANGUAGE SELECTOR PROFILE */
+.lang-selector-profile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color, var(--color-gray-200));
+    border-radius: 8px;
+    background: var(--bg-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.lang-option img {
+    width: 24px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.lang-option span {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.lang-option:hover {
+    border-color: var(--color-primary);
+    background: var(--bg-secondary);
+}
+
+.lang-option.active {
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.1);
+}
+
+.lang-option.active span {
+    color: var(--color-primary);
+}
+
+.history-empty {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-style: italic;
+    list-style: none !important;
+}
+
+.history-empty::before {
+    content: "" !important;
 }

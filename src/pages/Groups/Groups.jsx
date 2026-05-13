@@ -41,13 +41,13 @@ function Groups() {
   return (
     <div className="groups-page">
       <div className="groups-container">
-        <h1 className="groups-title">Grupurile mele</h1>
+        <h1 className="groups-title">{t('groups.title')}</h1>
 
         <div className="groups-search">
           <span className="groups-search__icon">⌕</span>
           <input
             type="text"
-            placeholder="Cauta grupuri..."
+            placeholder={t('groups.search')}
             className="groups-search__input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -55,7 +55,7 @@ function Groups() {
         </div>
 
         <Link to="/groups/create" className="groups-create-btn">
-          + Creeaza un grup
+          {t('groups.create_btn')}
         </Link>
 
         {isLoading && (
