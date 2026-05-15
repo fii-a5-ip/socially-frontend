@@ -37,12 +37,6 @@ function ProfileView({ data, onEdit }) {
           </strong>
         </div>
 
-        <div className="view-data-item">
-          <span className="view-label">{t('profile.view.budget')}</span>
-          <strong className="view-value view-value--accent">
-            {data.buget === '1000' ? t('profile.edit.budget_nolimit') : `${data.buget} RON`}
-          </strong>
-        </div>
       </div>
     </div>
   )

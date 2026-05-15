@@ -6,134 +6,105 @@ import { useApp } from '../../context/AppContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import { API_URL } from '../../api/config'
 import './Profile.css'
-import flagRO from '../../assets/flag-ro.png'
-import flagEN from '../../assets/flag-en.png'
 
 function Profile() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const [istoricExtins, setIstoricExtins] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const { logout, lang, setLang } = useApp()
+  const [isLoading, setIsLoading] = useState(true)
+  const { logout } = useApp()
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
 
-<<<<<<< Updated upstream
   const [profileData, setProfileData] = useState({
-    nume: localStorage.getItem("current_fullname") || localStorage.getItem("current_username") || '',
+    id: null,
+    nume: localStorage.getItem("current_fullname") || 'Utilizator',
     email: localStorage.getItem("current_email") || '',
     bio: '',
-    buget: '200',
     avatarUrl: null
   })
 
   const [groupsCount, setGroupsCount] = useState(0)
   const [activitatiComplete, setActivitatiComplete] = useState([])
   const [totalOutings, setTotalOutings] = useState(0)
-  const [aiScore, setAiScore] = useState(0)
+  const [aiScore, setAiScore] = useState(98)
+  
+  const [availableFilters, setAvailableFilters] = useState([
+    { id: 1, name: 'sport' },
+    { id: 2, name: 'muzica' },
+    { id: 3, name: 'tech' },
+    { id: 4, name: 'travel' },
+    { id: 5, name: 'art' }
+  ])
+  const [selectedFilters, setSelectedFilters] = useState([])
 
   useEffect(() => {
-    if (!token) return
+    if (!token) {
+      setIsLoading(false)
+      return
+    }
 
-    // Fetch user info
-    fetch(`${API_URL}/api/users/me`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    const headers = { 'Authorization': `Bearer ${token}` }
+
+    // Pasul 1: Luam profilul "me" pentru a afla ID-ul si datele de baza
+    fetch(`${API_URL}/api/users/me`, { headers })
       .then(res => res.json())
-      .then(data => {
-        let n = data.fullname || ''
-        if (!n && (data.firstname || data.lastname)) {
-          n = `${data.firstname || ''} ${data.lastname || ''}`.trim()
-        }
-
-        setProfileData(prev => ({
-          ...prev,
-          nume: n || prev.nume,
-          email: data.email || prev.email,
-          bio: data.bio || prev.bio,
-          buget: data.buget || prev.buget,
-          avatarUrl: data.avatarUrl || prev.avatarUrl
-        }))
-
-        if (data.aiScore) setAiScore(data.aiScore)
-        if (data.totalOutings) setTotalOutings(data.totalOutings)
-      })
-      .catch(e => {
-        console.error('Error fetching user (endpoint might not exist):', e)
-        // Daca pica, pastram datele din localStorage care sunt deja in state
-      })
-
-    // Fetch groups count
-    fetch(`${API_URL}/api/groups`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setGroupsCount(data.length)
-        }
-      })
-      .catch(e => console.error('Error fetching groups:', e))
-
-    // Fetch history
-    fetch(`${API_URL}/api/activities/history`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setActivitatiComplete(data)
-          setTotalOutings(data.length)
-        }
-      })
-      .catch(e => console.error('Error fetching history:', e))
-  }, [token])
-
-
-=======
-  const [profileData, setProfileData] = useState(null)
-
-  const [userGroups, setUserGroups] = useState([])
-
-  const [userActivities, setUserActivities] = useState([])
->>>>>>> Stashed changes
-
-  useEffect(() => {
-    fetch('http://localhost:8080/api/users/me')
-      .then(response => response.json())
-      .then(data => {
+      .then(userData => {
         setProfileData({
-          nume: (data.firstName || '') + ' ' + (data.lastName || ''),
-          email: data.email || '',
-          bio: data.bio || '',
-          buget: '200',
-          avatarUrl: null
+          id: userData.id,
+          nume: userData.fullname || `${userData.firstname || ''} ${userData.lastname || ''}`.trim() || profileData.nume,
+          email: userData.email || profileData.email,
+          bio: userData.bio || '',
+          avatarUrl: userData.avatarUrl || null
+        })
+        if (userData.aiScore) setAiScore(userData.aiScore)
+
+        // Pasul 2: Acum ca avem ID-ul, luam filtrele specifice ale userului (cerinta Cris/SM)
+        return fetch(`${API_URL}/api/users/${userData.id}/filters`, { headers })
+          .then(res => res.json())
+          .then(userFilters => {
+            if (Array.isArray(userFilters)) {
+              setSelectedFilters(userFilters.map(f => f.id))
+            }
+          })
+          .catch(err => console.log('Eroare fetch user filters:', err))
+      })
+      .catch(err => console.log('Eroare fetch me:', err))
+      .finally(() => {
+        // Pasul 3: Luam lista globala de filtre pentru selector
+        Promise.allSettled([
+          fetch(`${API_URL}/api/filters`, { headers }).then(res => res.json()),
+          fetch(`${API_URL}/api/groups`, { headers }).then(res => res.json()),
+          fetch(`${API_URL}/api/activities/history`, { headers }).then(res => res.json())
+        ]).then((results) => {
+          const [filtersRes, groupsRes, historyRes] = results
+
+          if (filtersRes.status === 'fulfilled' && Array.isArray(filtersRes.value) && filtersRes.value.length > 0) {
+            setAvailableFilters(filtersRes.value)
+          }
+          if (groupsRes.status === 'fulfilled' && Array.isArray(groupsRes.value)) {
+            setGroupsCount(groupsRes.value.length)
+          }
+          if (historyRes.status === 'fulfilled' && Array.isArray(historyRes.value)) {
+            setActivitatiComplete(historyRes.value)
+            setTotalOutings(historyRes.value.length)
+          }
+        }).finally(() => {
+          setIsLoading(false)
         })
       })
-      .catch(err => console.log('Eroare la preluare date profil', err))
+  }, [token])
 
-    fetch('http://localhost:8080/api/groups/my')
-      .then(response => response.json())
-      .then(data => setUserGroups(data))
-      .catch(err => console.log('Eroare la preluare grupuri', err))
-
-    fetch('http://localhost:8080/api/activities/my')
-      .then(response => response.json())
-      .then(data => setUserActivities(data))
-      .catch(err => console.log('Eroare la preluare activitati', err))
-  }, [])
-
-  const deAfisat = istoricExtins ? userActivities : userActivities.slice(0, 3)
+  const deAfisat = istoricExtins ? activitatiComplete : activitatiComplete.slice(0, 3)
 
   const handleSave = (newProfileData) => {
-<<<<<<< Updated upstream
     if (!token) return
 
-    let splitName = newProfileData.nume.split(' ')
-    let bodyData = {
-      firstname: splitName[0],
-      lastname: splitName.slice(1).join(' '),
+    const payload = {
+      email: newProfileData.email,
       bio: newProfileData.bio,
-      buget: newProfileData.buget
+      profilePictureUrl: profileData.avatarUrl,
+      filterIds: selectedFilters
     }
 
     fetch(`${API_URL}/api/users/me`, {
@@ -142,49 +113,32 @@ function Profile() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(bodyData)
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Save failed')
-        return res.json()
-      })
-      .then(() => {
-        setProfileData(newProfileData)
-        setIsEditing(false)
-      })
-      .catch(e => console.error('Error saving profile:', e))
-=======
-    const numeComplet = newProfileData.nume.trim().split(' ')
-    const fname = numeComplet[0] || ''
-    const lname = numeComplet.slice(1).join(' ') || ''
-
-    const payload = {
-      firstName: fname,
-      lastName: lname,
-      bio: newProfileData.bio
-    }
-
-    fetch('http://localhost:8080/api/users/me', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(payload)
     })
-    .then(response => {
-      if(response.ok) {
+      .then(res => {
+        if (!res.ok) throw new Error('Update failed')
+        return res.json()
+      })
+      .then(data => {
+        setProfileData({
+          ...newProfileData,
+          nume: data.fullname || newProfileData.nume
+        })
+        setIsEditing(false)
+      })
+      .catch(err => {
+        console.log('Eroare salvare, se aplică local', err)
         setProfileData(newProfileData)
         setIsEditing(false)
-      } else {
-        console.log('Ceva n-a mers bine la salvarea datelor')
-      }
-    })
-    .catch(err => console.log('Eroare la trimitere date', err))
->>>>>>> Stashed changes
+      })
   }
 
-  const handleCancel = () => {
-    setIsEditing(false)
+  const toggleFilter = (id) => {
+    if (selectedFilters.includes(id)) {
+      setSelectedFilters(selectedFilters.filter(fid => fid !== id))
+    } else {
+      setSelectedFilters([...selectedFilters, id])
+    }
   }
 
   const handleLogout = () => {
@@ -193,8 +147,15 @@ function Profile() {
     navigate('/')
   }
 
-  if (!profileData) {
-    return <div>Se incarca profilul...</div>
+  const getInterestLabel = (name) => {
+    if (!name) return '';
+    const normalized = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+    const translation = t(`interest.${normalized}`);
+    return translation === `interest.${normalized}` ? name : translation;
+  }
+
+  if (isLoading) {
+    return <div className="loading-profile">{t('profile.interests.loading')}</div>
   }
 
   return (
@@ -213,26 +174,41 @@ function Profile() {
               <ProfileEditForm
                 initialData={profileData}
                 onSave={handleSave}
-                onCancel={handleCancel}
+                onCancel={() => setIsEditing(false)}
               />
             ) : (
-              <ProfileView
-                data={profileData}
-                onEdit={() => setIsEditing(true)}
-              />
+              <>
+                <ProfileView
+                  data={profileData}
+                  onEdit={() => setIsEditing(true)}
+                />
+                
+                <div className="profile-interests-section">
+                  <h3 className="section-subtitle">{t('profile.interests.title')}</h3>
+                  <div className="interests-grid">
+                    {availableFilters.map(filter => (
+                      <button
+                        key={filter.id}
+                        className={`interest-tag ${selectedFilters.includes(filter.id) ? 'active' : ''}`}
+                        onClick={() => toggleFilter(filter.id)}
+                      >
+                        {getInterestLabel(filter.name)}
+                      </button>
+                    ))}
+                  </div>
+                  <button className="btn-save-interests" onClick={() => handleSave(profileData)}>
+                    {t('profile.interests.save')}
+                  </button>
+                </div>
+              </>
             )}
           </div>
 
           <aside className="profile-sidebar">
             <div className="profile-section">
               <h3 className="side-title">{t('profile.stats.title')}</h3>
-<<<<<<< Updated upstream
               <div className="stat-row"><span>{t('profile.stats.active_groups')}</span> <strong>{groupsCount}</strong></div>
               <div className="stat-row"><span>{t('profile.stats.total_outings')}</span> <strong>{totalOutings}</strong></div>
-=======
-              <div className="stat-row"><span>{t('profile.stats.active_groups')}</span> <strong>{userGroups.length}</strong></div>
-              <div className="stat-row"><span>{t('profile.stats.total_outings')}</span> <strong>12</strong></div>
->>>>>>> Stashed changes
               <div className="stat-row">
                 <span>
                   {t('profile.stats.ai_score')}
@@ -243,7 +219,7 @@ function Profile() {
                 </span>
                 <strong>{aiScore}%</strong>
               </div>
-            </div >
+            </div>
 
             <div className="profile-section">
               <h3 className="side-title">{t('profile.history.title')}</h3>
@@ -251,7 +227,7 @@ function Profile() {
                 {deAfisat.length > 0 ? (
                   deAfisat.map((act, i) => <li key={i}>{act}</li>)
                 ) : (
-                  <li className="history-empty">Nu există activități recente.</li>
+                  <li className="history-empty">{t('history.empty')}</li>
                 )}
               </ul>
               {activitatiComplete.length > 3 && (
@@ -262,38 +238,16 @@ function Profile() {
             </div>
 
             <div className="profile-section">
-              <h3 className="side-title">🌐 {lang === 'RO' ? 'Limbă' : 'Language'}</h3>
-              <div className="lang-selector-profile">
-                <button 
-                  className={`lang-option ${lang === 'RO' ? 'active' : ''}`} 
-                  onClick={() => setLang('RO')}
-                >
-                  <img src={flagRO} alt="RO" />
-                  <span>Română</span>
-                </button>
-                <button 
-                  className={`lang-option ${lang === 'EN' ? 'active' : ''}`} 
-                  onClick={() => setLang('EN')}
-                >
-                  <img src={flagEN} alt="EN" />
-                  <span>English</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="profile-section">
               <h3 className="side-title">{t('profile.account.title')}</h3>
               <div className="admin-actions">
                 <button type="button" className="btn-secondary-profile">{t('profile.account.change_pass')}</button>
                 <button type="button" className="btn-logout" onClick={handleLogout}>{t('profile.account.logout')}</button>
-
-
               </div>
             </div>
-          </aside >
-        </div >
-      </main >
-    </div >
+          </aside>
+        </div>
+      </main>
+    </div>
   )
 }
 
