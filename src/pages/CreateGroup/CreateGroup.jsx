@@ -20,15 +20,15 @@ const initialValues = {
   members: [],
 };
 
-const validationRules = {
-  name: (v) => validateRequired(v, 'Numele grupului'),
-};
-
 function CreateGroup() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [creationSuccess, setCreationSuccess] = useState(false);
+
+  const validationRules = {
+    name: (v) => v ? null : t('creategroup.error_name_required'),
+  };
 
   const { values, errors, touched, handleChange, handleBlur, setValues, setErrors } = useForm(
     initialValues,
@@ -42,9 +42,9 @@ function CreateGroup() {
 
   const handleNextStep = () => {
     const stepErrors = {};
-    
-    if (!values.name) { stepErrors.name = 'Numele grupului este obligatoriu.'; }
-    
+
+    if (!values.name) { stepErrors.name = t('creategroup.error_name_required'); }
+
     setErrors(prev => ({ ...prev, ...stepErrors }));
 
     // Permitem trecerea la nivel vizual pentru testare chiar dacă sunt erori
@@ -74,26 +74,26 @@ function CreateGroup() {
       });
 
       if (!response.ok) {
-        throw new Error('Eroare la crearea grupului');
+        throw new Error(t('creategroup.error_save'));
       }
 
       const createdGroup = await response.json();
       setCreationSuccess(true);
-      
+
       setTimeout(() => {
         navigate(`/groups/${createdGroup.id}`);
       }, 2500);
 
     } catch (error) {
       console.error(error);
-      alert('A apărut o eroare la salvarea grupului.');
+      alert(t('creategroup.error_save'));
     }
   };
 
   return (
     <div className="cg-page">
       <div className="cg-container">
-        
+
         {/* Header simplu */}
         <div className="cg-header">
           <h1 className="cg-page-title">{t('creategroup.title')}</h1>
@@ -124,23 +124,23 @@ function CreateGroup() {
             {!creationSuccess ? (
               <motion.div key={`step-${step}`} className="cg-step-wrapper">
                 {step === 1 && (
-                  <Step1Details 
-                    values={values} 
-                    errors={errors} 
-                    touched={touched} 
-                    handleChange={handleChange} 
+                  <Step1Details
+                    values={values}
+                    errors={errors}
+                    touched={touched}
+                    handleChange={handleChange}
                     handleBlur={handleBlur}
                     setValues={setValues}
                   />
                 )}
                 {step === 2 && (
-                  <Step2Members 
+                  <Step2Members
                     setValues={setValues}
                   />
                 )}
               </motion.div>
             ) : (
-              <motion.div 
+              <motion.div
                 key="success"
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -166,7 +166,7 @@ function CreateGroup() {
               ) : (
                 <div></div> // vizual gol
               )}
-              
+
               {step === 1 ? (
                 <button type="button" onClick={handleNextStep} className="cg-btn cg-btn-primary">
                   {t('creategroup.btn_next')} <ArrowRight size={18} />
@@ -179,7 +179,7 @@ function CreateGroup() {
             </div>
           )}
         </div>
-        
+
       </div>
     </div>
   );

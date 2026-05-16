@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   Clock,
   MapPin,
@@ -10,7 +10,9 @@ import {
   Sparkles,
   ChevronLeft,
   Activity as ActivityIcon,
-  Users
+  Users,
+  Search,
+  LogOut
 } from "lucide-react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,24 +20,153 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from "../../hooks/useTranslation";
 import "./GroupDetail.css";
 
+function EventDetailsModal({ event, onClose, isJoined, onToggleJoin }) {
+  const { t } = useTranslation();
+  if (!event) return null;
+
+  const hasImage = event.imageUrl && event.imageUrl !== "PLACEHOLDER";
+
+  return (
+    <div className="gd-place-details fade-in-fast">
+      <div
+        className="gd-pd-header"
+        style={hasImage ? { backgroundImage: `url(${event.imageUrl})` } : {}}
+      >
+        <button className="gd-pd-back-btn" onClick={onClose}>✕</button>
+        <div className="gd-pd-header-overlay"></div>
+        {!hasImage && (
+          <div className="gd-pd-no-image-placeholder">
+            <Trophy size={40} style={{ color: 'var(--color-primary)' }} />
+          </div>
+        )}
+      </div>
+
+      <div className="gd-pd-content">
+        <h1 className="gd-pd-title">{event.title}</h1>
+
+        <div className="gd-pd-top-meta">
+          <span className="gd-pd-meta-badge category">{event.type}</span>
+          <span className="gd-pd-meta-badge rating">
+            <Trophy size={12} style={{ marginRight: '4px' }} />
+            {event.score || 85}% Match
+          </span>
+        </div>
+
+        <div className="gd-pd-info-clean">
+          <div className="gd-pd-info-row">
+            <div className="icon"><Clock size={16} /></div>
+            <div>
+              <strong>{t('solo.schedule', 'Program')}</strong>
+              <p>{event.time}</p>
+            </div>
+          </div>
+
+          <div
+            className="gd-pd-info-row gd-clickable-address"
+            onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`, '_blank')}
+          >
+            <div className="icon"><MapPin size={16} /></div>
+            <div>
+              <strong>{t('solo.address', 'Adresa')}</strong>
+              <p className="gd-address-link">{event.location}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="gd-pd-description">
+          {event.description}
+        </div>
+      </div>
+
+      <div className="gd-pd-footer-action">
+        <button
+          className="gd-pd-reserve-btn"
+          onClick={onToggleJoin}
+          style={{
+            backgroundColor: isJoined ? '#ef4444' : 'var(--color-primary)',
+            color: 'white'
+          }}
+        >
+          {isJoined ? "Leave Event ✕" : "Join Event ✓"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
 function GroupDetail() {
   const { t } = useTranslation();
   const { groupId } = useParams();
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [members, setMembers] = useState([]);
   const [groupDetails, setGroupDetails] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Event detail modal state
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  const handleToggleJoin = async (id) => {
+    const event = events.find(e => e.id === id);
+    if (!event) return;
+
+    const isJoining = !event.isJoined;
+    const url = `/api/events/${id}/join`;
+    const method = isJoining ? 'POST' : 'DELETE';
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        // Update local state for immediate feedback
+        const updatedEvents = events.map(e =>
+          e.id === id ? { ...e, isJoined: isJoining } : e
+        );
+        setEvents(updatedEvents);
+        if (selectedEvent && selectedEvent.id === id) {
+          setSelectedEvent({ ...selectedEvent, isJoined: isJoining });
+        }
+        // Refresh full data from backend
+        fetchGroupDetails(debouncedSearch);
+      }
+    } catch (error) {
+      console.error('Error toggling join status:', error);
+    }
+  };
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
-    fetchGroupDetails();
-  }, [groupId]);
+    fetchGroupDetails(debouncedSearch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId, debouncedSearch]);
 
   const groupName = groupDetails ? groupDetails.name : `Grup ${groupId || "1"}`;
   const totalMembers = members.length;
 
-  const fetchGroupDetails = () => {
-    fetch(`/api/groups/${groupId}/details`)
+  const fetchGroupDetails = (query = "") => {
+    const url = query
+      ? `/api/groups/${groupId}/details?query=${encodeURIComponent(query)}`
+      : `/api/groups/${groupId}/details`;
+    const token = localStorage.getItem('token');
+
+    fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
       .then(res => {
         if (!res.ok) throw new Error('Backend offline');
         return res.json();
@@ -47,32 +178,7 @@ function GroupDetail() {
         setIsLoading(false);
       })
       .catch(err => {
-        console.warn('Backend indisponibil, se folosesc date de test (Mock):', err);
-        const mockData = {
-          name: "Grup Test (Mod Offline)",
-          members: [
-            { id: 1, name: "Daria", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150", isReal: true, role: "Admin" },
-            { id: 2, name: "Ionut", avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150", isReal: true }
-          ],
-          events: [
-            {
-              id: "e1",
-              title: "Ieșire la Cafea",
-              type: "Relaxare",
-              location: "Centrul Vechi",
-              time: "Vineri, 18:00",
-              score: 95,
-              imageUrl: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800",
-              votes: { da: 2, nu: 0, poate: 1 },
-              myVote: null,
-              isWinning: true,
-              attributes: [{ name: "Socializare", percentage: 95 }]
-            }
-          ]
-        };
-        setGroupDetails(mockData);
-        setEvents(mockData.events);
-        setMembers(mockData.members);
+        console.warn('Backend indisponibil sau eroare la fetch:', err);
         setIsLoading(false);
       });
   };
@@ -86,16 +192,12 @@ function GroupDetail() {
   const handleVote = async (eventId, vote) => {
     try {
       const token = localStorage.getItem('token');
-
       const response = await fetch(`/api/events/${eventId}/vote?type=${vote}`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-
       if (response.ok) {
-        fetchGroupDetails();
+        fetchGroupDetails(debouncedSearch);
       } else {
         console.error('Eroare la înregistrarea votului');
       }
@@ -104,10 +206,46 @@ function GroupDetail() {
     }
   };
 
+  const handleLeaveGroup = async () => {
+    if (!window.confirm(t('groupdetail.leave_confirm', 'Sigur vrei să părăsești grupul?'))) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/groups/${groupId}/leave`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        navigate('/groups');
+      } else {
+        console.error('Eroare la părăsirea grupului');
+      }
+    } catch (error) {
+      console.error('Eroare rețea la părăsirea grupului:', error);
+    }
+  };
+
+  // Events come already filtered from backend
+  const filteredEvents = events;
+
+  // Loading state
   if (isLoading) {
     return <div className="gd-page"><div className="gd-container"><h2>Loading...</h2></div></div>;
   }
 
+  // Event detail screen
+  if (selectedEvent) {
+    return (
+      <EventDetailsModal
+        event={selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+        isJoined={selectedEvent.isJoined}
+        onToggleJoin={() => handleToggleJoin(selectedEvent.id)}
+      />
+    );
+  }
+
+  // Main page
   return (
     <>
       <div className="gd-page">
@@ -138,7 +276,10 @@ function GroupDetail() {
                 <div key={member.id} className="gd-member-item">
                   <div className={`gd-member-avatar ${member.isReal ? 'real' : 'placeholder'}`}>
                     {member.isReal ? (
-                      <img src={member.avatar || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"} alt={member.name} />
+                      <img
+                        src={member.avatar || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"}
+                        alt={member.name}
+                      />
                     ) : (
                       <span>(poza)</span>
                     )}
@@ -146,9 +287,6 @@ function GroupDetail() {
                   <span className={`gd-member-name ${member.isReal ? 'real-text' : 'placeholder-text'}`}>
                     {member.name}
                   </span>
-                  {member.role && (
-                    <span className="gd-member-role badge">{member.role}</span>
-                  )}
                 </div>
               ))}
               <button className="gd-member-item gd-invite-btn group">
@@ -161,17 +299,30 @@ function GroupDetail() {
           </div>
 
           {/* Events Header */}
-          <div className="gd-activities-header">
-            <h2>{t('groupdetail.proposed_activities', 'Evenimente Propuse')}</h2>
-            <div className="gd-ai-badge">
-              <Sparkles className="icon-sm" />
-              AI Matched
+          <div className="gd-activities-header" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'stretch' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <h2>{t('groupdetail.proposed_activities', 'Evenimente Propuse')}</h2>
+              <div className="gd-ai-badge">
+                <Sparkles className="icon-sm" />
+                AI Matched
+              </div>
+            </div>
+
+            <div className="gd-search-bar" style={{ position: 'relative', width: '100%' }}>
+              <Search className="icon-sm gd-search-icon" />
+              <input
+                type="text"
+                placeholder={t('groupdetail.search_event', 'Caută un eveniment')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="gd-search-input"
+              />
             </div>
           </div>
 
           {/* Events List */}
           <div className="gd-activities-list">
-            {events.map((event, index) => {
+            {filteredEvents.map((event, index) => {
               const totalVotes = event.votes.da + event.votes.nu + event.votes.poate;
               const daPercent = totalVotes ? (event.votes.da / totalVotes) * 100 : 0;
               const poatePercent = totalVotes ? (event.votes.poate / totalVotes) * 100 : 0;
@@ -185,6 +336,8 @@ function GroupDetail() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className={`gd-activity-card ${event.isWinning ? 'winning' : ''}`}
+                  onClick={() => setSelectedEvent(event)}
+                  style={{ cursor: 'pointer' }}
                 >
                   {/* Image Area */}
                   <div className="gd-activity-image-area">
@@ -295,7 +448,7 @@ function GroupDetail() {
                       {/* Modern Voting Buttons */}
                       <div className="gd-vote-buttons">
                         <button
-                          onClick={() => handleVote(event.id, "Da")}
+                          onClick={(e) => { e.stopPropagation(); handleVote(event.id, "Da"); }}
                           className={`gd-vote-btn da ${event.myVote === "Da" ? "active" : event.myVote !== null ? "inactive" : ""}`}
                         >
                           {event.myVote === "Da" && (
@@ -317,7 +470,7 @@ function GroupDetail() {
                         </button>
 
                         <button
-                          onClick={() => handleVote(event.id, "Poate")}
+                          onClick={(e) => { e.stopPropagation(); handleVote(event.id, "Poate"); }}
                           className={`gd-vote-btn poate ${event.myVote === "Poate" ? "active" : event.myVote !== null ? "inactive" : ""}`}
                         >
                           {event.myVote === "Poate" && (
@@ -339,7 +492,7 @@ function GroupDetail() {
                         </button>
 
                         <button
-                          onClick={() => handleVote(event.id, "Nu")}
+                          onClick={(e) => { e.stopPropagation(); handleVote(event.id, "Nu"); }}
                           className={`gd-vote-btn nu ${event.myVote === "Nu" ? "active" : event.myVote !== null ? "inactive" : ""}`}
                         >
                           {event.myVote === "Nu" && (
@@ -364,6 +517,32 @@ function GroupDetail() {
                 </motion.div>
               );
             })}
+          </div>
+
+          {/* Leave Group Button */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem', marginBottom: '2rem' }}>
+            <button
+              className="gd-leave-btn"
+              onClick={handleLeaveGroup}
+              style={{
+                padding: '14px 32px',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 59, 48, 0.3)',
+                background: 'rgba(255, 59, 48, 0.1)',
+                color: '#ff3b30',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255, 59, 48, 0.2)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)'; }}
+            >
+              <LogOut size={20} />
+              <span>{t('groupdetail.leave_group', 'Părăsește Grupul')}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -404,7 +583,10 @@ function GroupDetail() {
                   <div key={member.id} className="gd-modal-member-row">
                     <div className={`gd-modal-avatar ${member.isReal ? 'real' : 'placeholder'}`}>
                       {member.isReal ? (
-                        <img src={member.avatar || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"} alt={member.name} />
+                        <img
+                          src={member.avatar || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"}
+                          alt={member.name}
+                        />
                       ) : (
                         <span>(poza)</span>
                       )}
