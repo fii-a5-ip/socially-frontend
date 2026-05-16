@@ -97,13 +97,39 @@ function Profile() {
 
   const deAfisat = istoricExtins ? activitatiComplete : activitatiComplete.slice(0, 3)
 
-  const handleSave = (newProfileData) => {
+  const handleSave = async (newProfileData) => {
     if (!token) return
+
+    let currentAvatarUrl = profileData.avatarUrl;
+
+    if (newProfileData.avatarFile) {
+      try {
+        const formData = new FormData();
+        formData.append('avatar', newProfileData.avatarFile);
+        
+        const uploadRes = await fetch(`${API_URL}/api/users/me/avatar`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+        
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          currentAvatarUrl = uploadData.avatarUrl || uploadData.profilePictureUrl || currentAvatarUrl;
+        } else {
+          console.warn('Backend upload endpoint might not be ready.');
+        }
+      } catch (e) {
+        console.error('Error uploading avatar:', e);
+      }
+    }
 
     const payload = {
       email: newProfileData.email,
       bio: newProfileData.bio,
-      profilePictureUrl: profileData.avatarUrl,
+      profilePictureUrl: currentAvatarUrl,
       filterIds: selectedFilters
     }
 
@@ -122,13 +148,14 @@ function Profile() {
       .then(data => {
         setProfileData({
           ...newProfileData,
-          nume: data.fullname || newProfileData.nume
+          nume: data.fullname || newProfileData.nume,
+          avatarUrl: currentAvatarUrl
         })
         setIsEditing(false)
       })
       .catch(err => {
         console.log('Eroare salvare, se aplică local', err)
-        setProfileData(newProfileData)
+        setProfileData({ ...newProfileData, avatarUrl: currentAvatarUrl })
         setIsEditing(false)
       })
   }

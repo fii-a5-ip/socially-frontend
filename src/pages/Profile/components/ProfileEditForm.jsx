@@ -26,7 +26,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setValues((prev) => ({ ...prev, avatar: reader.result }))
+        setValues((prev) => ({ ...prev, avatar: reader.result, avatarFile: file }))
       }
       reader.readAsDataURL(file)
     }
@@ -42,8 +42,8 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
 
       <div className="avatar-box">
         <div className="avatar-display" style={{ overflow: 'hidden' }}>
-          {values.avatar ? (
-            <img src={values.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          {values.avatar || values.avatarUrl ? (
+            <img src={values.avatar || values.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             '👤'
           )}
