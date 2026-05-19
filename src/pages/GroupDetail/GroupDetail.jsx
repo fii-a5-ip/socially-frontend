@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   Clock,
@@ -16,6 +16,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useTranslation } from "../../hooks/useTranslation";
+import { getGroupById } from "../../api/groupsApi";
 import "./GroupDetail.css";
 
 const initialActivities = [
@@ -71,42 +72,44 @@ const initialActivities = [
   },
 ];
 
-const mockMembers = [
-  {
-    id: 1,
-    name: "Andrei",
-    avatar:
-      "https://images.unsplash.com/photo-1615327388641-203faee20165?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx5b3VuZyUyMG1hbiUyMGZhY2UlMjBwb3J0cmFpdHxlbnwxfHx8fDE3NzU0OTMxOTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    isReal: true,
-  },
-  {
-    id: 2,
-    name: "nume",
-    avatar: null,
-    isReal: false,
-  },
-  {
-    id: 3,
-    name: "nume",
-    avatar: null,
-    isReal: false,
-  },
-  {
-    id: 4,
-    name: "nume",
-    avatar: null,
-    isReal: false,
-  },
-];
+function getMemberDisplayName(member) {
+  return member.fullname || member.name || member.username || `User ${member.userId}`;
+}
+
+function getMemberAvatar(member) {
+  return member.profileImgUrl || member.avatarUrl || member.profilePictureUrl || null;
+}
 
 function GroupDetail() {
   const { t } = useTranslation();
   const { groupId } = useParams();
+  const [group, setGroup] = useState(null);
+  const [isGroupLoading, setIsGroupLoading] = useState(true);
+  const [groupError, setGroupError] = useState(null);
   const [activities, setActivities] = useState(initialActivities);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const groupName = `Grup ${groupId || "1"}`;
-  const totalMembers = mockMembers.length;
+  useEffect(() => {
+    const loadGroup = async () => {
+      try {
+        setIsGroupLoading(true);
+        setGroupError(null);
+        const data = await getGroupById(groupId);
+        setGroup(data);
+      } catch (error) {
+        setGroupError(error.message || "Nu s-au putut incarca detaliile grupului");
+        console.error("Error loading group details:", error);
+      } finally {
+        setIsGroupLoading(false);
+      }
+    };
+
+    loadGroup();
+  }, [groupId]);
+
+  const members = Array.isArray(group?.members) ? group.members : [];
+  const groupName = group?.name || `Grup ${groupId || "1"}`;
+  const totalMembers = members.length;
 
   const handleVote = (activityId, vote) => {
     setActivities((prev) =>
@@ -152,7 +155,20 @@ function GroupDetail() {
             <h1 className="gd-title">{groupName}</h1>
           </div>
 
+          {isGroupLoading && (
+            <div className="gd-card gd-status-card">
+              <p>Se incarca detaliile grupului...</p>
+            </div>
+          )}
+
+          {!isGroupLoading && groupError && (
+            <div className="gd-card gd-status-card error">
+              <p>{groupError}</p>
+            </div>
+          )}
+
           {/* Participants Section */}
+          {!isGroupLoading && !groupError && (
           <div className="gd-card gd-members-section">
             <div className="gd-members-header">
               <h2>{t('groupdetail.members_title')}</h2>
@@ -166,20 +182,25 @@ function GroupDetail() {
             </div>
 
             <div className="gd-members-list custom-scrollbar">
-              {mockMembers.map((member) => (
-                <div key={member.id} className="gd-member-item">
-                  <div className={`gd-member-avatar ${member.isReal ? 'real' : 'placeholder'}`}>
-                    {member.isReal ? (
-                      <img src={member.avatar} alt={member.name} />
+              {members.map((member) => {
+                const memberName = getMemberDisplayName(member);
+                const memberAvatar = getMemberAvatar(member);
+
+                return (
+                <div key={`${member.userId}-${member.role || 'member'}`} className="gd-member-item">
+                  <div className={`gd-member-avatar ${memberAvatar ? 'real' : 'placeholder'}`}>
+                    {memberAvatar ? (
+                      <img src={memberAvatar} alt={memberName} />
                     ) : (
-                      <span>(poza)</span>
+                      <span>{member.userId}</span>
                     )}
                   </div>
-                  <span className={`gd-member-name ${member.isReal ? 'real-text' : 'placeholder-text'}`}>
-                    {member.name}
+                  <span className={`gd-member-name ${memberAvatar ? 'real-text' : 'placeholder-text'}`}>
+                    {memberName}
                   </span>
                 </div>
-              ))}
+                );
+              })}
               <button className="gd-member-item gd-invite-btn group">
                 <div className="gd-member-avatar invite">
                   <span>+</span>
@@ -188,6 +209,7 @@ function GroupDetail() {
               </button>
             </div>
           </div>
+          )}
 
           {/* Activities Header */}
           <div className="gd-activities-header">
@@ -430,23 +452,28 @@ function GroupDetail() {
               </div>
 
               <div className="gd-modal-body custom-scrollbar">
-                {mockMembers.map((member) => (
-                  <div key={member.id} className="gd-modal-member-row">
-                    <div className={`gd-modal-avatar ${member.isReal ? 'real' : 'placeholder'}`}>
-                      {member.isReal ? (
-                        <img src={member.avatar} alt={member.name} />
+                {members.map((member) => {
+                  const memberName = getMemberDisplayName(member);
+                  const memberAvatar = getMemberAvatar(member);
+
+                  return (
+                  <div key={`${member.userId}-${member.role || 'member'}`} className="gd-modal-member-row">
+                    <div className={`gd-modal-avatar ${memberAvatar ? 'real' : 'placeholder'}`}>
+                      {memberAvatar ? (
+                        <img src={memberAvatar} alt={memberName} />
                       ) : (
-                        <span>(poza)</span>
+                        <span>{member.userId}</span>
                       )}
                     </div>
                     <div className="gd-modal-member-info">
-                      <h4 className={member.isReal ? 'real' : 'placeholder'}>
-                        {member.name}
+                      <h4 className={memberAvatar ? 'real' : 'placeholder'}>
+                        {memberName}
                       </h4>
-                      <span>{t('groupdetail.modal_member_label')} {member.id}</span>
+                      <span>{member.role || t('groupdetail.modal_member_label')} {member.userId}</span>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
                 
                 <button className="gd-modal-invite-btn">
                   <div className="gd-modal-invite-icon">
