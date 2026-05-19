@@ -289,3 +289,32 @@
     justify-content: center;
   }
 }
+
+
+/* --- Weather Button Integration --- */
+.ce-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ce-weather-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: var(--radius-full, 20px);
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .ce-weather-btn:hover {
+        background: var(--color-primary-subtle);
+        color: var(--color-primary);
+        border-color: var(--color-primary);
+    }

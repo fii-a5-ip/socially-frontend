@@ -151,6 +151,14 @@ export const en = {
   'profile.account.change_pass': 'Change password',
   'profile.account.deactivate': 'Deactivate account',
   'profile.account.logout': 'Logout',
+  'profile.interests.title': '✨ My Interests',
+  'profile.interests.save': 'Save Preferences',
+  'profile.interests.loading': 'Loading interests...',
+  'interest.sport': 'Sport',
+  'interest.muzica': 'Music',
+  'interest.tech': 'Technology',
+  'interest.travel': 'Travel',
+  'interest.art': 'Art',
 
   'profile.edit.title': 'Edit Profile',
   'profile.edit.change_photo': 'Change Photo',
@@ -158,8 +166,6 @@ export const en = {
   'profile.edit.email': 'Email',
   'profile.edit.bio_label': 'Bio (max 50 characters)',
   'profile.edit.bio_placeholder': 'Tell us something about yourself...',
-  'profile.edit.budget_label': 'Budget Per Outing:',
-  'profile.edit.budget_nolimit': 'No limit',
   'profile.edit.save': 'Save Changes',
   'profile.edit.cancel': 'Cancel',
   'profile.view.title': 'Personal Details',
@@ -168,7 +174,6 @@ export const en = {
   'profile.view.email': 'Email',
   'profile.view.bio': 'Bio',
   'profile.view.bio_empty': 'Add a short description by clicking edit...',
-  'profile.view.budget': 'Budget Per Outing',
 
   // Groups
   'groups.title': 'My Groups',

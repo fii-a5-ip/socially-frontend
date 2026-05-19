@@ -151,6 +151,14 @@ export const ro = {
   'profile.account.change_pass': 'Schimbă parola',
   'profile.account.deactivate': 'Dezactivează contul',
   'profile.account.logout': 'Deconectare',
+  'profile.interests.title': '✨ Interesele Mele',
+  'profile.interests.save': 'Salvează Preferințele',
+  'profile.interests.loading': 'Se încarcă interesele...',
+  'interest.sport': 'Sport',
+  'interest.muzica': 'Muzică',
+  'interest.tech': 'Tehnologie',
+  'interest.travel': 'Călătorii',
+  'interest.art': 'Artă',
 
   'profile.edit.title': 'Editează Profil',
   'profile.edit.change_photo': 'Schimbă Poza',
@@ -158,8 +166,6 @@ export const ro = {
   'profile.edit.email': 'Email',
   'profile.edit.bio_label': 'Bio (max 50 caractere)',
   'profile.edit.bio_placeholder': 'Spune-ne ceva despre tine...',
-  'profile.edit.budget_label': 'Buget Per Ieșire:',
-  'profile.edit.budget_nolimit': 'Fără limită',
   'profile.edit.save': 'Salvează Modificările',
   'profile.edit.cancel': 'Anulează',
   'profile.view.title': 'Date Personale',
@@ -168,7 +174,6 @@ export const ro = {
   'profile.view.email': 'Email',
   'profile.view.bio': 'Bio',
   'profile.view.bio_empty': 'Adaugă o scurtă descriere apăsând editează...',
-  'profile.view.budget': 'Buget Per Ieșire',
 
   // Groups
   'groups.title': 'Grupurile mele',
