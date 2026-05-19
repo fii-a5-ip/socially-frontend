@@ -26,7 +26,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setValues((prev) => ({ ...prev, avatar: reader.result }))
+        setValues((prev) => ({ ...prev, avatar: reader.result, avatarFile: file }))
       }
       reader.readAsDataURL(file)
     }
@@ -42,8 +42,8 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
 
       <div className="avatar-box">
         <div className="avatar-display" style={{ overflow: 'hidden' }}>
-          {values.avatar ? (
-            <img src={values.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          {values.avatar || values.avatarUrl ? (
+            <img src={values.avatar || values.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             '👤'
           )}
@@ -86,7 +86,7 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
           <div className="bio-container">
             <textarea
               name="bio"
-              className="form-textarea"
+              className="profile-text"
               value={values.bio}
               onChange={handleChange}
               onKeyDown={handleBioKeyDown}
@@ -97,26 +97,6 @@ function ProfileEditForm({ initialData, onSave, onCancel }) {
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="input-label">
-            {t('profile.edit.budget_label')} <span style={{ fontWeight: 'bold' }}>{values.buget === '1000' ? t('profile.edit.budget_nolimit') : values.buget + ' RON'}</span>
-          </label>
-          <input
-            type="range"
-            name="buget"
-            className="form-range"
-            min="0"
-            max="1000"
-            step="50"
-            value={values.buget}
-            onChange={handleChange}
-          />
-          <div className="range-labels">
-            <span>0 RON</span>
-            <span>500 RON</span>
-            <span>{t('profile.edit.budget_nolimit')}</span>
-          </div>
-        </div>
 
         <div className="form-actions">
           <button type="submit" className="btn-save">{t('profile.edit.save')}</button>
