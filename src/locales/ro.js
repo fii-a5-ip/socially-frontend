@@ -160,6 +160,7 @@ export const ro = {
   'groupdetail.view_all': 'Vezi toți membrii',
   'groupdetail.invite': 'Invită',
   'groupdetail.proposed_activities': 'Activități propuse',
+  'groupdetail.propose_event': 'Propune',
   'groupdetail.winning_activity': 'Activitate Câștigătoare',
   'groupdetail.ai_score': 'Scor AI:',
   'groupdetail.profile_prefs': 'Profilul & Preferințele Tale',

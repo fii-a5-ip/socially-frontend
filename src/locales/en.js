@@ -160,6 +160,7 @@ export const en = {
   'groupdetail.view_all': 'View all members',
   'groupdetail.invite': 'Invite',
   'groupdetail.proposed_activities': 'Proposed activities',
+  'groupdetail.propose_event': 'Propose',
   'groupdetail.winning_activity': 'Winning Activity',
   'groupdetail.ai_score': 'AI Score:',
   'groupdetail.profile_prefs': 'Your Profile & Preferences',

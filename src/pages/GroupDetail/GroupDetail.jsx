@@ -12,12 +12,14 @@ import {
   Activity as ActivityIcon,
   Users,
   Search,
-  LogOut
+  LogOut,
+  Plus
 } from "lucide-react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useTranslation } from "../../hooks/useTranslation";
+import { API_URL } from "../../api/config";
 import "./GroupDetail.css";
 
 function EventDetailsModal({ event, onClose, isJoined, onToggleJoin }) {
@@ -115,7 +117,7 @@ function GroupDetail() {
     if (!event) return;
 
     const isJoining = !event.isJoined;
-    const url = `/api/events/${id}/join`;
+    const url = `${API_URL}/api/events/${id}/join`;
     const method = isJoining ? 'POST' : 'DELETE';
     const token = localStorage.getItem('token');
 
@@ -160,8 +162,8 @@ function GroupDetail() {
 
   const fetchGroupDetails = (query = "") => {
     const url = query
-      ? `/api/groups/${groupId}/details?query=${encodeURIComponent(query)}`
-      : `/api/groups/${groupId}/details`;
+      ? `${API_URL}/api/groups/${groupId}/details?query=${encodeURIComponent(query)}`
+      : `${API_URL}/api/groups/${groupId}/details`;
     const token = localStorage.getItem('token');
 
     fetch(url, {
@@ -192,7 +194,7 @@ function GroupDetail() {
   const handleVote = async (eventId, vote) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/events/${eventId}/vote?type=${vote}`, {
+      const response = await fetch(`${API_URL}/api/events/${eventId}/vote?type=${vote}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -211,7 +213,7 @@ function GroupDetail() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/groups/${groupId}/leave`, {
+      const response = await fetch(`${API_URL}/api/groups/${groupId}/leave`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -302,9 +304,19 @@ function GroupDetail() {
           <div className="gd-activities-header" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'stretch' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
               <h2>{t('groupdetail.proposed_activities', 'Evenimente Propuse')}</h2>
-              <div className="gd-ai-badge">
-                <Sparkles className="icon-sm" />
-                AI Matched
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <button
+                  onClick={() => navigate(`/discover/create?groupId=${groupId}`)}
+                  className="gd-ai-badge"
+                  style={{ cursor: 'pointer', border: 'none', background: 'var(--color-primary)', color: 'white', borderRadius: '20px', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 600 }}
+                >
+                  <Plus className="icon-sm" />
+                  {t('groupdetail.propose_event', 'Propune')}
+                </button>
+                <div className="gd-ai-badge">
+                  <Sparkles className="icon-sm" />
+                  AI Matched
+                </div>
               </div>
             </div>
 
