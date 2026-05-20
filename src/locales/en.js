@@ -228,16 +228,46 @@ export const en = {
   'solo.filters_title': 'Filters',
   'solo.filters_reset': 'Reset',
   'solo.filters_apply': 'Apply',
-  'solo.filter_group_location': 'Location type',
-  'solo.filter_group_activity': 'Activity',
-  'solo.filter_restaurante': 'Restaurants',
-  'solo.filter_cafenele': 'Cafés',
-  'solo.filter_parcuri': 'Parks',
-  'solo.filter_muzee': 'Museums',
-  'solo.filter_sport': 'Sport',
-  'solo.filter_cultura': 'Culture',
-  'solo.filter_relaxare': 'Relaxation',
-  'solo.filter_educatie': 'Education',
+
+  //Filtre predefinite
+
+  'solo.filter_venue_type': 'Venue Type',
+
+  'solo.filter_restaurant': 'Restaurant',
+  'solo.filter_cafe': 'Café',
+  'solo.filter_bar': 'Bar',
+  'solo.filter_pub': 'Pub',
+
+  'solo.filter_food': 'Food',
+
+  'solo.filter_pizza': 'Pizza',
+  'solo.filter_sushi': 'Sushi',
+  'solo.filter_buffet': 'Buffet',
+  'solo.filter_vegetarian': 'Vegetarian',
+  'solo.filter_gluten_free': 'Gluten-free',
+
+  'solo.filter_activities': 'Activități',
+
+  'solo.filter_live_music': 'Live music',
+  'solo.filter_sports_screening': 'Sports screening',
+  'solo.filter_board_games': 'Board games',
+
+  'solo.filter_facilities': 'Facilities',
+
+  'solo.filter_free_wifi': 'Free Wi-Fi',
+  'solo.filter_air_conditioning': 'Air conditioning',
+  'solo.filter_power_outlets': 'Power outlets',
+
+  'solo.filter_transport_parking': 'Transport & Parking',
+
+  'solo.filter_free_parking': 'Free parking',
+  'solo.filter_public_transport_nearby': 'Public transport nearby',
+
+
+  // No result
+  'solo.results_for': 'results for',
+  'solo.no_results_for': 'No results for',
+  'solo.no_results_title': 'No results',
 
   // Create Event
   'createevent.title': 'Create Event',
