@@ -62,6 +62,21 @@
   margin-bottom: 1.5rem;
 }
 
+.gd-status-card {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.gd-status-card p {
+  margin: 0;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.gd-status-card.error {
+  border-left: 4px solid var(--color-error, #ff6b6b);
+}
+
 .gd-members-header {
   display: flex;
   justify-content: space-between;

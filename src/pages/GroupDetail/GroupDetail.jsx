@@ -16,7 +16,7 @@ import {
   Plus
 } from "lucide-react";
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
 
 import { useTranslation } from "../../hooks/useTranslation";
 import { API_URL } from "../../api/config";
@@ -34,11 +34,13 @@ function EventDetailsModal({ event, onClose, isJoined, onToggleJoin }) {
         className="gd-pd-header"
         style={hasImage ? { backgroundImage: `url(${event.imageUrl})` } : {}}
       >
-        <button className="gd-pd-back-btn" onClick={onClose}>✕</button>
+        <button className="gd-pd-back-btn" onClick={onClose}>
+          ✕
+        </button>
         <div className="gd-pd-header-overlay"></div>
         {!hasImage && (
           <div className="gd-pd-no-image-placeholder">
-            <Trophy size={40} style={{ color: 'var(--color-primary)' }} />
+            <Trophy size={40} style={{ color: "var(--color-primary)" }} />
           </div>
         )}
       </div>
@@ -49,35 +51,42 @@ function EventDetailsModal({ event, onClose, isJoined, onToggleJoin }) {
         <div className="gd-pd-top-meta">
           <span className="gd-pd-meta-badge category">{event.type}</span>
           <span className="gd-pd-meta-badge rating">
-            <Trophy size={12} style={{ marginRight: '4px' }} />
+            <Trophy size={12} style={{ marginRight: "4px" }} />
             {event.score || 85}% Match
           </span>
         </div>
 
         <div className="gd-pd-info-clean">
           <div className="gd-pd-info-row">
-            <div className="icon"><Clock size={16} /></div>
+            <div className="icon">
+              <Clock size={16} />
+            </div>
             <div>
-              <strong>{t('solo.schedule', 'Program')}</strong>
+              <strong>{t("solo.schedule", "Program")}</strong>
               <p>{event.time}</p>
             </div>
           </div>
 
           <div
             className="gd-pd-info-row gd-clickable-address"
-            onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`, '_blank')}
+            onClick={() =>
+              window.open(
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`,
+                "_blank"
+              )
+            }
           >
-            <div className="icon"><MapPin size={16} /></div>
+            <div className="icon">
+              <MapPin size={16} />
+            </div>
             <div>
-              <strong>{t('solo.address', 'Adresa')}</strong>
+              <strong>{t("solo.address", "Adresa")}</strong>
               <p className="gd-address-link">{event.location}</p>
             </div>
           </div>
         </div>
 
-        <div className="gd-pd-description">
-          {event.description}
-        </div>
+        <div className="gd-pd-description">{event.description}</div>
       </div>
 
       <div className="gd-pd-footer-action">
@@ -85,8 +94,8 @@ function EventDetailsModal({ event, onClose, isJoined, onToggleJoin }) {
           className="gd-pd-reserve-btn"
           onClick={onToggleJoin}
           style={{
-            backgroundColor: isJoined ? '#ef4444' : 'var(--color-primary)',
-            color: 'white'
+            backgroundColor: isJoined ? "#ef4444" : "var(--color-primary)",
+            color: "white"
           }}
         >
           {isJoined ? "Leave Event ✕" : "Join Event ✓"}
@@ -96,16 +105,41 @@ function EventDetailsModal({ event, onClose, isJoined, onToggleJoin }) {
   );
 }
 
+function getMemberDisplayName(member) {
+  const memberId = member?.userId ?? member?.id;
+  return (
+    member?.fullname ||
+    member?.name ||
+    member?.username ||
+    (memberId != null ? `User ${memberId}` : "User")
+  );
+}
+
+function getMemberAvatar(member) {
+  return (
+    member?.profileImgUrl ||
+    member?.avatarUrl ||
+    member?.profilePictureUrl ||
+    member?.avatar ||
+    null
+  );
+}
 
 function GroupDetail() {
   const { t } = useTranslation();
   const { groupId } = useParams();
   const navigate = useNavigate();
+
   const [events, setEvents] = useState([]);
   const [members, setMembers] = useState([]);
   const [groupDetails, setGroupDetails] = useState(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [isGroupLoading, setIsGroupLoading] = useState(true);
+  const [groupError, setGroupError] = useState(null);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -113,23 +147,23 @@ function GroupDetail() {
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   const handleToggleJoin = async (id) => {
-    const event = events.find(e => e.id === id);
+    const event = events.find((e) => e.id === id);
     if (!event) return;
 
     const isJoining = !event.isJoined;
     const url = `${API_URL}/api/events/${id}/join`;
-    const method = isJoining ? 'POST' : 'DELETE';
-    const token = localStorage.getItem('token');
+    const method = isJoining ? "POST" : "DELETE";
+    const token = localStorage.getItem("token");
 
     try {
       const response = await fetch(url, {
         method,
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       if (response.ok) {
         // Update local state for immediate feedback
-        const updatedEvents = events.map(e =>
+        const updatedEvents = events.map((e) =>
           e.id === id ? { ...e, isJoined: isJoining } : e
         );
         setEvents(updatedEvents);
@@ -140,7 +174,7 @@ function GroupDetail() {
         fetchGroupDetails(debouncedSearch);
       }
     } catch (error) {
-      console.error('Error toggling join status:', error);
+      console.error("Error toggling join status:", error);
     }
   };
 
@@ -164,24 +198,30 @@ function GroupDetail() {
     const url = query
       ? `${API_URL}/api/groups/${groupId}/details?query=${encodeURIComponent(query)}`
       : `${API_URL}/api/groups/${groupId}/details`;
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
+
+    setIsGroupLoading(true);
+    setGroupError(null);
 
     fetch(url, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => {
-        if (!res.ok) throw new Error('Backend offline');
+      .then((res) => {
+        if (!res.ok) throw new Error("Backend offline");
         return res.json();
       })
-      .then(data => {
+      .then((data) => {
         setGroupDetails(data);
         setEvents(data.events || []);
         setMembers(data.members || []);
         setIsLoading(false);
+        setIsGroupLoading(false);
       })
-      .catch(err => {
-        console.warn('Backend indisponibil sau eroare la fetch:', err);
+      .catch((err) => {
+        console.warn("Backend indisponibil sau eroare la fetch:", err);
+        setGroupError(err?.message || "Eroare la încărcarea detaliilor grupului");
         setIsLoading(false);
+        setIsGroupLoading(false);
       });
   };
 
@@ -193,37 +233,45 @@ function GroupDetail() {
 
   const handleVote = async (eventId, vote) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/events/${eventId}/vote?type=${vote}`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_URL}/api/events/${eventId}/vote?type=${vote}`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
       if (response.ok) {
         fetchGroupDetails(debouncedSearch);
       } else {
-        console.error('Eroare la înregistrarea votului');
+        console.error("Eroare la înregistrarea votului");
       }
     } catch (error) {
-      console.error('Eroare rețea la vot:', error);
+      console.error("Eroare rețea la vot:", error);
     }
   };
 
   const handleLeaveGroup = async () => {
-    if (!window.confirm(t('groupdetail.leave_confirm', 'Sigur vrei să părăsești grupul?'))) return;
+    if (
+      !window.confirm(
+        t("groupdetail.leave_confirm", "Sigur vrei să părăsești grupul?")
+      )
+    )
+      return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await fetch(`${API_URL}/api/groups/${groupId}/leave`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {
-        navigate('/groups');
+        navigate("/groups");
       } else {
-        console.error('Eroare la părăsirea grupului');
+        console.error("Eroare la părăsirea grupului");
       }
     } catch (error) {
-      console.error('Eroare rețea la părăsirea grupului:', error);
+      console.error("Eroare rețea la părăsirea grupului:", error);
     }
   };
 
@@ -232,7 +280,13 @@ function GroupDetail() {
 
   // Loading state
   if (isLoading) {
-    return <div className="gd-page"><div className="gd-container"><h2>Loading...</h2></div></div>;
+    return (
+      <div className="gd-page">
+        <div className="gd-container">
+          <h2>Loading...</h2>
+        </div>
+      </div>
+    );
   }
 
   // Event detail screen
@@ -260,58 +314,131 @@ function GroupDetail() {
             <h1 className="gd-title">{groupName}</h1>
           </div>
 
-          {/* Participants Section */}
-          <div className="gd-card gd-members-section">
-            <div className="gd-members-header">
-              <h2>{t('groupdetail.members_title')}</h2>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="gd-members-view-all"
-              >
-                <Users className="icon-sm" />
-                {t('groupdetail.view_all')}
-              </button>
+          {isGroupLoading && (
+            <div className="gd-card gd-status-card">
+              <p>Se incarca detaliile grupului...</p>
             </div>
+          )}
 
-            <div className="gd-members-list custom-scrollbar">
-              {members.map((member) => (
-                <div key={member.id} className="gd-member-item">
-                  <div className={`gd-member-avatar ${member.isReal ? 'real' : 'placeholder'}`}>
-                    {member.isReal ? (
-                      <img
-                        src={member.avatar || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"}
-                        alt={member.name}
-                      />
-                    ) : (
-                      <span>(poza)</span>
-                    )}
-                  </div>
-                  <span className={`gd-member-name ${member.isReal ? 'real-text' : 'placeholder-text'}`}>
-                    {member.name}
-                  </span>
-                </div>
-              ))}
-              <button className="gd-member-item gd-invite-btn group">
-                <div className="gd-member-avatar invite">
-                  <span>+</span>
-                </div>
-                <span className="gd-member-name text-invite">{t('groupdetail.invite')}</span>
-              </button>
+          {!isGroupLoading && groupError && (
+            <div className="gd-card gd-status-card error">
+              <p>{groupError}</p>
             </div>
-          </div>
+          )}
+
+          {/* Participants Section */}
+          {!isGroupLoading && !groupError && (
+            <div className="gd-card gd-members-section">
+              <div className="gd-members-header">
+                <h2>{t("groupdetail.members_title")}</h2>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="gd-members-view-all"
+                >
+                  <Users className="icon-sm" />
+                  {t("groupdetail.view_all")}
+                </button>
+              </div>
+
+              <div className="gd-members-list custom-scrollbar">
+                {members.map((member) => {
+                  const memberId = member?.userId ?? member?.id;
+                  const memberName = getMemberDisplayName(member);
+                  const memberAvatar = getMemberAvatar(member);
+                  const isReal = Boolean(memberAvatar) || Boolean(member?.isReal);
+
+                  return (
+                    <div
+                      key={`${memberId ?? memberName}-${member?.role || "member"}`}
+                      className="gd-member-item"
+                    >
+                      <div
+                        className={`gd-member-avatar ${
+                          isReal ? "real" : "placeholder"
+                        }`}
+                      >
+                        {memberAvatar ? (
+                          <img
+                            src={
+                              memberAvatar ||
+                              "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+                            }
+                            alt={memberName}
+                          />
+                        ) : (
+                          <span>{memberId ?? "?"}</span>
+                        )}
+                      </div>
+                      <span
+                        className={`gd-member-name ${
+                          isReal ? "real-text" : "placeholder-text"
+                        }`}
+                      >
+                        {memberName}
+                      </span>
+                    </div>
+                  );
+                })}
+
+                <button className="gd-member-item gd-invite-btn group">
+                  <div className="gd-member-avatar invite">
+                    <span>+</span>
+                  </div>
+                  <span className="gd-member-name text-invite">
+                    {t("groupdetail.invite")}
+                  </span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Events Header */}
-          <div className="gd-activities-header" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'stretch' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-              <h2>{t('groupdetail.proposed_activities', 'Evenimente Propuse')}</h2>
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <div
+            className="gd-activities-header"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+              alignItems: "stretch"
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                width: "100%"
+              }}
+            >
+              <h2>
+                {t("groupdetail.proposed_activities", "Evenimente Propuse")}
+              </h2>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  alignItems: "center"
+                }}
+              >
                 <button
                   onClick={() => navigate(`/discover/create?groupId=${groupId}`)}
                   className="gd-ai-badge"
-                  style={{ cursor: 'pointer', border: 'none', background: 'var(--color-primary)', color: 'white', borderRadius: '20px', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 600 }}
+                  style={{
+                    cursor: "pointer",
+                    border: "none",
+                    background: "var(--color-primary)",
+                    color: "white",
+                    borderRadius: "20px",
+                    padding: "6px 14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    fontSize: "0.8rem",
+                    fontWeight: 600
+                  }}
                 >
                   <Plus className="icon-sm" />
-                  {t('groupdetail.propose_event', 'Propune')}
+                  {t("groupdetail.propose_event", "Propune")}
                 </button>
                 <div className="gd-ai-badge">
                   <Sparkles className="icon-sm" />
@@ -320,11 +447,11 @@ function GroupDetail() {
               </div>
             </div>
 
-            <div className="gd-search-bar" style={{ position: 'relative', width: '100%' }}>
+            <div className="gd-search-bar" style={{ position: "relative", width: "100%" }}>
               <Search className="icon-sm gd-search-icon" />
               <input
                 type="text"
-                placeholder={t('groupdetail.search_event', 'Caută un eveniment')}
+                placeholder={t("groupdetail.search_event", "Caută un eveniment")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="gd-search-input"
@@ -347,9 +474,9 @@ function GroupDetail() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`gd-activity-card ${event.isWinning ? 'winning' : ''}`}
+                  className={`gd-activity-card ${event.isWinning ? "winning" : ""}`}
                   onClick={() => setSelectedEvent(event)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   {/* Image Area */}
                   <div className="gd-activity-image-area">
@@ -360,18 +487,22 @@ function GroupDetail() {
                         </div>
                       </div>
                     ) : (
-                      <img src={event.imageUrl} alt={event.title} className="gd-activity-img" />
+                      <img
+                        src={event.imageUrl}
+                        alt={event.title}
+                        className="gd-activity-img"
+                      />
                     )}
                     {event.isWinning && (
                       <div className="gd-winning-badge">
                         <Trophy className="icon-sm" />
-                        {t('groupdetail.winning_activity', 'Eveniment Câștigător')}
+                        {t("groupdetail.winning_activity", "Eveniment Câștigător")}
                       </div>
                     )}
 
                     <div className="gd-score-badge">
                       <Sparkles className="icon-xs" />
-                      {t('groupdetail.ai_score')} {averageMatch}%
+                      {t("groupdetail.ai_score")} {averageMatch}%
                     </div>
                   </div>
 
@@ -397,13 +528,15 @@ function GroupDetail() {
                     <div className="gd-event-profile">
                       <div className="gd-event-profile-header">
                         <ActivityIcon className="icon-sm" />
-                        <span>{t('groupdetail.profile_prefs', 'Compatibilitate')}</span>
+                        <span>{t("groupdetail.profile_prefs", "Compatibilitate")}</span>
                       </div>
                       <div className="gd-attributes-list">
                         <div className="gd-attribute-item">
                           <div className="gd-attribute-labels">
                             <span>Compatibilitate Medie</span>
-                            <span>{averageMatch}% {t('groupdetail.match')}</span>
+                            <span>
+                              {averageMatch}% {t("groupdetail.match")}
+                            </span>
                           </div>
                           <div className="gd-attribute-bar-bg">
                             <motion.div
@@ -423,8 +556,10 @@ function GroupDetail() {
                       {/* Dynamic Progress Bar */}
                       <div className="gd-vote-progress-area">
                         <div className="gd-vote-progress-header">
-                          <span className="label">{t('groupdetail.vote_results')}</span>
-                          <span className="count">{totalVotes} {t('groupdetail.votes')}</span>
+                          <span className="label">{t("groupdetail.vote_results")}</span>
+                          <span className="count">
+                            {totalVotes} {t("groupdetail.votes")}
+                          </span>
                         </div>
 
                         <div className="gd-vote-bar-container">
@@ -460,8 +595,17 @@ function GroupDetail() {
                       {/* Modern Voting Buttons */}
                       <div className="gd-vote-buttons">
                         <button
-                          onClick={(e) => { e.stopPropagation(); handleVote(event.id, "Da"); }}
-                          className={`gd-vote-btn da ${event.myVote === "Da" ? "active" : event.myVote !== null ? "inactive" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVote(event.id, "Da");
+                          }}
+                          className={`gd-vote-btn da ${
+                            event.myVote === "Da"
+                              ? "active"
+                              : event.myVote !== null
+                                ? "inactive"
+                                : ""
+                          }`}
                         >
                           {event.myVote === "Da" && (
                             <>
@@ -477,13 +621,26 @@ function GroupDetail() {
                             </>
                           )}
                           <span className="gd-btn-content">
-                            <Check className={`icon ${event.myVote === "Da" ? "glowing" : ""}`} strokeWidth={3} /> Da
+                            <Check
+                              className={`icon ${event.myVote === "Da" ? "glowing" : ""}`}
+                              strokeWidth={3}
+                            />{" "}
+                            Da
                           </span>
                         </button>
 
                         <button
-                          onClick={(e) => { e.stopPropagation(); handleVote(event.id, "Poate"); }}
-                          className={`gd-vote-btn poate ${event.myVote === "Poate" ? "active" : event.myVote !== null ? "inactive" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVote(event.id, "Poate");
+                          }}
+                          className={`gd-vote-btn poate ${
+                            event.myVote === "Poate"
+                              ? "active"
+                              : event.myVote !== null
+                                ? "inactive"
+                                : ""
+                          }`}
                         >
                           {event.myVote === "Poate" && (
                             <>
@@ -499,13 +656,26 @@ function GroupDetail() {
                             </>
                           )}
                           <span className="gd-btn-content">
-                            <HelpCircle className={`icon ${event.myVote === "Poate" ? "glowing" : ""}`} strokeWidth={3} /> Poate
+                            <HelpCircle
+                              className={`icon ${event.myVote === "Poate" ? "glowing" : ""}`}
+                              strokeWidth={3}
+                            />{" "}
+                            Poate
                           </span>
                         </button>
 
                         <button
-                          onClick={(e) => { e.stopPropagation(); handleVote(event.id, "Nu"); }}
-                          className={`gd-vote-btn nu ${event.myVote === "Nu" ? "active" : event.myVote !== null ? "inactive" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVote(event.id, "Nu");
+                          }}
+                          className={`gd-vote-btn nu ${
+                            event.myVote === "Nu"
+                              ? "active"
+                              : event.myVote !== null
+                                ? "inactive"
+                                : ""
+                          }`}
                         >
                           {event.myVote === "Nu" && (
                             <>
@@ -520,7 +690,11 @@ function GroupDetail() {
                             </>
                           )}
                           <span className="gd-btn-content">
-                            <X className={`icon ${event.myVote === "Nu" ? "glowing" : ""}`} strokeWidth={3} /> Nu
+                            <X
+                              className={`icon ${event.myVote === "Nu" ? "glowing" : ""}`}
+                              strokeWidth={3}
+                            />{" "}
+                            Nu
                           </span>
                         </button>
                       </div>
@@ -532,28 +706,39 @@ function GroupDetail() {
           </div>
 
           {/* Leave Group Button */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem', marginBottom: '2rem' }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "2rem",
+              marginBottom: "2rem"
+            }}
+          >
             <button
               className="gd-leave-btn"
               onClick={handleLeaveGroup}
               style={{
-                padding: '14px 32px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 59, 48, 0.3)',
-                background: 'rgba(255, 59, 48, 0.1)',
-                color: '#ff3b30',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontWeight: '500',
-                transition: 'all 0.3s ease'
+                padding: "14px 32px",
+                borderRadius: "12px",
+                border: "1px solid rgba(255, 59, 48, 0.3)",
+                background: "rgba(255, 59, 48, 0.1)",
+                color: "#ff3b30",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontWeight: "500",
+                transition: "all 0.3s ease"
               }}
-              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255, 59, 48, 0.2)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)'; }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "rgba(255, 59, 48, 0.2)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "rgba(255, 59, 48, 0.1)";
+              }}
             >
               <LogOut size={20} />
-              <span>{t('groupdetail.leave_group', 'Părăsește Grupul')}</span>
+              <span>{t("groupdetail.leave_group", "Părăsește Grupul")}</span>
             </button>
           </div>
         </div>
@@ -582,48 +767,69 @@ function GroupDetail() {
             >
               <div className="gd-modal-header">
                 <div>
-                  <h2>{t('groupdetail.modal_title')}</h2>
-                  <p>{totalMembers} {t('groupdetail.modal_members')}</p>
+                  <h2>{t("groupdetail.modal_title")}</h2>
+                  <p>
+                    {totalMembers} {t("groupdetail.modal_members")}
+                  </p>
                 </div>
-                <button onClick={() => setIsModalOpen(false)} className="gd-close-btn">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="gd-close-btn"
+                >
                   <X className="icon" />
                 </button>
               </div>
 
               <div className="gd-modal-body custom-scrollbar">
-                {members.map((member) => (
-                  <div key={member.id} className="gd-modal-member-row">
-                    <div className={`gd-modal-avatar ${member.isReal ? 'real' : 'placeholder'}`}>
-                      {member.isReal ? (
-                        <img
-                          src={member.avatar || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"}
-                          alt={member.name}
-                        />
-                      ) : (
-                        <span>(poza)</span>
-                      )}
-                    </div>
-                    <div className="gd-modal-member-info">
-                      <h4 className={member.isReal ? 'real' : 'placeholder'}>
-                        {member.name}
-                      </h4>
-                      <span>
-                        {t('groupdetail.modal_member_label')} {member.id}
-                        {member.role && (
-                          <span className="gd-member-role badge" style={{ marginLeft: '8px' }}>
-                            {member.role}
-                          </span>
+                {members.map((member) => {
+                  const memberId = member?.userId ?? member?.id;
+                  const memberName = getMemberDisplayName(member);
+                  const memberAvatar = getMemberAvatar(member);
+                  const isReal = Boolean(memberAvatar) || Boolean(member?.isReal);
+
+                  return (
+                    <div
+                      key={`${memberId ?? memberName}-${member?.role || "member"}`}
+                      className="gd-modal-member-row"
+                    >
+                      <div
+                        className={`gd-modal-avatar ${
+                          isReal ? "real" : "placeholder"
+                        }`}
+                      >
+                        {memberAvatar ? (
+                          <img src={memberAvatar} alt={memberName} />
+                        ) : (
+                          <span>{memberId ?? "?"}</span>
                         )}
-                      </span>
+                      </div>
+                      <div className="gd-modal-member-info">
+                        <h4 className={isReal ? "real" : "placeholder"}>
+                          {memberName}
+                        </h4>
+                        <span>
+                          {t("groupdetail.modal_member_label")} {memberId}
+                          {member?.role && (
+                            <span
+                              className="gd-member-role badge"
+                              style={{ marginLeft: "8px" }}
+                            >
+                              {member.role}
+                            </span>
+                          )}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 <button className="gd-modal-invite-btn">
                   <div className="gd-modal-invite-icon">
                     <span>+</span>
                   </div>
-                  <span className="gd-modal-invite-text">{t('groupdetail.invite_new')}</span>
+                  <span className="gd-modal-invite-text">
+                    {t("groupdetail.invite_new")}
+                  </span>
                 </button>
               </div>
             </motion.div>

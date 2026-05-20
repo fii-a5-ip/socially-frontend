@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Users, Info, Settings2, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Users, Settings2, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from '../../hooks/useForm';
-import { validateRequired } from '../../utils/validation';
 import { useTranslation } from '../../hooks/useTranslation';
 
-import { API_URL } from '../../api/config';
+import { createGroup } from '../../api/groupsApi';
 import { Step1Details } from './components/Step1Details';
 import { Step2Members } from './components/Step2Members';
 import './CreateGroup.css';
@@ -27,27 +26,22 @@ function CreateGroup() {
   const [creationSuccess, setCreationSuccess] = useState(false);
 
   const validationRules = {
-    name: (v) => v ? null : t('creategroup.error_name_required'),
+    name: (v) => (v ? null : t('creategroup.error_name_required')),
   };
 
   const { values, errors, touched, handleChange, handleBlur, setValues, setErrors } = useForm(
     initialValues,
     validationRules,
-    /* eslint-disable-next-line no-unused-vars */
-    async (formData) => {
-      // API call simulare
-      return new Promise((resolve) => setTimeout(resolve, 1500));
-    }
+    async () => null
   );
 
   const handleNextStep = () => {
-    const stepErrors = {};
+    const name = (values.name || '').trim();
+    if (!name) {
+      setErrors((prev) => ({ ...prev, name: t('creategroup.error_name_required') }));
+      return;
+    }
 
-    if (!values.name) { stepErrors.name = t('creategroup.error_name_required'); }
-
-    setErrors(prev => ({ ...prev, ...stepErrors }));
-
-    // Permitem trecerea la nivel vizual pentru testare chiar dacă sunt erori
     setStep(2);
   };
 
@@ -57,33 +51,29 @@ function CreateGroup() {
 
   const submitFinalGroup = async () => {
     try {
-      const payload = {
-        name: values.name,
-        description: values.description,
-        imgLink: values.imageUrl, // Trimitem imaginea Base64
-        creatorUserId: 1, // HARDCODED: Trebuie înlocuit cu ID-ul user-ului logat când adăugați Auth
-        memberIds: values.members || []
-      };
-
-      const response = await fetch(`${API_URL}/api/groups`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error(t('creategroup.error_save'));
+      const name = (values.name || '').trim();
+      if (!name) {
+        setErrors((prev) => ({ ...prev, name: t('creategroup.error_name_required') }));
+        setStep(1);
+        return;
       }
 
-      const createdGroup = await response.json();
+      const payload = {
+        name,
+        imgLink: values.imageUrl || null,
+        desc: values.description?.trim() || null,
+        members: (values.members || []).map((userId) => ({
+          userId,
+          role: 'MEMBER',
+        })),
+      };
+
+      const createdGroup = await createGroup(payload);
       setCreationSuccess(true);
 
       setTimeout(() => {
         navigate(`/groups/${createdGroup.id}`);
       }, 2500);
-
     } catch (error) {
       console.error(error);
       alert(t('creategroup.error_save'));
@@ -93,32 +83,34 @@ function CreateGroup() {
   return (
     <div className="cg-page">
       <div className="cg-container">
-
-        {/* Header simplu */}
         <div className="cg-header">
           <h1 className="cg-page-title">{t('creategroup.title')}</h1>
           <p className="cg-page-subtitle">{t('creategroup.subtitle')}</p>
         </div>
 
-        {/* Stepper Visualizer */}
         <div className="cg-stepper">
           <div className={`cg-step ${step >= 1 ? 'active' : ''}`}>
-            <div className="cg-step-icon"><Settings2 size={18} /></div>
+            <div className="cg-step-icon">
+              <Settings2 size={18} />
+            </div>
             <span>{t('creategroup.step_details')}</span>
           </div>
           <div className={`cg-stepper-line ${step >= 2 ? 'active' : ''}`}></div>
           <div className={`cg-step ${step >= 2 ? 'active' : ''}`}>
-            <div className="cg-step-icon"><Users size={18} /></div>
+            <div className="cg-step-icon">
+              <Users size={18} />
+            </div>
             <span>{t('creategroup.step_members')}</span>
           </div>
           <div className={`cg-stepper-line ${creationSuccess ? 'active' : ''}`}></div>
           <div className={`cg-step ${creationSuccess ? 'active' : ''}`}>
-            <div className="cg-step-icon"><CheckCircle size={18} /></div>
+            <div className="cg-step-icon">
+              <CheckCircle size={18} />
+            </div>
             <span>{t('creategroup.step_complete')}</span>
           </div>
         </div>
 
-        {/* Main Card */}
         <div className="cg-card">
           <AnimatePresence mode="wait">
             {!creationSuccess ? (
@@ -133,11 +125,7 @@ function CreateGroup() {
                     setValues={setValues}
                   />
                 )}
-                {step === 2 && (
-                  <Step2Members
-                    setValues={setValues}
-                  />
-                )}
+                {step === 2 && <Step2Members setValues={setValues} />}
               </motion.div>
             ) : (
               <motion.div
@@ -156,15 +144,18 @@ function CreateGroup() {
             )}
           </AnimatePresence>
 
-          {/* Controls */}
           {!creationSuccess && (
             <div className="cg-controls">
               {step === 2 ? (
-                <button type="button" onClick={handlePrevStep} className="cg-btn cg-btn-secondary">
+                <button
+                  type="button"
+                  onClick={handlePrevStep}
+                  className="cg-btn cg-btn-secondary"
+                >
                   <ArrowLeft size={18} /> {t('creategroup.btn_back')}
                 </button>
               ) : (
-                <div></div> // vizual gol
+                <div></div>
               )}
 
               {step === 1 ? (
@@ -172,14 +163,17 @@ function CreateGroup() {
                   {t('creategroup.btn_next')} <ArrowRight size={18} />
                 </button>
               ) : (
-                <button type="button" onClick={submitFinalGroup} className="cg-btn cg-btn-primary success-btn">
+                <button
+                  type="button"
+                  onClick={submitFinalGroup}
+                  className="cg-btn cg-btn-primary success-btn"
+                >
                   {t('creategroup.btn_finish')} <CheckCircle size={18} />
                 </button>
               )}
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
