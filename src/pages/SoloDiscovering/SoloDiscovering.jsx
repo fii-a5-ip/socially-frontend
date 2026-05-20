@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from '../../hooks/useTranslation';
+import { API_URL } from '../../api/config';
 import './SoloDiscovering.css';
 
 // ==========================================
@@ -492,7 +493,8 @@ function SoloDiscovering() {
 
       const token = localStorage.getItem('token');
 
-      const url = `/api/events/discover?${params.toString()}`;
+      // const API_BASE_URL = import.meta.env.VITE_API_URL;
+      const url = `${API_URL}/api/events/search?query=...`; // Acum url va fi "http://localhost:9090/api/events..."
       console.log('[DISCOVER] GET', url, '| token:', token ? 'prezent' : 'LIPSĂ');
 
       const response = await fetch(url, {
@@ -537,7 +539,7 @@ function SoloDiscovering() {
       params.append('localTime', new Date().toISOString());
 
       const token = localStorage.getItem('token');
-      const url = `/api/events/search?${params.toString()}`;
+      const url = `${API_URL}/api/events/search?${params.toString()}`;
       console.log('[SEARCH] GET', url, '| token:', token ? 'prezent' : 'LIPSĂ');
 
       const response = await fetch(url, {
