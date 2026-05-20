@@ -142,6 +142,12 @@ function GroupDetail() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [inviteQuery, setInviteQuery] = useState("");
+  const [inviteResults, setInviteResults] = useState([]);
+  const [inviteStatus, setInviteStatus] = useState(null);
+  const [isInviteSearching, setIsInviteSearching] = useState(false);
+  const [invitingUserId, setInvitingUserId] = useState(null);
 
   // Event detail modal state
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -190,6 +196,54 @@ function GroupDetail() {
     fetchGroupDetails(debouncedSearch);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId, debouncedSearch]);
+
+  useEffect(() => {
+    if (!isInviteOpen || inviteQuery.trim().length < 2) {
+      setInviteResults([]);
+      setIsInviteSearching(false);
+      return undefined;
+    }
+
+    const token = localStorage.getItem("token");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(async () => {
+      try {
+        setIsInviteSearching(true);
+        setInviteStatus(null);
+        const response = await fetch(
+          `${API_URL}/api/users/search?query=${encodeURIComponent(inviteQuery.trim())}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            signal: controller.signal
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Nu s-au putut cauta utilizatori");
+        }
+
+        const data = await response.json();
+        const memberIds = new Set(members.map((member) => member?.userId ?? member?.id));
+        setInviteResults(
+          Array.isArray(data)
+            ? data.filter((user) => !memberIds.has(user.id))
+            : []
+        );
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Error searching users for invite:", error);
+          setInviteStatus({ type: "error", text: error.message });
+        }
+      } finally {
+        setIsInviteSearching(false);
+      }
+    }, 300);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
+  }, [inviteQuery, isInviteOpen, members]);
 
   const groupName = groupDetails ? groupDetails.name : `Grup ${groupId || "1"}`;
   const totalMembers = members.length;
@@ -272,6 +326,42 @@ function GroupDetail() {
       }
     } catch (error) {
       console.error("Eroare rețea la părăsirea grupului:", error);
+    }
+  };
+
+  const openInvitePanel = () => {
+    setIsModalOpen(true);
+    setIsInviteOpen(true);
+    setInviteStatus(null);
+  };
+
+  const handleSendInvite = async (userId) => {
+    const token = localStorage.getItem("token");
+    setInvitingUserId(userId);
+    setInviteStatus(null);
+
+    try {
+      const response = await fetch(`${API_URL}/api/groups/${groupId}/invites`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId })
+      });
+
+      if (!response.ok) {
+        const message = await response.text().catch(() => "");
+        throw new Error(message || "Nu s-a putut trimite invitatia");
+      }
+
+      setInviteStatus({ type: "success", text: "Invitatia a fost trimisa" });
+      setInviteResults((prev) => prev.filter((user) => user.id !== userId));
+    } catch (error) {
+      console.error("Error sending group invite:", error);
+      setInviteStatus({ type: "error", text: error.message });
+    } finally {
+      setInvitingUserId(null);
     }
   };
 
@@ -380,7 +470,10 @@ function GroupDetail() {
                   );
                 })}
 
-                <button className="gd-member-item gd-invite-btn group">
+                <button
+                  className="gd-member-item gd-invite-btn group"
+                  onClick={openInvitePanel}
+                >
                   <div className="gd-member-avatar invite">
                     <span>+</span>
                   </div>
@@ -823,7 +916,10 @@ function GroupDetail() {
                   );
                 })}
 
-                <button className="gd-modal-invite-btn">
+                <button
+                  className="gd-modal-invite-btn"
+                  onClick={() => setIsInviteOpen((prev) => !prev)}
+                >
                   <div className="gd-modal-invite-icon">
                     <span>+</span>
                   </div>
@@ -831,6 +927,48 @@ function GroupDetail() {
                     {t("groupdetail.invite_new")}
                   </span>
                 </button>
+
+                {isInviteOpen && (
+                  <div className="gd-invite-panel">
+                    <input
+                      type="text"
+                      className="gd-invite-search"
+                      value={inviteQuery}
+                      onChange={(event) => setInviteQuery(event.target.value)}
+                      placeholder="Cauta utilizatori"
+                    />
+
+                    {inviteStatus && (
+                      <p className={`gd-invite-status ${inviteStatus.type}`}>
+                        {inviteStatus.text}
+                      </p>
+                    )}
+
+                    {isInviteSearching && (
+                      <p className="gd-invite-status">Se cauta...</p>
+                    )}
+
+                    {!isInviteSearching && inviteQuery.trim().length >= 2 && inviteResults.length === 0 && (
+                      <p className="gd-invite-status">Nu sunt utilizatori disponibili</p>
+                    )}
+
+                    {inviteResults.map((user) => (
+                      <div className="gd-invite-result" key={user.id}>
+                        <div className="gd-invite-user">
+                          <strong>{user.fullname || user.username}</strong>
+                          <span>{user.username}</span>
+                        </div>
+                        <button
+                          className="gd-invite-send"
+                          disabled={invitingUserId === user.id}
+                          onClick={() => handleSendInvite(user.id)}
+                        >
+                          {invitingUserId === user.id ? "..." : "Invita"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>
