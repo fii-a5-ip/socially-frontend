@@ -24,6 +24,8 @@ function Notifications() {
   const [error, setError] = useState(null);
   const [showArchived, setShowArchived] = useState(false);
   const [showUnarchived, setUnarchived] = useState(true);
+  const [actionError, setActionError] = useState(null);
+  const [pendingActionId, setPendingActionId] = useState(null);
 
   const userTypes = ["GROUP_INVITE"];
   const systemTypes = ["OUTGOING_UPDATE", "REMINDER", "SYSTEM_UPDATE", "MESSAGE"];
@@ -68,20 +70,34 @@ function Notifications() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleAccept = (id) => {
+  const handleInviteAction = async (id, action) => {
     const token = localStorage.getItem("token");
-    fetch(`${API_URL}/api/notifications/${id}/read`, {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(() => {
-        setNotifications((prev) =>
-          prev.map((notif) =>
-            notif.id === id ? { ...notif, isRead: true } : notif
-          )
-        );
-      })
-      .catch((err) => console.error("Error marking as read:", err));
+    setActionError(null);
+    setPendingActionId(id);
+
+    try {
+      const response = await fetch(`${API_URL}/api/notifications/${id}/${action}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        throw new Error(action === "accept"
+          ? "Nu s-a putut accepta invitația"
+          : "Nu s-a putut refuza invitația");
+      }
+
+      setNotifications((prev) =>
+        prev.map((notif) =>
+          notif.id === id ? { ...notif, isRead: true } : notif
+        )
+      );
+    } catch (err) {
+      console.error("Error handling group invite:", err);
+      setActionError(err.message);
+    } finally {
+      setPendingActionId(null);
+    }
   };
 
   const newNotifications = notifications.filter((notif) => !notif.isRead);
@@ -131,11 +147,16 @@ function Notifications() {
                     <div className="notification_actions">
                       <button
                         className="btn btn--primary"
-                        onClick={() => handleAccept(notif.id)}
+                        disabled={pendingActionId === notif.id}
+                        onClick={() => handleInviteAction(notif.id, "accept")}
                       >
                         {t('notifications.accept')}
                       </button>
-                      <button className="btn btn--secondary">
+                      <button
+                        className="btn btn--secondary"
+                        disabled={pendingActionId === notif.id}
+                        onClick={() => handleInviteAction(notif.id, "decline")}
+                      >
                         {t('notifications.decline')}
                       </button>
                     </div>
@@ -189,6 +210,10 @@ function Notifications() {
       </header>
 
       <section className="notifications_section">
+        {actionError && (
+          <p className="notifications_action-error">{actionError}</p>
+        )}
+
         {newNotifications.length === 0 ? (
           <p className="notifications_empty">
             {t('notifications.empty')}
