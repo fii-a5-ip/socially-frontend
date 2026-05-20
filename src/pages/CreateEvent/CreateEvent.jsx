@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Info, Settings2, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useForm } from '../../hooks/useForm';
 import { validateRequired } from '../../utils/validation';
 import { useTranslation } from '../../hooks/useTranslation';
+import { API_URL } from '../../api/config';
 
 import { Step1Details } from './components/Step1Details';
 import { Step2Logistics } from './components/Step2Logistics';
@@ -26,6 +27,8 @@ function CreateEvent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get('groupId');
   const isEditMode = Boolean(id);
   
   const [step, setStep] = useState(1);
@@ -96,6 +99,7 @@ function CreateEvent() {
       }
 
     try {
+      // Save to localStorage for local state (Solo Discover)
       const existing = JSON.parse(localStorage.getItem('socially_myEvents') || '[]');
       const newEvent = {
           id: isEditMode ? Number(id) : Date.now(),
@@ -122,13 +126,35 @@ function CreateEvent() {
       } else {
         localStorage.setItem('socially_myEvents', JSON.stringify([newEvent, ...existing]));
       }
+
+      // If creating for a group, also send to backend API
+      if (groupId) {
+        const token = localStorage.getItem('token');
+        const payload = {
+          name: values.name,
+          url: 'https://socially.app/event',
+          desc: values.description,
+          locationId: 1,
+          groupId: parseInt(groupId),
+          scheduledDate: values.date,
+          filterIds: []
+        };
+        await fetch(`${API_URL}/api/events`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+      }
     } catch (e) {
-      console.error("Failed to save event locally", e);
+      console.error("Failed to save event", e);
     }
 
     setCreationSuccess(true);
     setTimeout(() => {
-      navigate('/discover');
+      navigate(groupId ? `/groups/${groupId}` : '/discover');
     }, 2500);
   };
 
@@ -219,7 +245,7 @@ function CreateEvent() {
                   <ArrowLeft size={18} /> {t('createevent.btn_back')}
                 </button>
               ) : (
-                <button type="button" onClick={() => navigate('/discover')} className="ce-btn ce-btn-secondary">
+                <button type="button" onClick={() => navigate(groupId ? `/groups/${groupId}` : '/discover')} className="ce-btn ce-btn-secondary">
                     <ArrowLeft size={18} /> {t('createevent.btn_back')}
                 </button>
               )}

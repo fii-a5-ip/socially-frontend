@@ -189,6 +189,7 @@ export const en = {
   'groupdetail.view_all': 'View all members',
   'groupdetail.invite': 'Invite',
   'groupdetail.proposed_activities': 'Proposed activities',
+  'groupdetail.propose_event': 'Propose',
   'groupdetail.winning_activity': 'Winning Activity',
   'groupdetail.ai_score': 'AI Score:',
   'groupdetail.profile_prefs': 'Your Profile & Preferences',
@@ -199,6 +200,8 @@ export const en = {
   'groupdetail.modal_members': 'members in group',
   'groupdetail.modal_member_label': 'MEMBER',
   'groupdetail.invite_new': 'Invite a new friend',
+  'groupdetail.leave_group': 'Leave Group',
+  'groupdetail.search_event': 'Search for an event',
 
   // Notifications
   'notifications.title': 'Notifications',
@@ -229,6 +232,14 @@ export const en = {
   'creategroup.searching': 'Searching...',
   'creategroup.search_empty': 'Search for friends to add to the group',
   'creategroup.no_results': 'No results found for',
+  "creategroup.group_name_label": "Group Name",
+  "creategroup.group_name_placeholder": "e.g., Mountain Trip",
+  "creategroup.group_desc_label": "Short Description",
+  "creategroup.group_desc_placeholder": "What is this group about?",
+  "creategroup.group_image_label": "Group Cover Image (optional)",
+  "creategroup.group_image_placeholder": "Click to upload an image",
+  "creategroup.error_name_required": "Group name is required.",
+  "creategroup.error_save": "An error occurred while saving the group.",
 
   // Solo Discovering
   'solo.title': 'Discover',
@@ -294,7 +305,7 @@ export const en = {
   'createevent.form.address': 'Address',
   'createevent.form.address_ph': 'Enter full address',
 
-   // Privacy Page
+  // Privacy Page
   'privacy.title': 'Your Privacy',
   'privacy.subtitle': 'Full transparency on how we protect the Socially community data.',
   'privacy.card1.title': 'Data Protection',

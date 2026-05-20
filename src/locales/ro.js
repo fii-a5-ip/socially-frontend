@@ -189,6 +189,7 @@ export const ro = {
   'groupdetail.view_all': 'Vezi toți membrii',
   'groupdetail.invite': 'Invită',
   'groupdetail.proposed_activities': 'Activități propuse',
+  'groupdetail.propose_event': 'Propune',
   'groupdetail.winning_activity': 'Activitate Câștigătoare',
   'groupdetail.ai_score': 'Scor AI:',
   'groupdetail.profile_prefs': 'Profilul & Preferințele Tale',
@@ -199,6 +200,8 @@ export const ro = {
   'groupdetail.modal_members': 'membri în grup',
   'groupdetail.modal_member_label': 'MEMBRU',
   'groupdetail.invite_new': 'Invită un prieten nou',
+  'groupdetail.leave_group': 'Părăsește Grupul',
+  'groupdetail.search_event': 'Caută un eveniment',
 
   // Notifications
   'notifications.title': 'Notificări',
@@ -229,6 +232,14 @@ export const ro = {
   'creategroup.searching': 'Se caută...',
   'creategroup.search_empty': 'Caută prieteni pentru a-i adăuga în grup',
   'creategroup.no_results': 'Nu s-au găsit rezultate după',
+  "creategroup.group_name_label": "Numele grupului",
+  "creategroup.group_name_placeholder": "Ex: Ieșire la munte",
+  "creategroup.group_desc_label": "Scurtă descriere",
+  "creategroup.group_desc_placeholder": "Despre ce este acest grup?",
+  "creategroup.group_image_label": "Imagine Copertă Grup (opțional)",
+  "creategroup.group_image_placeholder": "Click pentru a încărca o imagine",
+  "creategroup.error_name_required": "Numele grupului este obligatoriu.",
+  "creategroup.error_save": "A apărut o eroare la salvarea grupului.",
 
   // Solo Discovering
   'solo.title': 'Descoperă',

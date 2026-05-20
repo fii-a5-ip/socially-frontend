@@ -5,7 +5,6 @@ import { Users, Settings2, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-rea
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from '../../hooks/useForm';
-import { validateRequired } from '../../utils/validation';
 import { useTranslation } from '../../hooks/useTranslation';
 
 import { createGroup } from '../../api/groupsApi';
@@ -20,15 +19,15 @@ const initialValues = {
   members: [],
 };
 
-const validationRules = {
-  name: (v) => validateRequired(v, 'Numele grupului'),
-};
-
 function CreateGroup() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [creationSuccess, setCreationSuccess] = useState(false);
+
+  const validationRules = {
+    name: (v) => (v ? null : t('creategroup.error_name_required')),
+  };
 
   const { values, errors, touched, handleChange, handleBlur, setValues, setErrors } = useForm(
     initialValues,
@@ -37,8 +36,9 @@ function CreateGroup() {
   );
 
   const handleNextStep = () => {
-    if (!values.name.trim()) {
-      setErrors(prev => ({ ...prev, name: 'Numele grupului este obligatoriu.' }));
+    const name = (values.name || '').trim();
+    if (!name) {
+      setErrors((prev) => ({ ...prev, name: t('creategroup.error_name_required') }));
       return;
     }
 
@@ -51,14 +51,15 @@ function CreateGroup() {
 
   const submitFinalGroup = async () => {
     try {
-      if (!values.name.trim()) {
-        setErrors(prev => ({ ...prev, name: 'Numele grupului este obligatoriu.' }));
+      const name = (values.name || '').trim();
+      if (!name) {
+        setErrors((prev) => ({ ...prev, name: t('creategroup.error_name_required') }));
         setStep(1);
         return;
       }
 
       const payload = {
-        name: values.name.trim(),
+        name,
         imgLink: values.imageUrl || null,
         desc: values.description?.trim() || null,
         members: (values.members || []).map((userId) => ({
@@ -75,7 +76,7 @@ function CreateGroup() {
       }, 2500);
     } catch (error) {
       console.error(error);
-      alert(error.message || 'A aparut o eroare la salvarea grupului.');
+      alert(t('creategroup.error_save'));
     }
   };
 
@@ -89,17 +90,23 @@ function CreateGroup() {
 
         <div className="cg-stepper">
           <div className={`cg-step ${step >= 1 ? 'active' : ''}`}>
-            <div className="cg-step-icon"><Settings2 size={18} /></div>
+            <div className="cg-step-icon">
+              <Settings2 size={18} />
+            </div>
             <span>{t('creategroup.step_details')}</span>
           </div>
           <div className={`cg-stepper-line ${step >= 2 ? 'active' : ''}`}></div>
           <div className={`cg-step ${step >= 2 ? 'active' : ''}`}>
-            <div className="cg-step-icon"><Users size={18} /></div>
+            <div className="cg-step-icon">
+              <Users size={18} />
+            </div>
             <span>{t('creategroup.step_members')}</span>
           </div>
           <div className={`cg-stepper-line ${creationSuccess ? 'active' : ''}`}></div>
           <div className={`cg-step ${creationSuccess ? 'active' : ''}`}>
-            <div className="cg-step-icon"><CheckCircle size={18} /></div>
+            <div className="cg-step-icon">
+              <CheckCircle size={18} />
+            </div>
             <span>{t('creategroup.step_complete')}</span>
           </div>
         </div>
@@ -118,11 +125,7 @@ function CreateGroup() {
                     setValues={setValues}
                   />
                 )}
-                {step === 2 && (
-                  <Step2Members
-                    setValues={setValues}
-                  />
-                )}
+                {step === 2 && <Step2Members setValues={setValues} />}
               </motion.div>
             ) : (
               <motion.div
@@ -144,7 +147,11 @@ function CreateGroup() {
           {!creationSuccess && (
             <div className="cg-controls">
               {step === 2 ? (
-                <button type="button" onClick={handlePrevStep} className="cg-btn cg-btn-secondary">
+                <button
+                  type="button"
+                  onClick={handlePrevStep}
+                  className="cg-btn cg-btn-secondary"
+                >
                   <ArrowLeft size={18} /> {t('creategroup.btn_back')}
                 </button>
               ) : (
@@ -156,7 +163,11 @@ function CreateGroup() {
                   {t('creategroup.btn_next')} <ArrowRight size={18} />
                 </button>
               ) : (
-                <button type="button" onClick={submitFinalGroup} className="cg-btn cg-btn-primary success-btn">
+                <button
+                  type="button"
+                  onClick={submitFinalGroup}
+                  className="cg-btn cg-btn-primary success-btn"
+                >
                   {t('creategroup.btn_finish')} <CheckCircle size={18} />
                 </button>
               )}
