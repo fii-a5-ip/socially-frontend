@@ -37,7 +37,7 @@
 
 .form-input__field:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
 /* Error state */

@@ -29,7 +29,7 @@ function App() {
   const { isLoggedIn } = useApp()
 
   //nu afisam navbarul deloc
-  const isMandatoryFlow = ['/onboarding', '/preferences'].includes(location.pathname)
+  const isMandatoryFlow = ['/preferences'].includes(location.pathname)
 
   useEffect(() => {
     window.scrollTo(0, 0)

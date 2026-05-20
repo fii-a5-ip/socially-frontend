@@ -44,46 +44,48 @@ html[data-theme="dark"] .onboarding-container {
   gap: 2rem;
 }
 
-.onboarding-categories {
+.onboarding-progress {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
 }
 
-.category-chip {
+.onboarding-progress span {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 2rem;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
   background-color: var(--bg-default);
-  border: 2px solid var(--border-color);
-  color: var(--text-primary);
-  font-size: 0.95rem;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.85rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.category-chip:hover {
-  border-color: var(--color-primary-light);
-  background-color: var(--bg-primary);
-}
-
-.category-chip.selected {
+.onboarding-progress span.active {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
   color: white;
 }
 
-.onboarding-custom {
+.onboarding-fields,
+.onboarding-answer {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
-.onboarding-custom label {
+.onboarding-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.onboarding-fields label,
+.onboarding-answer {
   color: var(--text-primary);
   font-weight: 500;
   font-size: 0.95rem;
@@ -104,6 +106,47 @@ html[data-theme="dark"] .onboarding-container {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--bg-primary);
+}
+
+.onboarding-input[type="textarea"],
+textarea.onboarding-input {
+  min-height: 8rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.onboarding-checkbox {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.65rem !important;
+}
+
+.onboarding-checkbox input {
+  width: 1rem;
+  height: 1rem;
+}
+
+.onboarding-question {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background-color: var(--bg-default);
+  border: 1px solid var(--border-color);
+}
+
+.onboarding-question span {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.onboarding-question p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  line-height: 1.6;
 }
 
 .onboarding-footer {
@@ -143,10 +186,41 @@ html[data-theme="dark"] .onboarding-container {
   opacity: 0.7;
 }
 
+.btn-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 600;
+}
+
 .onboarding-hint {
-  color: var(--color-danger, #e74c3c);
+  color: var(--text-muted);
   font-size: 0.85rem;
   font-weight: 500;
+  text-align: center;
+}
+
+.onboarding-error {
+  margin-top: 1.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  background-color: rgba(231, 76, 60, 0.12);
+  color: var(--color-danger, #e74c3c);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.spin {
+  animation: onboarding-spin 0.9s linear infinite;
+}
+
+@keyframes onboarding-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Responsivitate pentru ecrane mici */
@@ -158,9 +232,8 @@ html[data-theme="dark"] .onboarding-container {
   .onboarding-header h1 {
     font-size: 1.5rem;
   }
-  
-  .category-chip {
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
+
+  .onboarding-row {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,57 +1,101 @@
 import { API_URL } from './config';
 
+export const GROUPS_API_URL = import.meta.env.VITE_GROUPS_API_URL || API_URL;
+
 /**
- * Tipul pentru Group
+ * @typedef {"ADMIN" | "MEMBER" | string} GroupRole
+ *
+ * @typedef {Object} GroupUser
+ * @property {number | null | undefined} groupId
+ * @property {number} userId
+ * @property {GroupRole | null | undefined} role
+ *
  * @typedef {Object} Group
  * @property {number} id
  * @property {string} name
- * @property {string | null} imgLink
- * @property {string | null} desc
+ * @property {string | null | undefined} imgLink
+ * @property {string | null | undefined} desc
  * @property {number} creatorUserId
- * @property {number[]} memberIds
+ * @property {GroupUser[] | null | undefined} members
  */
 
-/**
- * Obține lista de grupuri ale utilizatorului autentificat
- * @returns {Promise<Group[]>}
- */
-export async function getMyGroups() {
-  const token = localStorage.getItem('token');
+function getToken() {
+  return localStorage.getItem('token');
+}
 
-  if (!token) {
-    throw new Error('Nu ești autentificat');
+async function readError(response, fallbackMessage) {
+  const text = await response.text().catch(() => '');
+  if (!text) return fallbackMessage;
+
+  try {
+    const json = JSON.parse(text);
+    return json.message || json.error || fallbackMessage;
+  } catch {
+    return text;
+  }
+}
+
+async function requestGroups(path, options = {}) {
+  const response = await fetch(`${GROUPS_API_URL}${path}`, options);
+
+  if (!response.ok) {
+    throw new Error(await readError(response, 'Cererea pentru grupuri a esuat'));
   }
 
-  const response = await fetch(`${API_URL}/api/groups`, {
+  if (response.status === 204) return null;
+  return response.json();
+}
+
+export async function getMyGroups() {
+  const token = getToken();
+
+  if (!token) {
+    throw new Error('Nu esti autentificat');
+  }
+
+  return requestGroups('/api/groups', {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-
-  if (!response.ok) {
-    throw new Error('Nu s-au putut încărca grupurile');
-  }
-
-  return response.json();
 }
 
-/**
- * Obține detaliile unui grup după ID
- * @param {number} id - ID-ul grupului
- * @returns {Promise<Group>}
- */
-export async function getGroupById(id) {
-  const token = localStorage.getItem('token');
+export async function searchGroups(query) {
+  const normalizedQuery = query.trim();
 
-  const response = await fetch(`${API_URL}/api/groups/${id}`, {
-    method: 'GET',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-
-  if (!response.ok) {
-    throw new Error('Nu s-au putut încărca detaliile grupului');
+  if (!normalizedQuery) {
+    return [];
   }
 
-  return response.json();
+  if (normalizedQuery.length > 150) {
+    throw new Error('Cautarea poate avea maximum 150 de caractere');
+  }
+
+  return requestGroups(`/api/groups/search?query=${encodeURIComponent(normalizedQuery)}`);
+}
+
+export async function getGroupById(id) {
+  if (!id) {
+    throw new Error('Lipseste ID-ul grupului');
+  }
+
+  return requestGroups(`/api/groups/${encodeURIComponent(id)}`);
+}
+
+export async function createGroup(groupData) {
+  const token = getToken();
+
+  if (!token) {
+    throw new Error('Nu esti autentificat');
+  }
+
+  return requestGroups('/api/groups', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(groupData),
+  });
 }

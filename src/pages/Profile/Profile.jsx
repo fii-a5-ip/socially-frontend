@@ -5,101 +5,132 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import { API_URL } from '../../api/config'
+import { getMyGroups } from '../../api/groupsApi'
 import './Profile.css'
-import flagRO from '../../assets/flag-ro.png'
-import flagEN from '../../assets/flag-en.png'
 
 function Profile() {
   const { t } = useTranslation()
   const [istoricExtins, setIstoricExtins] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const { logout, lang, setLang } = useApp()
+  const [isLoading, setIsLoading] = useState(() => Boolean(localStorage.getItem('token')))
+  const { logout } = useApp()
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
 
   const [profileData, setProfileData] = useState({
-    nume: localStorage.getItem("current_fullname") || localStorage.getItem("current_username") || '',
+    id: null,
+    nume: localStorage.getItem("current_fullname") || 'Utilizator',
     email: localStorage.getItem("current_email") || '',
     bio: '',
-    buget: '200',
     avatarUrl: null
   })
 
   const [groupsCount, setGroupsCount] = useState(0)
   const [activitatiComplete, setActivitatiComplete] = useState([])
   const [totalOutings, setTotalOutings] = useState(0)
-  const [aiScore, setAiScore] = useState(0)
+  const [aiScore, setAiScore] = useState(98)
+  
+  const [availableFilters, setAvailableFilters] = useState([
+    { id: 1, name: 'sport' },
+    { id: 2, name: 'muzica' },
+    { id: 3, name: 'tech' },
+    { id: 4, name: 'travel' },
+    { id: 5, name: 'art' }
+  ])
+  const [selectedFilters, setSelectedFilters] = useState([])
 
   useEffect(() => {
-    if (!token) return
+    if (!token) {
+      return
+    }
 
-    // Fetch user info
-    fetch(`${API_URL}/api/users/me`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    const headers = { 'Authorization': `Bearer ${token}` }
+
+    // Pasul 1: Luam profilul "me" pentru a afla ID-ul si datele de baza
+    fetch(`${API_URL}/api/users/me`, { headers })
       .then(res => res.json())
-      .then(data => {
-        let n = data.fullname || ''
-        if (!n && (data.firstname || data.lastname)) {
-          n = `${data.firstname || ''} ${data.lastname || ''}`.trim()
-        }
-
-        setProfileData(prev => ({
-          ...prev,
-          nume: n || prev.nume,
-          email: data.email || prev.email,
-          bio: data.bio || prev.bio,
-          buget: data.buget || prev.buget,
-          avatarUrl: data.avatarUrl || prev.avatarUrl
+      .then(userData => {
+        setProfileData(prevProfileData => ({
+          id: userData.id,
+          nume: userData.fullname || `${userData.firstname || ''} ${userData.lastname || ''}`.trim() || prevProfileData.nume,
+          email: userData.email || prevProfileData.email,
+          bio: userData.bio || '',
+          avatarUrl: userData.avatarUrl || null
         }))
+        if (userData.aiScore) setAiScore(userData.aiScore)
 
-        if (data.aiScore) setAiScore(data.aiScore)
-        if (data.totalOutings) setTotalOutings(data.totalOutings)
+        // Pasul 2: Acum ca avem ID-ul, luam filtrele specifice ale userului (cerinta Cris/SM)
+        return fetch(`${API_URL}/api/users/${userData.id}/filters`, { headers })
+          .then(res => res.json())
+          .then(userFilters => {
+            if (Array.isArray(userFilters)) {
+              setSelectedFilters(userFilters.map(f => f.id))
+            }
+          })
+          .catch(err => console.log('Eroare fetch user filters:', err))
       })
-      .catch(e => {
-        console.error('Error fetching user (endpoint might not exist):', e)
-        // Daca pica, pastram datele din localStorage care sunt deja in state
-      })
+      .catch(err => console.log('Eroare fetch me:', err))
+      .finally(() => {
+        // Pasul 3: Luam lista globala de filtre pentru selector
+        Promise.allSettled([
+          fetch(`${API_URL}/api/filters`, { headers }).then(res => res.json()),
+          getMyGroups(),
+          fetch(`${API_URL}/api/activities/history`, { headers }).then(res => res.json())
+        ]).then((results) => {
+          const [filtersRes, groupsRes, historyRes] = results
 
-    // Fetch groups count
-    fetch(`${API_URL}/api/groups`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setGroupsCount(data.length)
-        }
+          if (filtersRes.status === 'fulfilled' && Array.isArray(filtersRes.value) && filtersRes.value.length > 0) {
+            setAvailableFilters(filtersRes.value)
+          }
+          if (groupsRes.status === 'fulfilled' && Array.isArray(groupsRes.value)) {
+            setGroupsCount(groupsRes.value.length)
+          }
+          if (historyRes.status === 'fulfilled' && Array.isArray(historyRes.value)) {
+            setActivitatiComplete(historyRes.value)
+            setTotalOutings(historyRes.value.length)
+          }
+        }).finally(() => {
+          setIsLoading(false)
+        })
       })
-      .catch(e => console.error('Error fetching groups:', e))
-
-    // Fetch history
-    fetch(`${API_URL}/api/activities/history`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setActivitatiComplete(data)
-          setTotalOutings(data.length)
-        }
-      })
-      .catch(e => console.error('Error fetching history:', e))
   }, [token])
-
-
 
   const deAfisat = istoricExtins ? activitatiComplete : activitatiComplete.slice(0, 3)
 
-  const handleSave = (newProfileData) => {
+  const handleSave = async (newProfileData) => {
     if (!token) return
 
-    let splitName = newProfileData.nume.split(' ')
-    let bodyData = {
-      firstname: splitName[0],
-      lastname: splitName.slice(1).join(' '),
+    let currentAvatarUrl = profileData.avatarUrl;
+
+    if (newProfileData.avatarFile) {
+      try {
+        const formData = new FormData();
+        formData.append('avatar', newProfileData.avatarFile);
+        
+        const uploadRes = await fetch(`${API_URL}/api/users/me/avatar`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+        
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          currentAvatarUrl = uploadData.avatarUrl || uploadData.profilePictureUrl || currentAvatarUrl;
+        } else {
+          console.warn('Backend upload endpoint might not be ready.');
+        }
+      } catch (e) {
+        console.error('Error uploading avatar:', e);
+      }
+    }
+
+    const payload = {
+      email: newProfileData.email,
       bio: newProfileData.bio,
-      buget: newProfileData.buget
+      profilePictureUrl: currentAvatarUrl,
+      filterIds: selectedFilters
     }
 
     fetch(`${API_URL}/api/users/me`, {
@@ -108,27 +139,50 @@ function Profile() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(bodyData)
+      body: JSON.stringify(payload)
     })
       .then(res => {
-        if (!res.ok) throw new Error('Save failed')
+        if (!res.ok) throw new Error('Update failed')
         return res.json()
       })
-      .then(() => {
-        setProfileData(newProfileData)
+      .then(data => {
+        setProfileData({
+          ...newProfileData,
+          nume: data.fullname || newProfileData.nume,
+          avatarUrl: currentAvatarUrl
+        })
         setIsEditing(false)
       })
-      .catch(e => console.error('Error saving profile:', e))
+      .catch(err => {
+        console.log('Eroare salvare, se aplică local', err)
+        setProfileData({ ...newProfileData, avatarUrl: currentAvatarUrl })
+        setIsEditing(false)
+      })
   }
 
-  const handleCancel = () => {
-    setIsEditing(false)
+  const toggleFilter = (id) => {
+    if (selectedFilters.includes(id)) {
+      setSelectedFilters(selectedFilters.filter(fid => fid !== id))
+    } else {
+      setSelectedFilters([...selectedFilters, id])
+    }
   }
 
   const handleLogout = () => {
     logout()
     window.scrollTo(0, 0)
     navigate('/')
+  }
+
+  const getInterestLabel = (name) => {
+    if (!name) return '';
+    const normalized = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+    const translation = t(`interest.${normalized}`);
+    return translation === `interest.${normalized}` ? name : translation;
+  }
+
+  if (isLoading) {
+    return <div className="loading-profile">{t('profile.interests.loading')}</div>
   }
 
   return (
@@ -147,13 +201,33 @@ function Profile() {
               <ProfileEditForm
                 initialData={profileData}
                 onSave={handleSave}
-                onCancel={handleCancel}
+                onCancel={() => setIsEditing(false)}
               />
             ) : (
-              <ProfileView
-                data={profileData}
-                onEdit={() => setIsEditing(true)}
-              />
+              <>
+                <ProfileView
+                  data={profileData}
+                  onEdit={() => setIsEditing(true)}
+                />
+                
+                <div className="profile-interests-section">
+                  <h3 className="section-subtitle">{t('profile.interests.title')}</h3>
+                  <div className="interests-grid">
+                    {availableFilters.map(filter => (
+                      <button
+                        key={filter.id}
+                        className={`interest-tag ${selectedFilters.includes(filter.id) ? 'active' : ''}`}
+                        onClick={() => toggleFilter(filter.id)}
+                      >
+                        {getInterestLabel(filter.name)}
+                      </button>
+                    ))}
+                  </div>
+                  <button className="btn-save-interests" onClick={() => handleSave(profileData)}>
+                    {t('profile.interests.save')}
+                  </button>
+                </div>
+              </>
             )}
           </div>
 
@@ -180,7 +254,7 @@ function Profile() {
                 {deAfisat.length > 0 ? (
                   deAfisat.map((act, i) => <li key={i}>{act}</li>)
                 ) : (
-                  <li className="history-empty">Nu există activități recente.</li>
+                  <li className="history-empty">{t('history.empty')}</li>
                 )}
               </ul>
               {activitatiComplete.length > 3 && (
@@ -191,32 +265,10 @@ function Profile() {
             </div>
 
             <div className="profile-section">
-              <h3 className="side-title">🌐 {lang === 'RO' ? 'Limbă' : 'Language'}</h3>
-              <div className="lang-selector-profile">
-                <button 
-                  className={`lang-option ${lang === 'RO' ? 'active' : ''}`} 
-                  onClick={() => setLang('RO')}
-                >
-                  <img src={flagRO} alt="RO" />
-                  <span>Română</span>
-                </button>
-                <button 
-                  className={`lang-option ${lang === 'EN' ? 'active' : ''}`} 
-                  onClick={() => setLang('EN')}
-                >
-                  <img src={flagEN} alt="EN" />
-                  <span>English</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="profile-section">
               <h3 className="side-title">{t('profile.account.title')}</h3>
               <div className="admin-actions">
                 <button type="button" className="btn-secondary-profile">{t('profile.account.change_pass')}</button>
                 <button type="button" className="btn-logout" onClick={handleLogout}>{t('profile.account.logout')}</button>
-
-
               </div>
             </div>
           </aside>

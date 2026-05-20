@@ -2,47 +2,178 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
-import { Coffee, MapPin, Music, Utensils, Beer, Gamepad2, ArrowRight } from 'lucide-react';
+import { ArrowRight, Check, Loader2, RotateCcw } from 'lucide-react';
+import { API_URL } from '../../api/config';
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 import './Onboarding.css';
 
-const PREDEFINED_CATEGORIES = [
-  { id: 'coffee', label: 'Cafenele & Relaxare', icon: Coffee },
-  { id: 'food', label: 'Restaurante', icon: Utensils },
-  { id: 'party', label: 'Cluburi & Party', icon: Music },
-  { id: 'drinks', label: 'Pub-uri & Berării', icon: Beer },
-  { id: 'gaming', label: 'Boardgames', icon: Gamepad2 },
-  { id: 'explore', label: 'Explorare Urbană', icon: MapPin },
-];
+const MIN_ANSWER_LENGTH = 30;
+const RETRY_DELAYS = [1000, 2000, 4000];
+
+const sleep = (delay) => new Promise(resolve => setTimeout(resolve, delay));
 
 function Onboarding() {
-  const { t } = useTranslation();
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [customInterest, setCustomInterest] = useState('');
+  const { t, lang } = useTranslation();
+  const [phase, setPhase] = useState('intro');
+  const [userInfo, setUserInfo] = useState({
+    nume: localStorage.getItem('current_fullname') || localStorage.getItem('current_username') || '',
+    varsta: '',
+    ocupatie: '',
+    oras: '',
+    is_remote: false,
+  });
+  const [currentStep, setCurrentStep] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState('');
+  const [conversationHistory, setConversationHistory] = useState([]);
+  const [answer, setAnswer] = useState('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const { login } = useApp();
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
-  const toggleCategory = (id) => {
-    setSelectedCategories(prev =>
-      prev.includes(id)
-        ? prev.filter(c => c !== id)
-        : [...prev, id]
-    );
+  const callOnboarding = async (payload) => {
+    for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
+      const response = await fetch(`${API_URL}/api/onboardingProcess`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.status !== 429 || attempt === RETRY_DELAYS.length) {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const message = data.error || (response.status === 429 ? t('onboarding.error_rate_limit') : t('onboarding.error_generic'));
+          throw new Error(message);
+        }
+        return data;
+      }
+
+      setIsRetrying(true);
+      await sleep(RETRY_DELAYS[attempt]);
+    }
   };
 
-  const handleFinish = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const updateUserFilters = async (filterIds) => {
+    if (!token) {
+      throw new Error(t('onboarding.error_auth'));
+    }
 
-    setTimeout(() => {
+    const response = await fetch(`${API_URL}/api/users/me`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ filterIds }),
+    });
+
+    if (!response.ok) {
+      throw new Error(t('onboarding.error_save'));
+    }
+  };
+
+  const handleInfoChange = (field, value) => {
+    setUserInfo(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleStart = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+    setIsRetrying(false);
+
+    try {
+      const data = await callOnboarding({
+        step: 0,
+        language: lang.toLowerCase(),
+        user_info: {
+          ...userInfo,
+          varsta: Number(userInfo.varsta),
+        },
+      });
+
+      setCurrentStep(data.next_step || 1);
+      setCurrentQuestion(data.question_text || '');
+      setPhase('chat');
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setIsLoading(false);
-      login();
-      navigate('/mode');
-    }, 1500);
+      setIsRetrying(false);
+    }
+  };
+
+  const handleAnswer = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (answer.trim().length < MIN_ANSWER_LENGTH) {
+      setError(t('onboarding.error_short_answer'));
+      return;
+    }
+
+    setIsLoading(true);
+    setIsRetrying(false);
+
+    const nextHistory = [
+      ...conversationHistory,
+      { q: currentQuestion, a: answer.trim() },
+    ];
+
+    try {
+      const data = await callOnboarding({
+        step: currentStep,
+        language: lang.toLowerCase(),
+        conversation_history: nextHistory,
+      });
+
+      setConversationHistory(nextHistory);
+      setAnswer('');
+
+      if (data.status === 'complete') {
+        await updateUserFilters((data.final_filters || []).map(Number).filter(Number.isFinite));
+        login();
+        navigate('/mode');
+        return;
+      }
+
+      setCurrentStep(data.next_step || currentStep + 1);
+      setCurrentQuestion(data.next_question_text || t('onboarding.fallback_question'));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+      setIsRetrying(false);
+    }
+  };
+
+  const progress = phase === 'intro' ? 0 : Math.min(currentStep, 3);
+  const occupationOptions = [
+    { value: 'student', label: t('onboarding.occupation_student') },
+    { value: 'angajat', label: t('onboarding.occupation_employee') },
+    { value: 'antreprenor', label: t('onboarding.occupation_entrepreneur') },
+    { value: 'altceva', label: t('onboarding.occupation_other') },
+  ];
+
+  const isStartDisabled = isLoading || !userInfo.varsta || !userInfo.ocupatie || !userInfo.oras.trim();
+  const isAnswerDisabled = isLoading || answer.trim().length < MIN_ANSWER_LENGTH;
+  const loadingText = isRetrying ? t('onboarding.btn_retrying') : t('onboarding.btn_loading');
+
+  const resetFlow = () => {
+    setPhase('intro');
+    setCurrentStep(0);
+    setCurrentQuestion('');
+    setConversationHistory([]);
+    setAnswer('');
+    setError('');
   };
 
   return (
@@ -59,72 +190,133 @@ function Onboarding() {
           <p>{t('onboarding.desc')}</p>
         </motion.div>
 
-        <form onSubmit={handleFinish} className="onboarding-form">
-          <motion.div
-            className="onboarding-categories"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
-            {PREDEFINED_CATEGORIES.map((cat, idx) => {
-              const Icon = cat.icon;
-              const isSelected = selectedCategories.includes(cat.id);
+        <div className="onboarding-progress" aria-label={t('onboarding.progress_label')}>
+          {[0, 1, 2, 3].map(step => (
+            <span key={step} className={progress >= step ? 'active' : ''}>
+              {progress > step ? <Check size={14} /> : step}
+            </span>
+          ))}
+        </div>
 
-              return (
-                <motion.button
-                  type="button"
-                  key={cat.id}
-                  onClick={() => toggleCategory(cat.id)}
-                  className={`category-chip ${isSelected ? 'selected' : ''}`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + (idx * 0.05) }}
-                >
-                  <Icon size={18} />
-                  <span>{cat.label}</span>
-                </motion.button>
-              );
-            })}
-          </motion.div>
-
-          <motion.div
-            className="onboarding-custom"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-          >
-            <label>{t('onboarding.other_passions')}</label>
-            <input
-              type="text"
-              placeholder={t('onboarding.placeholder')}
-              value={customInterest}
-              onChange={(e) => setCustomInterest(e.target.value)}
-              className="onboarding-input"
-            />
-          </motion.div>
-
-          <motion.div
-            className="onboarding-footer"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            <button
-              type="submit"
-              className="btn-finish"
-              disabled={isLoading || selectedCategories.length === 0}
+        {phase === 'intro' ? (
+          <form onSubmit={handleStart} className="onboarding-form">
+            <motion.div
+              className="onboarding-fields"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
             >
-              {isLoading ? t('onboarding.btn_loading') : t('onboarding.btn_finish')}
-              {!isLoading && <ArrowRight size={20} />}
-            </button>
-            {selectedCategories.length === 0 && (
-              <span className="onboarding-hint">{t('onboarding.hint')}</span>
-            )}
-          </motion.div>
+              <label>
+                {t('onboarding.name')}
+                <input
+                  type="text"
+                  value={userInfo.nume}
+                  onChange={(e) => handleInfoChange('nume', e.target.value)}
+                  className="onboarding-input"
+                  placeholder={t('onboarding.name_placeholder')}
+                />
+              </label>
 
-        </form>
+              <div className="onboarding-row">
+                <label>
+                  {t('onboarding.age')}
+                  <input
+                    type="number"
+                    min="13"
+                    max="120"
+                    value={userInfo.varsta}
+                    onChange={(e) => handleInfoChange('varsta', e.target.value)}
+                    className="onboarding-input"
+                    placeholder="21"
+                    required
+                  />
+                </label>
+
+                <label>
+                  {t('onboarding.city')}
+                  <input
+                    type="text"
+                    value={userInfo.oras}
+                    onChange={(e) => handleInfoChange('oras', e.target.value)}
+                    className="onboarding-input"
+                    placeholder={t('onboarding.city_placeholder')}
+                    required
+                  />
+                </label>
+              </div>
+
+              <label>
+                {t('onboarding.occupation')}
+                <select
+                  value={userInfo.ocupatie}
+                  onChange={(e) => handleInfoChange('ocupatie', e.target.value)}
+                  className="onboarding-input"
+                  required
+                >
+                  <option value="">{t('onboarding.occupation_placeholder')}</option>
+                  {occupationOptions.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="onboarding-checkbox">
+                <input
+                  type="checkbox"
+                  checked={userInfo.is_remote}
+                  onChange={(e) => handleInfoChange('is_remote', e.target.checked)}
+                />
+                <span>{t('onboarding.remote')}</span>
+              </label>
+            </motion.div>
+
+            <div className="onboarding-footer">
+              <button type="submit" className="btn-finish" disabled={isStartDisabled}>
+                {isLoading ? loadingText : t('onboarding.btn_start')}
+                {isLoading ? <Loader2 className="spin" size={20} /> : <ArrowRight size={20} />}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <form onSubmit={handleAnswer} className="onboarding-form">
+            <motion.div
+              className="onboarding-question"
+              key={currentQuestion}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <span>{t('onboarding.ai_label')}</span>
+              <p>{currentQuestion}</p>
+            </motion.div>
+
+            <label className="onboarding-answer">
+              {t('onboarding.answer_label')}
+              <textarea
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                className="onboarding-input"
+                placeholder={t('onboarding.answer_placeholder')}
+                rows="5"
+              />
+            </label>
+
+            <div className="onboarding-footer">
+              <button type="submit" className="btn-finish" disabled={isAnswerDisabled}>
+                {isLoading ? loadingText : currentStep >= 3 ? t('onboarding.btn_finish') : t('onboarding.btn_next')}
+                {isLoading ? <Loader2 className="spin" size={20} /> : <ArrowRight size={20} />}
+              </button>
+              <button type="button" className="btn-reset" onClick={resetFlow} disabled={isLoading}>
+                <RotateCcw size={16} />
+                {t('onboarding.btn_restart')}
+              </button>
+              <span className="onboarding-hint">{t('onboarding.answer_hint')}</span>
+            </div>
+          </form>
+        )}
+
+        {error && <div className="onboarding-error" role="alert">{error}</div>}
+
 
       </div>
     </div>
