@@ -441,13 +441,14 @@ function SoloDiscovering() {
   const [searchResults, setSearchResults] = useState([]);
 
   const [searchString, setSearchString] = useState('');
-  const [maxDistance, setMaxDistance] = useState('');
-  const [maxDays, setMaxDays] = useState('');
+  const [maxDistance, setMaxDistance] = useState('100');
+  const [maxDays, setMaxDays] = useState('30');
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
 
   const [places, setPlaces] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasMoreData, setHasMoreData] = useState(true);
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
 
   const [likedPlaces, setLikedPlaces] = useState(() => {
@@ -494,7 +495,7 @@ function SoloDiscovering() {
       const token = localStorage.getItem('token');
 
       // const API_BASE_URL = import.meta.env.VITE_API_URL;
-      const url = `${API_URL}/api/events/search?query=...`; // Acum url va fi "http://localhost:9090/api/events..."
+      const url = `${API_URL}/api/events/discover?${params.toString()}`;
       console.log('[DISCOVER] GET', url, '| token:', token ? 'prezent' : 'LIPSĂ');
 
       const response = await fetch(url, {
@@ -510,6 +511,12 @@ function SoloDiscovering() {
 
       const data = await response.json();
       console.log('[DISCOVER] date primite:', data);
+      
+      if (data.length === 0) {
+        setHasMoreData(false);
+      } else {
+        setHasMoreData(true);
+      }
       setPlaces(data.map(mapEventDTO));
     } catch (error) {
       console.error('[DISCOVER] EROARE — fallback pe mock:', error);
@@ -571,6 +578,11 @@ function SoloDiscovering() {
 
       const data = await response.json();
       console.log('[SEARCH] date primite:', data);
+      if (data.length === 0) {
+        setHasMoreData(false);
+      } else {
+        setHasMoreData(true);
+      }
       setSearchResults(data.map(mapEventDTO));
     } catch (error) {
       console.error('[SEARCH] EROARE — fallback pe mock:', error);
@@ -592,6 +604,16 @@ function SoloDiscovering() {
         !likedPlaces.some((lp) => lp.id === loc.id) && !dislikedIds.includes(loc.id)
     );
   }, [places, likedPlaces, dislikedIds]);
+
+  useEffect(() => {
+    if (availablePlaces.length === 0 && hasMoreData && !isLoading) {
+      if (isSearchMode && searchString.trim().length > 0) {
+        fetchSearchResults();
+      } else {
+        fetchMainFeed();
+      }
+    }
+  }, [availablePlaces.length, hasMoreData, isLoading, isSearchMode, searchString, fetchSearchResults, fetchMainFeed]);
 
   // --- Handlers ---
   const handleSearch = (e) => {
@@ -627,20 +649,48 @@ function SoloDiscovering() {
     }
   };
 
-  const handleCardAction = (location, action) => {
-    if (action === 'reset') { setDislikedIds([]); return; }
+  const handleCardAction = async (location, action) => {
+    const token = localStorage.getItem('token');
+    
+    if (action === 'reset') { 
+      try {
+        await fetch(`${API_URL}/api/events/reset-dislikes`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.error('Failed to reset dislikes', err);
+      }
+      setDislikedIds([]); 
+      localStorage.removeItem('socially_dislikedIds');
+      setHasMoreData(true);
+      fetchMainFeed();
+      return; 
+    }
+    
     if (action === 'like') {
       const updated = likedPlaces.some((p) => p.id === location.id)
         ? likedPlaces
         : [...likedPlaces, location];
       setLikedPlaces(updated);
       localStorage.setItem('socially_likedPlaces', JSON.stringify(updated));
+      
+      fetch(`${API_URL}/api/events/${location.id}/vote?type=Da`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(err => console.error('Failed to send like', err));
+      
     } else {
       const updated = dislikedIds.includes(location.id)
         ? dislikedIds
         : [...dislikedIds, location.id];
       setDislikedIds(updated);
       localStorage.setItem('socially_dislikedIds', JSON.stringify(updated));
+      
+      fetch(`${API_URL}/api/events/${location.id}/vote?type=Nu`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(err => console.error('Failed to send dislike', err));
     }
   };
 
@@ -727,9 +777,9 @@ function SoloDiscovering() {
             <div className="sd-inline-param">
               <span className="sd-inline-label">{t('solo.km_label')}</span>
               <input
-                type="number" min="0" max="100" className="sd-inline-input"
+                type="number" min="0" max="1000" className="sd-inline-input"
                 value={maxDistance} onChange={(e) => setMaxDistance(e.target.value)}
-                placeholder="10" title="Distanța maximă (km)"
+                placeholder="100" title="Distanța maximă (km)"
               />
             </div>
 
