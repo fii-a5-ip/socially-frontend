@@ -71,43 +71,44 @@ function Notifications() {
   }, []);
 
   const handleInviteAction = async (id, action) => {
-  try {
+
+    const token = localStorage.getItem("token");
     setPendingActionId(id);
     setActionError(null);
-
-    const response = await fetch(
-      `${API_URL}/api/notifications/${id}/read`,
-      {
+    try {
+    const responseModificareTabel_Edi = await fetch(`${API_URL}/api/notifications/${id}/${action}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+           if (!responseModificareTabel_Edi.ok) {
+        throw new Error(action === "accept"
+          ? "Nu s-a putut accepta invitația"
+          : "Nu s-a putut refuza invitația");
+      }
+      
+    const responseModificareContor_Dinu = await fetch(`${API_URL}/api/notifications/${id}/read`,{
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ action }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Eroare la procesarea notificării");
-    }
+      });
+      if (!responseModificareContor_Dinu.ok) {throw new Error("Eroare la procesarea notificării"); }
 
     // Mută notificarea în Archived ( teoretic functional )
     setNotifications((prev) =>
       prev.map((notif) =>
-        notif.id === id
-          ? {
-              ...notif,
-              isRead: true,
-            }
-          : notif
+        notif.id === id ? { ...notif, isRead: true }: notif
       )
     );
+    window.dispatchEvent(new Event("notificationChanged")); //posibil sa mearga si fara window.
+
   } catch (error) {
     console.error("Eroare la apelul API:", error);
     setActionError(error.message);
   } finally {
     setPendingActionId(null);
-    window.dispatchEvent(new Event("notificationChanged")); //posibil sa trebuiasca in afara lui finally
   }
   };
 
