@@ -5,6 +5,7 @@ import { useTranslation } from '../../hooks/useTranslation'
 import flagRO from '../../assets/flag-ro.png'
 import flagEN from '../../assets/flag-en.png'
 import './Navbar.css'
+import { API_URL } from '../../api/config'
 
 /* ── Inline SVG Icons (no lucide-react needed) ── */
 const IconHome = () => (
@@ -78,10 +79,10 @@ function Dropdown({ trigger, children }) {
 }
 
 /* ── Navbar ── */
-function NavBtn({ to, icon }) {
+function NavBtn({ to, icon, className= "" }) {
   const location = useLocation()
   return (
-    <Link to={to} className={`nb-icon-btn${location.pathname === to ? ' nb-icon-btn--active' : ''}`}>
+    <Link to={to} className={`nb-icon-btn${location.pathname === to ? ' nb-icon-btn--active' : ''} ${className}`}>
       {icon}
     </Link>
   )
@@ -91,7 +92,33 @@ function Navbar() {
   const { theme, toggleTheme, lang, setLang } = useApp()
   const { t } = useTranslation()
 
+  const [hasUnread, setHasUnread] = useState(false);
 
+  //Verificare daca exista notificari noi si actualizarea clopotelului
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) { return; }
+
+      try {const response = await fetch(`${API_URL}/api/notifications/unread-count`, { //unread-count provine de la metoda "countByRecipientUserIdAndIsReadFalse" pe care o implementeaza Spring-Boot 
+          headers: { 'Authorization': `Bearer ${token}` } });
+
+      if (response.ok) { 
+        const count = await response.json(); 
+        setHasUnread(count > 0); }
+
+          } catch (error) { console.error("Eroare la verificarea notificărilor de către clopoțel", error);}
+    };
+    fetchUnreadCount();
+
+    const interval = setInterval(fetchUnreadCount, 20000);// = la fiecare 2o sec
+
+    globalThis.addEventListener("notificationChanged", fetchUnreadCount);//atunci interactionam pe pagina de notifications
+
+
+    return () => clearInterval(interval);
+
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -106,7 +133,7 @@ function Navbar() {
           <div className="nb-top__nav">
             <NavBtn to="/" icon={<IconHome />} />
             <NavBtn to="/mode" icon={<IconUsers />} />
-            <NavBtn to="/notifications" icon={<IconBell />} />
+            <NavBtn to="/notifications" icon={<IconBell />} className={hasUnread ? "nb-icon-btn--alert" : ""} />
             <NavBtn to="/profile" icon={<IconUser />} />
           </div>
 
@@ -157,7 +184,7 @@ function Navbar() {
       <nav className="nb-bottom">
         <NavBtn to="/" icon={<IconHome />} />
         <NavBtn to="/mode" icon={<IconUsers />} />
-        <NavBtn to="/notifications" icon={<IconBell />} />
+        <NavBtn to="/notifications" icon={<IconBell />} className={hasUnread ? "nb-icon-btn--alert" : ""} />
         <NavBtn to="/profile" icon={<IconUser />} />
       </nav>
     </>

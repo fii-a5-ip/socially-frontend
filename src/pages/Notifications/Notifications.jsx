@@ -71,33 +71,44 @@ function Notifications() {
   }, []);
 
   const handleInviteAction = async (id, action) => {
-    const token = localStorage.getItem("token");
-    setActionError(null);
+  try {
     setPendingActionId(id);
+    setActionError(null);
 
-    try {
-      const response = await fetch(`${API_URL}/api/notifications/${id}/${action}`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) {
-        throw new Error(action === "accept"
-          ? "Nu s-a putut accepta invitația"
-          : "Nu s-a putut refuza invitația");
+    const response = await fetch(
+      `${API_URL}/api/notifications/${id}/read`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action }),
       }
+    );
 
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          notif.id === id ? { ...notif, isRead: true } : notif
-        )
-      );
-    } catch (err) {
-      console.error("Error handling group invite:", err);
-      setActionError(err.message);
-    } finally {
-      setPendingActionId(null);
+    if (!response.ok) {
+      throw new Error("Eroare la procesarea notificării");
     }
+
+    // Mută notificarea în Archived ( teoretic functional )
+    setNotifications((prev) =>
+      prev.map((notif) =>
+        notif.id === id
+          ? {
+              ...notif,
+              isRead: true,
+            }
+          : notif
+      )
+    );
+  } catch (error) {
+    console.error("Eroare la apelul API:", error);
+    setActionError(error.message);
+  } finally {
+    setPendingActionId(null);
+    window.dispatchEvent(new Event("notificationChanged")); //posibil sa trebuiasca in afara lui finally
+  }
   };
 
   const newNotifications = notifications.filter((notif) => !notif.isRead);
