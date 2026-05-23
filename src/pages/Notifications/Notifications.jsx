@@ -27,8 +27,8 @@ function Notifications() {
   const [actionError, setActionError] = useState(null);
   const [pendingActionId, setPendingActionId] = useState(null);
 
-  const userTypes = ["GROUP_INVITE"];
-  const systemTypes = ["OUTGOING_UPDATE", "REMINDER", "SYSTEM_UPDATE", "MESSAGE"];
+  const userTypes = ["GROUP_INVITE","USER_MESSAGE"];
+  const systemTypes = ["OUTGOING_UPDATE", "REMINDER", "SYSTEM_UPDATE", "SYSTEM_MESSAGE"];
 
   const isSystemType = (type) => systemTypes.includes(type);
 
@@ -75,7 +75,12 @@ function Notifications() {
     const token = localStorage.getItem("token");
     setPendingActionId(id);
     setActionError(null);
+
+    const currentNotif = notifications.find(n => n.id === id);
+    const isInvite = currentNotif?.hasActions;
+
     try {
+  if (isInvite && (action === "accept" || action === "decline")) {
     const responseModificareTabel_Edi = await fetch(`${API_URL}/api/notifications/${id}/${action}`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -84,7 +89,9 @@ function Notifications() {
         throw new Error(action === "accept"
           ? "Nu s-a putut accepta invitația"
           : "Nu s-a putut refuza invitația");
+        }
       }
+
       
     const responseModificareContor_Dinu = await fetch(`${API_URL}/api/notifications/${id}/read`,{
         method: "PATCH",
@@ -102,6 +109,7 @@ function Notifications() {
         notif.id === id ? { ...notif, isRead: true }: notif
       )
     );
+    
     window.dispatchEvent(new Event("notificationChanged")); //posibil sa mearga si fara window.
 
   } catch (error) {
@@ -157,6 +165,8 @@ function Notifications() {
                   </div>
                   {notif.hasActions && !notif.isRead && (
                     <div className="notification_actions">
+
+
                       <button
                         className="btn btn--primary"
                         disabled={pendingActionId === notif.id}
@@ -164,6 +174,7 @@ function Notifications() {
                       >
                         {t('notifications.accept')}
                       </button>
+
                       <button
                         className="btn btn--secondary"
                         disabled={pendingActionId === notif.id}
@@ -173,6 +184,16 @@ function Notifications() {
                       </button>
                     </div>
                   )}
+
+                   {!notif.hasActions && !notif.isRead && (
+                      <button  
+                        className="notification_X_button"
+                        disabled={pendingActionId === notif.id}
+                        onClick={() => handleInviteAction(notif.id, "remove")}
+                        > x </button> )}
+
+
+
                 </div>
                 <p className="notification_text">{notif.text}</p>
               </div>
