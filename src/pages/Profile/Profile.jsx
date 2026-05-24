@@ -31,11 +31,11 @@ function Profile() {
   const [aiScore, setAiScore] = useState(98)
   
   const [availableFilters, setAvailableFilters] = useState([
-    { id: 1, name: 'sport' },
-    { id: 2, name: 'muzica' },
-    { id: 3, name: 'tech' },
-    { id: 4, name: 'travel' },
-    { id: 5, name: 'art' }
+    { id: 192, name: 'Sports' },
+    { id: 144, name: 'Music' },
+    { id: 13, name: 'Art & Culture' },
+    { id: 156, name: 'Outdoors' },
+    { id: 95, name: 'Food' }
   ])
   const [selectedFilters, setSelectedFilters] = useState([])
 

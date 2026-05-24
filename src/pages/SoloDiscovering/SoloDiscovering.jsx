@@ -40,27 +40,27 @@ const MOCK_LOCATIONS = [
 ];
 
 const AVAILABLE_FILTERS = [
-  { id: 257, labelKey: "solo.filter_restaurant", groupKey: "solo.filter_venue_type" },
-  { id: 60, labelKey: "solo.filter_cafe",    groupKey: "solo.filter_venue_type" },
-  { id: 27, labelKey: "solo.filter_bar",     groupKey: "solo.filter_venue_type" },
-  { id: 247, labelKey: "solo.filter_pub",       groupKey: "solo.filter_venue_type" },
+  { id: 175, labelKey: "solo.filter_restaurant", groupKey: "solo.filter_venue_type" },
+  { id: 46, labelKey: "solo.filter_cafe",    groupKey: "solo.filter_venue_type" },
+  { id: 20, labelKey: "solo.filter_bar",     groupKey: "solo.filter_venue_type" },
+  { id: 171, labelKey: "solo.filter_pub",       groupKey: "solo.filter_venue_type" },
 
-  { id: 233, labelKey: "solo.filter_pizza", groupKey: "solo.filter_food" },
-  { id: 305, labelKey: "solo.filter_sushi", groupKey: "solo.filter_food" },
-  { id: 56, labelKey: "solo.filter_buffet", groupKey: "solo.filter_food" },
-  { id: 325, labelKey: "solo.filter_vegetarian",  groupKey: "solo.filter_food" },
-  { id: 141, labelKey: "solo.filter_gluten_free", groupKey: "solo.filter_food" },
+  { id: 167, labelKey: "solo.filter_pizza", groupKey: "solo.filter_food" },
+  { id: 121, labelKey: "solo.filter_sushi", groupKey: "solo.filter_food" },
+  { id: 43, labelKey: "solo.filter_buffet", groupKey: "solo.filter_food" },
+  { id: 217, labelKey: "solo.filter_vegetarian",  groupKey: "solo.filter_food" },
+  { id: 105, labelKey: "solo.filter_gluten_free", groupKey: "solo.filter_food" },
 
-  { id: 181, labelKey: "solo.filter_live_music", groupKey: "solo.filter_activities" },
-  { id: 40, labelKey: "solo.filter_board_games", groupKey: "solo.filter_activities" },
-  { id: 293, labelKey: "solo.filter_sports_screening", groupKey: "solo.filter_activities" },
+  { id: 134, labelKey: "solo.filter_live_music", groupKey: "solo.filter_activities" },
+  { id: 33, labelKey: "solo.filter_board_games", groupKey: "solo.filter_activities" },
+  { id: 135, labelKey: "solo.filter_sports_screening", groupKey: "solo.filter_activities" },
 
-  { id: 134, labelKey: "solo.filter_free_wifi", groupKey: "solo.filter_facilities" },
-  { id: 240, labelKey: "solo.filter_power_outlets", groupKey: "solo.filter_facilities" },
-  { id: 9, labelKey: "solo.filter_air_conditioning", groupKey: "solo.filter_facilities" },
+  { id: 101, labelKey: "solo.filter_free_wifi", groupKey: "solo.filter_facilities" },
+  { id: 70, labelKey: "solo.filter_power_outlets", groupKey: "solo.filter_facilities" },
+  { id: 7, labelKey: "solo.filter_air_conditioning", groupKey: "solo.filter_facilities" },
 
-  { id: 62, labelKey: "solo.filter_free_parking", groupKey: "solo.filter_transport_parking" },
-  { id: 250, labelKey: "solo.filter_public_transport_nearby", groupKey: "solo.filter_transport_parking" },
+  { id: 100, labelKey: "solo.filter_free_parking", groupKey: "solo.filter_transport_parking" },
+  { id: 161, labelKey: "solo.filter_public_transport_nearby", groupKey: "solo.filter_transport_parking" },
 
 ];
 
@@ -312,6 +312,7 @@ function FavoritesScreen({ likedPlaces, onRemove, onOpenDetails }) {
           <div className="sd-fav-info">
             <h4 className="sd-fav-title">{place.title}</h4>
             <span className="sd-fav-category">{place.category}</span>
+            {place.distance && <span className="sd-fav-category" style={{marginTop: '4px'}}>📍 {place.distance}</span>}
             <button
               className="sd-fav-remove-btn"
               onClick={(e) => { e.stopPropagation(); onRemove(place.id); }}
@@ -347,6 +348,7 @@ function MyEventsScreen({ events, onOpenDetails }) {
           <div className="sd-fav-info">
             <h4 className="sd-fav-title">{place.title}</h4>
             <span className="sd-fav-category">{place.schedule}</span>
+            {place.distance && <span className="sd-fav-category" style={{marginTop: '4px'}}>📍 {place.distance}</span>}
             <span className="sd-fav-category" style={{ marginTop: '4px', fontStyle: 'italic', color: 'var(--color-primary)' }}>
               {t('solo.organized_by_you')}
             </span>
@@ -441,13 +443,14 @@ function SoloDiscovering() {
   const [searchResults, setSearchResults] = useState([]);
 
   const [searchString, setSearchString] = useState('');
-  const [maxDistance, setMaxDistance] = useState('');
-  const [maxDays, setMaxDays] = useState('');
+  const [maxDistance, setMaxDistance] = useState('100');
+  const [maxDays, setMaxDays] = useState('30');
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
 
   const [places, setPlaces] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasMoreData, setHasMoreData] = useState(true);
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
 
   const [likedPlaces, setLikedPlaces] = useState(() => {
@@ -474,12 +477,34 @@ function SoloDiscovering() {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchSavedEvents = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const url = `${API_URL}/api/events/saved`;
+        const response = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const mapped = data.map(mapEventDTO);
+          setLikedPlaces(mapped);
+          localStorage.setItem('socially_likedPlaces', JSON.stringify(mapped));
+        }
+      } catch (err) {
+        console.error('Eroare sincronizare salvate:', err);
+      }
+    };
+    fetchSavedEvents();
+  }, []);
+
   // ----------------------------------------
   // Fetch Feed Principal (Explore - swipe mode)
   // Răspuns așteptat: List<EventResponseDTO> (JSON array)
   // ----------------------------------------
-  const fetchMainFeed = useCallback(async () => {
-    setIsLoading(true);
+  const fetchMainFeed = useCallback(async (background = false) => {
+    if (!background) setIsLoading(true);
     try {
       const params = new URLSearchParams();
       if (maxDistance) params.append('maxDistance', maxDistance);
@@ -494,7 +519,7 @@ function SoloDiscovering() {
       const token = localStorage.getItem('token');
 
       // const API_BASE_URL = import.meta.env.VITE_API_URL;
-      const url = `${API_URL}/api/events/search?query=...`; // Acum url va fi "http://localhost:9090/api/events..."
+      const url = `${API_URL}/api/events/discover?${params.toString()}`;
       console.log('[DISCOVER] GET', url, '| token:', token ? 'prezent' : 'LIPSĂ');
 
       const response = await fetch(url, {
@@ -510,14 +535,20 @@ function SoloDiscovering() {
 
       const data = await response.json();
       console.log('[DISCOVER] date primite:', data);
+      
+      if (data.length === 0) {
+        setHasMoreData(false);
+      } else {
+        setHasMoreData(true);
+      }
       setPlaces(data.map(mapEventDTO));
     } catch (error) {
       console.error('[DISCOVER] EROARE — fallback pe mock:', error);
       setPlaces(MOCK_LOCATIONS);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [maxDistance, maxDays, selectedFilters, userLocation]);
+      } finally {
+        if (!background) setIsLoading(false);
+      }
+    }, [maxDistance, maxDays, selectedFilters, userLocation]);
 
   // ----------------------------------------
   // Fetch pentru Grid (Search)
@@ -571,6 +602,11 @@ function SoloDiscovering() {
 
       const data = await response.json();
       console.log('[SEARCH] date primite:', data);
+      if (data.length === 0) {
+        setHasMoreData(false);
+      } else {
+        setHasMoreData(true);
+      }
       setSearchResults(data.map(mapEventDTO));
     } catch (error) {
       console.error('[SEARCH] EROARE — fallback pe mock:', error);
@@ -582,16 +618,22 @@ function SoloDiscovering() {
 
   useEffect(() => {
     if (!isSearchMode) {
-      fetchMainFeed();
+      const handler = setTimeout(() => {
+        fetchMainFeed();
+      }, 500);
+      return () => clearTimeout(handler);
     }
   }, [userLocation, fetchMainFeed, isSearchMode]);
 
   const availablePlaces = useMemo(() => {
+    if (isSearchMode) {
+      return places;
+    }
     return places.filter(
       (loc) =>
         !likedPlaces.some((lp) => lp.id === loc.id) && !dislikedIds.includes(loc.id)
     );
-  }, [places, likedPlaces, dislikedIds]);
+  }, [places, likedPlaces, dislikedIds, isSearchMode]);
 
   // --- Handlers ---
   const handleSearch = (e) => {
@@ -627,20 +669,48 @@ function SoloDiscovering() {
     }
   };
 
-  const handleCardAction = (location, action) => {
-    if (action === 'reset') { setDislikedIds([]); return; }
+  const handleCardAction = async (location, action) => {
+    const token = localStorage.getItem('token');
+    
+    if (action === 'reset') { 
+      try {
+        await fetch(`${API_URL}/api/events/reset-dislikes`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.error('Failed to reset dislikes', err);
+      }
+      setDislikedIds([]); 
+      localStorage.removeItem('socially_dislikedIds');
+      setHasMoreData(true);
+      fetchMainFeed();
+      return; 
+    }
+    
     if (action === 'like') {
       const updated = likedPlaces.some((p) => p.id === location.id)
         ? likedPlaces
         : [...likedPlaces, location];
       setLikedPlaces(updated);
       localStorage.setItem('socially_likedPlaces', JSON.stringify(updated));
+      
+      fetch(`${API_URL}/api/events/${location.id}/vote?type=Da`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(err => console.error('Failed to send like', err));
+      
     } else {
       const updated = dislikedIds.includes(location.id)
         ? dislikedIds
         : [...dislikedIds, location.id];
       setDislikedIds(updated);
       localStorage.setItem('socially_dislikedIds', JSON.stringify(updated));
+      
+      fetch(`${API_URL}/api/events/${location.id}/vote?type=Nu`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(err => console.error('Failed to send dislike', err));
     }
   };
 
@@ -727,9 +797,9 @@ function SoloDiscovering() {
             <div className="sd-inline-param">
               <span className="sd-inline-label">{t('solo.km_label')}</span>
               <input
-                type="number" min="0" max="100" className="sd-inline-input"
+                type="number" min="0" max="1000" className="sd-inline-input"
                 value={maxDistance} onChange={(e) => setMaxDistance(e.target.value)}
-                placeholder="10" title="Distanța maximă (km)"
+                placeholder="100" title="Distanța maximă (km)"
               />
             </div>
 
@@ -769,7 +839,7 @@ function SoloDiscovering() {
         )}
       </header>
 
-      <div className={`sd-content${isSearchMode ? ' sd-content--scrollable' : ''}`}>
+      <div className={`sd-content${(isSearchMode || viewMode === 'saved' || viewMode === 'mine') ? ' sd-content--scrollable' : ''}`}>
         {isLoading && (
           <div style={{ textAlign: 'center', marginTop: '50px' }}>Încărcare...</div>
         )}
@@ -780,7 +850,24 @@ function SoloDiscovering() {
         {!isLoading && viewMode === 'saved' && !isSearchMode && (
           <FavoritesScreen
             likedPlaces={likedPlaces}
-            onRemove={(id) => setLikedPlaces((prev) => prev.filter((p) => p.id !== id))}
+            onRemove={async (id) => {
+              const updated = likedPlaces.filter((p) => p.id !== id);
+              setLikedPlaces(updated);
+              localStorage.setItem('socially_likedPlaces', JSON.stringify(updated));
+              
+              const token = localStorage.getItem('token');
+              try {
+                const API_BASE = window.API_URL || "http://localhost:9090"; // Fallback in case API_URL isn't globally available here
+                await fetch(`${API_BASE}/api/events/${id}/vote`, {
+                  method: 'DELETE',
+                  headers: { Authorization: `Bearer ${token}` }
+                });
+                // Fetch main feed to repopulate the event in the Explore tab if it was empty
+                fetchMainFeed(true);
+              } catch (err) {
+                console.error('Failed to remove vote from backend', err);
+              }
+            }}
             onOpenDetails={setSelectedPlace}
           />
         )}
