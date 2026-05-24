@@ -22,6 +22,7 @@ const MOCK_LOCATIONS = [
     image: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&q=80&w=800",
     description: "Zona dedicată activităților din cadrul CJE Iași.",
     longDescription: "Un eveniment de weekend dedicat studenților și asociațiilor din zona tineretului."
+    
   },
   {
     id: 3, title: "Muzeul de Artă Modernă", category: "Muzee", rating: 4.6,
@@ -29,6 +30,7 @@ const MOCK_LOCATIONS = [
     image: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&q=80&w=800",
     description: "Colecție vastă de artă contemporană și expoziții temporare.",
     longDescription: "Ai poftă să te pierzi puțin în gânduri artistice? Muzeul găzduiește expoziția temporală de fotografie."
+    
   },
   {
     id: 4, title: "La Trattoria", category: "Restaurante", rating: 4.5,
@@ -36,6 +38,7 @@ const MOCK_LOCATIONS = [
     image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&q=80&w=800",
     description: "Restaurant cu specific italian recunoscut pentru pizza autentică.",
     longDescription: "Un restaurant intim ideal atunci când simți că meriți o cină fantastică – doar pentru tine."
+    
   }
 ];
 
