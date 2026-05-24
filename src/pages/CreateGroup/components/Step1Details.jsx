@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import { MapPin, Image as ImageIcon, PartyPopper, Utensils, Coffee } from 'lucide-react';
 import FormInput from '../../../components/FormInput/FormInput';
 import { FormTextArea } from './FormTextArea';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 export function Step1Details({ values, errors, touched, handleChange, handleBlur, setValues }) {
+  const { t } = useTranslation();
 
   return (
     <motion.div
@@ -16,10 +18,10 @@ export function Step1Details({ values, errors, touched, handleChange, handleBlur
     >
       <div className="cg-form-row">
         <FormInput
-          label="Numele Grupului / Ieșirii"
+          label={t('creategroup.group_name_label')}
           name="name"
           value={values.name}
-          placeholder="ex: Ieșire la Burgeri vineri..."
+          placeholder={t('creategroup.group_name_placeholder')}
           error={errors.name}
           touched={touched.name}
           onChange={handleChange}
@@ -30,10 +32,10 @@ export function Step1Details({ values, errors, touched, handleChange, handleBlur
 
       <div className="cg-form-row">
         <FormTextArea
-          label="Scurtă descriere (opțional)"
+          label={t('creategroup.group_desc_label')}
           name="description"
           value={values.description}
-          placeholder="Unde, cum, cine aduce sucul..."
+          placeholder={t('creategroup.group_desc_placeholder')}
           error={errors.description}
           touched={touched.description}
           onChange={handleChange}
@@ -45,7 +47,7 @@ export function Step1Details({ values, errors, touched, handleChange, handleBlur
 
 
       <div className="cg-form-row">
-        <label className="cg-field-label">Imagine Copertă Grup (opțional)</label>
+        <label className="cg-field-label">{t('creategroup.group_image_label', 'Imagine Copertă Grup (opțional)')}</label>
         <div className="cg-file-upload-container">
           <input 
             type="file" 
@@ -69,7 +71,7 @@ export function Step1Details({ values, errors, touched, handleChange, handleBlur
             ) : (
               <div className="cg-file-placeholder">
                 <ImageIcon size={32} />
-                <span>Click pentru a încărca o imagine</span>
+                <span>{t('creategroup.group_image_placeholder', 'Click pentru a încărca o imagine')}</span>
               </div>
             )}
           </label>

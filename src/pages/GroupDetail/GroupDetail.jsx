@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   Clock,
   MapPin,
@@ -10,136 +10,388 @@ import {
   Sparkles,
   ChevronLeft,
   Activity as ActivityIcon,
-  Users
+  Users,
+  Search,
+  LogOut,
+  Plus
 } from "lucide-react";
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
 
 import { useTranslation } from "../../hooks/useTranslation";
+import { API_URL } from "../../api/config";
 import "./GroupDetail.css";
 
-const initialActivities = [
-  {
-    id: "a1",
-    title: "[TITLU: ACTIVITATE 1]",
-    type: "[Tip Activitate]",
-    location: "[Locația, orașul strada]",
-    time: "[dată, ziua, ora]",
-    score: 95,
-    imageUrl: "PLACEHOLDER",
-    votes: { da: 4, nu: 0, poate: 1 },
-    myVote: null,
-    isWinning: true,
-    attributes: [
-      {
-        name: "[Nume Preferință 1]",
-        percentage: 85,
-        color: "var(--color-primary-dark)",
-      },
-      {
-        name: "[Nume Preferință 2]",
-        percentage: 95,
-        color: "var(--color-primary)",
-      },
-      {
-        name: "[Nume Preferință 3]",
-        percentage: 35,
-        color: "var(--color-accent)",
-      },
-    ],
-  },
-  {
-    id: "a2",
-    title: "Cină la Trattoria Il Forno",
-    type: "Mâncare / Relaxare",
-    location: "Piața Unirii, nr. 12",
-    time: "Sâmbătă, 20:00",
-    score: 88,
-    imageUrl:
-      "https://images.unsplash.com/photo-1634672192240-ed8e1e8c1cf7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpdGFsaWFuJTIwcmVzdGF1cmFudCUyMHBpenphJTIwcGFzdGF8ZW58MXx8fHwxNzc0OTYxMjA3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    votes: { da: 3, nu: 1, poate: 1 },
-    myVote: null,
-    attributes: [
-      {
-        name: "Gastronomie",
-        percentage: 100,
-        color: "var(--color-primary-light)",
-      },
-      { name: "Relaxare", percentage: 85, color: "var(--color-primary)" },
-      { name: "Socializare", percentage: 90, color: "var(--color-accent)" },
-    ],
-  },
-];
+function EventDetailsModal({ event, onClose, isJoined, onToggleJoin }) {
+  const { t } = useTranslation();
+  if (!event) return null;
 
-const mockMembers = [
-  {
-    id: 1,
-    name: "Andrei",
-    avatar:
-      "https://images.unsplash.com/photo-1615327388641-203faee20165?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx5b3VuZyUyMG1hbiUyMGZhY2UlMjBwb3J0cmFpdHxlbnwxfHx8fDE3NzU0OTMxOTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    isReal: true,
-  },
-  {
-    id: 2,
-    name: "nume",
-    avatar: null,
-    isReal: false,
-  },
-  {
-    id: 3,
-    name: "nume",
-    avatar: null,
-    isReal: false,
-  },
-  {
-    id: 4,
-    name: "nume",
-    avatar: null,
-    isReal: false,
-  },
-];
+  const hasImage = event.imageUrl && event.imageUrl !== "PLACEHOLDER";
+
+  return (
+    <div className="gd-place-details fade-in-fast">
+      <div
+        className="gd-pd-header"
+        style={hasImage ? { backgroundImage: `url(${event.imageUrl})` } : {}}
+      >
+        <button className="gd-pd-back-btn" onClick={onClose}>
+          ✕
+        </button>
+        <div className="gd-pd-header-overlay"></div>
+        {!hasImage && (
+          <div className="gd-pd-no-image-placeholder">
+            <Trophy size={40} style={{ color: "var(--color-primary)" }} />
+          </div>
+        )}
+      </div>
+
+      <div className="gd-pd-content">
+        <h1 className="gd-pd-title">{event.title}</h1>
+
+        <div className="gd-pd-top-meta">
+          <span className="gd-pd-meta-badge category">{event.type}</span>
+          <span className="gd-pd-meta-badge rating">
+            <Trophy size={12} style={{ marginRight: "4px" }} />
+            {event.score || 85}% Match
+          </span>
+        </div>
+
+        <div className="gd-pd-info-clean">
+          <div className="gd-pd-info-row">
+            <div className="icon">
+              <Clock size={16} />
+            </div>
+            <div>
+              <strong>{t("solo.schedule", "Program")}</strong>
+              <p>{event.time}</p>
+            </div>
+          </div>
+
+          <div
+            className="gd-pd-info-row gd-clickable-address"
+            onClick={() =>
+              window.open(
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`,
+                "_blank"
+              )
+            }
+          >
+            <div className="icon">
+              <MapPin size={16} />
+            </div>
+            <div>
+              <strong>{t("solo.address", "Adresa")}</strong>
+              <p className="gd-address-link">{event.location}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="gd-pd-description">{event.description}</div>
+      </div>
+
+      <div className="gd-pd-footer-action">
+        <button
+          className="gd-pd-reserve-btn"
+          onClick={onToggleJoin}
+          style={{
+            backgroundColor: isJoined ? "#ef4444" : "var(--color-primary)",
+            color: "white"
+          }}
+        >
+          {isJoined ? "Leave Event ✕" : "Join Event ✓"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function getMemberDisplayName(member) {
+  const memberId = member?.userId ?? member?.id;
+  return (
+    member?.fullname ||
+    member?.name ||
+    member?.username ||
+    (memberId != null ? `User ${memberId}` : "User")
+  );
+}
+
+function getMemberAvatar(member) {
+  return (
+    member?.profileImgUrl ||
+    member?.avatarUrl ||
+    member?.profilePictureUrl ||
+    member?.avatar ||
+    null
+  );
+}
 
 function GroupDetail() {
   const { t } = useTranslation();
   const { groupId } = useParams();
-  const [activities, setActivities] = useState(initialActivities);
+  const navigate = useNavigate();
+
+  const [events, setEvents] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [groupDetails, setGroupDetails] = useState(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const groupName = `Grup ${groupId || "1"}`;
-  const totalMembers = mockMembers.length;
+  const [isGroupLoading, setIsGroupLoading] = useState(true);
+  const [groupError, setGroupError] = useState(null);
 
-  const handleVote = (activityId, vote) => {
-    setActivities((prev) =>
-      prev
-        .map((act) => {
-          if (act.id === activityId) {
-            let noileVoturi = { ...act.votes };
-            if (act.myVote) {
-              if (act.myVote === "Da") noileVoturi.da -= 1;
-              if (act.myVote === "Nu") noileVoturi.nu -= 1;
-              if (act.myVote === "Poate") noileVoturi.poate -= 1;
-            }
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [inviteQuery, setInviteQuery] = useState("");
+  const [inviteResults, setInviteResults] = useState([]);
+  const [inviteStatus, setInviteStatus] = useState(null);
+  const [isInviteSearching, setIsInviteSearching] = useState(false);
+  const [invitingUserId, setInvitingUserId] = useState(null);
 
-            if (vote === "Da") noileVoturi.da += 1;
-            if (vote === "Nu") noileVoturi.nu += 1;
-            if (vote === "Poate") noileVoturi.poate += 1;
+  // Event detail modal state
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
-            return { ...act, myVote: vote, votes: noileVoturi };
-          }
-          return act;
-        })
-        .sort((a, b) => {
-          const aScore = a.votes.da - a.votes.nu;
-          const bScore = b.votes.da - b.votes.nu;
-          return bScore - aScore;
-        })
-        .map((act, index) => ({
-          ...act,
-          isWinning: index === 0 && act.votes.da > 0,
-        }))
-    );
+  const handleToggleJoin = async (id) => {
+    const event = events.find((e) => e.id === id);
+    if (!event) return;
+
+    const isJoining = !event.isJoined;
+    const url = `${API_URL}/api/events/${id}/join`;
+    const method = isJoining ? "POST" : "DELETE";
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        // Update local state for immediate feedback
+        const updatedEvents = events.map((e) =>
+          e.id === id ? { ...e, isJoined: isJoining } : e
+        );
+        setEvents(updatedEvents);
+        if (selectedEvent && selectedEvent.id === id) {
+          setSelectedEvent({ ...selectedEvent, isJoined: isJoining });
+        }
+        // Refresh full data from backend
+        fetchGroupDetails(debouncedSearch);
+      }
+    } catch (error) {
+      console.error("Error toggling join status:", error);
+    }
   };
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    fetchGroupDetails(debouncedSearch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId, debouncedSearch]);
+
+  useEffect(() => {
+    if (!isInviteOpen || inviteQuery.trim().length < 2) {
+      setInviteResults([]);
+      setIsInviteSearching(false);
+      return undefined;
+    }
+
+    const token = localStorage.getItem("token");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(async () => {
+      try {
+        setIsInviteSearching(true);
+        setInviteStatus(null);
+        const response = await fetch(
+          `${API_URL}/api/users/search?query=${encodeURIComponent(inviteQuery.trim())}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            signal: controller.signal
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Nu s-au putut cauta utilizatori");
+        }
+
+        const data = await response.json();
+        const memberIds = new Set(members.map((member) => member?.userId ?? member?.id));
+        setInviteResults(
+          Array.isArray(data)
+            ? data.filter((user) => !memberIds.has(user.id))
+            : []
+        );
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Error searching users for invite:", error);
+          setInviteStatus({ type: "error", text: error.message });
+        }
+      } finally {
+        setIsInviteSearching(false);
+      }
+    }, 300);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
+  }, [inviteQuery, isInviteOpen, members]);
+
+  const groupName = groupDetails ? groupDetails.name : `Grup ${groupId || "1"}`;
+  const totalMembers = members.length;
+
+  const fetchGroupDetails = (query = "") => {
+    const url = query
+      ? `${API_URL}/api/groups/${groupId}/details?query=${encodeURIComponent(query)}`
+      : `${API_URL}/api/groups/${groupId}/details`;
+    const token = localStorage.getItem("token");
+
+    setIsGroupLoading(true);
+    setGroupError(null);
+
+    fetch(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Backend offline");
+        return res.json();
+      })
+      .then((data) => {
+        setGroupDetails(data);
+        setEvents(data.events || []);
+        setMembers(data.members || []);
+        setIsLoading(false);
+        setIsGroupLoading(false);
+      })
+      .catch((err) => {
+        console.warn("Backend indisponibil sau eroare la fetch:", err);
+        setGroupError(err?.message || "Eroare la încărcarea detaliilor grupului");
+        setIsLoading(false);
+        setIsGroupLoading(false);
+      });
+  };
+
+  const calculateAverageMatch = (attributes) => {
+    if (!attributes || attributes.length === 0) return 0;
+    const sum = attributes.reduce((acc, attr) => acc + attr.percentage, 0);
+    return Math.round(sum / attributes.length);
+  };
+
+  const handleVote = async (eventId, vote) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_URL}/api/events/${eventId}/vote?type=${vote}`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      if (response.ok) {
+        fetchGroupDetails(debouncedSearch);
+      } else {
+        console.error("Eroare la înregistrarea votului");
+      }
+    } catch (error) {
+      console.error("Eroare rețea la vot:", error);
+    }
+  };
+
+  const handleLeaveGroup = async () => {
+    if (
+      !window.confirm(
+        t("groupdetail.leave_confirm", "Sigur vrei să părăsești grupul?")
+      )
+    )
+      return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_URL}/api/groups/${groupId}/leave`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        navigate("/groups");
+      } else {
+        console.error("Eroare la părăsirea grupului");
+      }
+    } catch (error) {
+      console.error("Eroare rețea la părăsirea grupului:", error);
+    }
+  };
+
+  const openInvitePanel = () => {
+    setIsModalOpen(true);
+    setIsInviteOpen(true);
+    setInviteStatus(null);
+  };
+
+  const handleSendInvite = async (userId) => {
+    const token = localStorage.getItem("token");
+    setInvitingUserId(userId);
+    setInviteStatus(null);
+
+    try {
+      const response = await fetch(`${API_URL}/api/groups/${groupId}/invites`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId })
+      });
+
+      if (!response.ok) {
+        const message = await response.text().catch(() => "");
+        throw new Error(message || "Nu s-a putut trimite invitatia");
+      }
+
+      setInviteStatus({ type: "success", text: "Invitatia a fost trimisa" });
+      setInviteResults((prev) => prev.filter((user) => user.id !== userId));
+    } catch (error) {
+      console.error("Error sending group invite:", error);
+      setInviteStatus({ type: "error", text: error.message });
+    } finally {
+      setInvitingUserId(null);
+    }
+  };
+
+  // Events come already filtered from backend
+  const filteredEvents = events;
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="gd-page">
+        <div className="gd-container">
+          <h2>Loading...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  // Event detail screen
+  if (selectedEvent) {
+    return (
+      <EventDetailsModal
+        event={selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+        isJoined={selectedEvent.isJoined}
+        onToggleJoin={() => handleToggleJoin(selectedEvent.id)}
+      />
+    );
+  }
+
+  // Main page
   return (
     <>
       <div className="gd-page">
@@ -152,107 +404,216 @@ function GroupDetail() {
             <h1 className="gd-title">{groupName}</h1>
           </div>
 
+          {isGroupLoading && (
+            <div className="gd-card gd-status-card">
+              <p>Se incarca detaliile grupului...</p>
+            </div>
+          )}
+
+          {!isGroupLoading && groupError && (
+            <div className="gd-card gd-status-card error">
+              <p>{groupError}</p>
+            </div>
+          )}
+
           {/* Participants Section */}
-          <div className="gd-card gd-members-section">
-            <div className="gd-members-header">
-              <h2>{t('groupdetail.members_title')}</h2>
-              <button 
-                onClick={() => setIsModalOpen(true)}
-                className="gd-members-view-all"
-              >
-                <Users className="icon-sm" />
-                {t('groupdetail.view_all')}
-              </button>
-            </div>
+          {!isGroupLoading && !groupError && (
+            <div className="gd-card gd-members-section">
+              <div className="gd-members-header">
+                <h2>{t("groupdetail.members_title")}</h2>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="gd-members-view-all"
+                >
+                  <Users className="icon-sm" />
+                  {t("groupdetail.view_all")}
+                </button>
+              </div>
 
-            <div className="gd-members-list custom-scrollbar">
-              {mockMembers.map((member) => (
-                <div key={member.id} className="gd-member-item">
-                  <div className={`gd-member-avatar ${member.isReal ? 'real' : 'placeholder'}`}>
-                    {member.isReal ? (
-                      <img src={member.avatar} alt={member.name} />
-                    ) : (
-                      <span>(poza)</span>
-                    )}
+              <div className="gd-members-list custom-scrollbar">
+                {members.map((member) => {
+                  const memberId = member?.userId ?? member?.id;
+                  const memberName = getMemberDisplayName(member);
+                  const memberAvatar = getMemberAvatar(member);
+                  const isReal = Boolean(memberAvatar) || Boolean(member?.isReal);
+
+                  return (
+                    <div
+                      key={`${memberId ?? memberName}-${member?.role || "member"}`}
+                      className="gd-member-item"
+                    >
+                      <div
+                        className={`gd-member-avatar ${
+                          isReal ? "real" : "placeholder"
+                        }`}
+                      >
+                        {memberAvatar ? (
+                          <img
+                            src={
+                              memberAvatar ||
+                              "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+                            }
+                            alt={memberName}
+                          />
+                        ) : (
+                          <span>{memberId ?? "?"}</span>
+                        )}
+                      </div>
+                      <span
+                        className={`gd-member-name ${
+                          isReal ? "real-text" : "placeholder-text"
+                        }`}
+                      >
+                        {memberName}
+                      </span>
+                    </div>
+                  );
+                })}
+
+                <button
+                  className="gd-member-item gd-invite-btn group"
+                  onClick={openInvitePanel}
+                >
+                  <div className="gd-member-avatar invite">
+                    <span>+</span>
                   </div>
-                  <span className={`gd-member-name ${member.isReal ? 'real-text' : 'placeholder-text'}`}>
-                    {member.name}
+                  <span className="gd-member-name text-invite">
+                    {t("groupdetail.invite")}
                   </span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Events Header */}
+          <div
+            className="gd-activities-header"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+              alignItems: "stretch"
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                width: "100%"
+              }}
+            >
+              <h2>
+                {t("groupdetail.proposed_activities", "Evenimente Propuse")}
+              </h2>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  alignItems: "center"
+                }}
+              >
+                <button
+                  onClick={() => navigate(`/discover/create?groupId=${groupId}`)}
+                  className="gd-ai-badge"
+                  style={{
+                    cursor: "pointer",
+                    border: "none",
+                    background: "var(--color-primary)",
+                    color: "white",
+                    borderRadius: "20px",
+                    padding: "6px 14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    fontSize: "0.8rem",
+                    fontWeight: 600
+                  }}
+                >
+                  <Plus className="icon-sm" />
+                  {t("groupdetail.propose_event", "Propune")}
+                </button>
+                <div className="gd-ai-badge">
+                  <Sparkles className="icon-sm" />
+                  AI Matched
                 </div>
-              ))}
-              <button className="gd-member-item gd-invite-btn group">
-                <div className="gd-member-avatar invite">
-                  <span>+</span>
-                </div>
-                <span className="gd-member-name text-invite">{t('groupdetail.invite')}</span>
-              </button>
+              </div>
+            </div>
+
+            <div className="gd-search-bar" style={{ position: "relative", width: "100%" }}>
+              <Search className="icon-sm gd-search-icon" />
+              <input
+                type="text"
+                placeholder={t("groupdetail.search_event", "Caută un eveniment")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="gd-search-input"
+              />
             </div>
           </div>
 
-          {/* Activities Header */}
-          <div className="gd-activities-header">
-            <h2>{t('groupdetail.proposed_activities')}</h2>
-            <div className="gd-ai-badge">
-              <Sparkles className="icon-sm" />
-              AI Matched
-            </div>
-          </div>
-
-          {/* Activities List */}
+          {/* Events List */}
           <div className="gd-activities-list">
-            {activities.map((activity, index) => {
-              const totalVotes = activity.votes.da + activity.votes.nu + activity.votes.poate;
-              const daPercent = totalVotes ? (activity.votes.da / totalVotes) * 100 : 0;
-              const poatePercent = totalVotes ? (activity.votes.poate / totalVotes) * 100 : 0;
-              const nuPercent = totalVotes ? (activity.votes.nu / totalVotes) * 100 : 0;
+            {filteredEvents.map((event, index) => {
+              const totalVotes = event.votes.da + event.votes.nu + event.votes.poate;
+              const daPercent = totalVotes ? (event.votes.da / totalVotes) * 100 : 0;
+              const poatePercent = totalVotes ? (event.votes.poate / totalVotes) * 100 : 0;
+              const nuPercent = totalVotes ? (event.votes.nu / totalVotes) * 100 : 0;
+              const averageMatch = calculateAverageMatch(event.attributes) || event.score;
 
               return (
                 <motion.div
-                  key={activity.id}
+                  key={event.id}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`gd-activity-card ${activity.isWinning ? 'winning' : ''}`}
+                  className={`gd-activity-card ${event.isWinning ? "winning" : ""}`}
+                  onClick={() => setSelectedEvent(event)}
+                  style={{ cursor: "pointer" }}
                 >
                   {/* Image Area */}
                   <div className="gd-activity-image-area">
-                    {activity.imageUrl === "PLACEHOLDER" ? (
+                    {!event.imageUrl || event.imageUrl === "PLACEHOLDER" ? (
                       <div className="gd-image-placeholder">
                         <div className="gd-placeholder-badge">
                           <span>[POZA EVENIMENT]</span>
                         </div>
                       </div>
                     ) : (
-                      <img src={activity.imageUrl} alt={activity.title} className="gd-activity-img" />
+                      <img
+                        src={event.imageUrl}
+                        alt={event.title}
+                        className="gd-activity-img"
+                      />
                     )}
-                    {activity.isWinning && (
+                    {event.isWinning && (
                       <div className="gd-winning-badge">
                         <Trophy className="icon-sm" />
-                        {t('groupdetail.winning_activity')}
+                        {t("groupdetail.winning_activity", "Eveniment Câștigător")}
                       </div>
                     )}
 
                     <div className="gd-score-badge">
                       <Sparkles className="icon-xs" />
-                      {t('groupdetail.ai_score')} {activity.score}%
+                      {t("groupdetail.ai_score")} {averageMatch}%
                     </div>
                   </div>
 
                   {/* Content Area */}
                   <div className="gd-activity-content">
                     <div className="gd-activity-titles">
-                      <h3>{activity.title}</h3>
-                      <p>{activity.type}</p>
+                      <h3>{event.title}</h3>
+                      <p>{event.type}</p>
                     </div>
 
                     <div className="gd-activity-meta">
                       <div className="meta-item">
                         <MapPin className="icon" />
-                        {activity.location}
+                        {event.location}
                       </div>
                       <div className="meta-item">
                         <Clock className="icon" />
-                        {activity.time}
+                        {event.time}
                       </div>
                     </div>
 
@@ -260,26 +621,26 @@ function GroupDetail() {
                     <div className="gd-event-profile">
                       <div className="gd-event-profile-header">
                         <ActivityIcon className="icon-sm" />
-                        <span>{t('groupdetail.profile_prefs')}</span>
+                        <span>{t("groupdetail.profile_prefs", "Compatibilitate")}</span>
                       </div>
                       <div className="gd-attributes-list">
-                        {activity.attributes.map((attr, idx) => (
-                          <div key={idx} className="gd-attribute-item">
-                            <div className="gd-attribute-labels">
-                              <span>{attr.name}</span>
-                              <span>{attr.percentage}% {t('groupdetail.match')}</span>
-                            </div>
-                            <div className="gd-attribute-bar-bg">
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${attr.percentage}%` }}
-                                transition={{ duration: 1, delay: 0.2 + idx * 0.1 }}
-                                className="gd-attribute-fill"
-                                style={{ backgroundColor: attr.color }}
-                              />
-                            </div>
+                        <div className="gd-attribute-item">
+                          <div className="gd-attribute-labels">
+                            <span>Compatibilitate Medie</span>
+                            <span>
+                              {averageMatch}% {t("groupdetail.match")}
+                            </span>
                           </div>
-                        ))}
+                          <div className="gd-attribute-bar-bg">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${averageMatch}%` }}
+                              transition={{ duration: 1, delay: 0.2 }}
+                              className="gd-attribute-fill"
+                              style={{ backgroundColor: "var(--color-primary)" }}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -288,13 +649,15 @@ function GroupDetail() {
                       {/* Dynamic Progress Bar */}
                       <div className="gd-vote-progress-area">
                         <div className="gd-vote-progress-header">
-                          <span className="label">{t('groupdetail.vote_results')}</span>
-                          <span className="count">{totalVotes} {t('groupdetail.votes')}</span>
+                          <span className="label">{t("groupdetail.vote_results")}</span>
+                          <span className="count">
+                            {totalVotes} {t("groupdetail.votes")}
+                          </span>
                         </div>
-                        
+
                         <div className="gd-vote-bar-container">
                           <div className="gd-vote-bar">
-                            <motion.div 
+                            <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${daPercent}%` }}
                               transition={{ duration: 0.8, ease: "easeOut" }}
@@ -302,7 +665,7 @@ function GroupDetail() {
                             >
                               <div className="gd-shimmer"></div>
                             </motion.div>
-                            <motion.div 
+                            <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${poatePercent}%` }}
                               transition={{ duration: 0.8, ease: "easeOut" }}
@@ -310,7 +673,7 @@ function GroupDetail() {
                             >
                               <div className="gd-shimmer"></div>
                             </motion.div>
-                            <motion.div 
+                            <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${nuPercent}%` }}
                               transition={{ duration: 0.8, ease: "easeOut" }}
@@ -325,10 +688,19 @@ function GroupDetail() {
                       {/* Modern Voting Buttons */}
                       <div className="gd-vote-buttons">
                         <button
-                          onClick={() => handleVote(activity.id, "Da")}
-                          className={`gd-vote-btn da ${activity.myVote === "Da" ? "active" : activity.myVote !== null ? "inactive" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVote(event.id, "Da");
+                          }}
+                          className={`gd-vote-btn da ${
+                            event.myVote === "Da"
+                              ? "active"
+                              : event.myVote !== null
+                                ? "inactive"
+                                : ""
+                          }`}
                         >
-                          {activity.myVote === "Da" && (
+                          {event.myVote === "Da" && (
                             <>
                               <div className="gd-fluid-fill success">
                                 <div className="gd-wave-smooth"></div>
@@ -342,15 +714,28 @@ function GroupDetail() {
                             </>
                           )}
                           <span className="gd-btn-content">
-                            <Check className={`icon ${activity.myVote === "Da" ? "glowing" : ""}`} strokeWidth={3} /> Da
+                            <Check
+                              className={`icon ${event.myVote === "Da" ? "glowing" : ""}`}
+                              strokeWidth={3}
+                            />{" "}
+                            Da
                           </span>
                         </button>
-                        
+
                         <button
-                          onClick={() => handleVote(activity.id, "Poate")}
-                          className={`gd-vote-btn poate ${activity.myVote === "Poate" ? "active" : activity.myVote !== null ? "inactive" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVote(event.id, "Poate");
+                          }}
+                          className={`gd-vote-btn poate ${
+                            event.myVote === "Poate"
+                              ? "active"
+                              : event.myVote !== null
+                                ? "inactive"
+                                : ""
+                          }`}
                         >
-                          {activity.myVote === "Poate" && (
+                          {event.myVote === "Poate" && (
                             <>
                               <div className="gd-fluid-fill warning">
                                 <div className="gd-wave-slow"></div>
@@ -364,15 +749,28 @@ function GroupDetail() {
                             </>
                           )}
                           <span className="gd-btn-content">
-                            <HelpCircle className={`icon ${activity.myVote === "Poate" ? "glowing" : ""}`} strokeWidth={3} /> Poate
+                            <HelpCircle
+                              className={`icon ${event.myVote === "Poate" ? "glowing" : ""}`}
+                              strokeWidth={3}
+                            />{" "}
+                            Poate
                           </span>
                         </button>
-                        
+
                         <button
-                          onClick={() => handleVote(activity.id, "Nu")}
-                          className={`gd-vote-btn nu ${activity.myVote === "Nu" ? "active" : activity.myVote !== null ? "inactive" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVote(event.id, "Nu");
+                          }}
+                          className={`gd-vote-btn nu ${
+                            event.myVote === "Nu"
+                              ? "active"
+                              : event.myVote !== null
+                                ? "inactive"
+                                : ""
+                          }`}
                         >
-                          {activity.myVote === "Nu" && (
+                          {event.myVote === "Nu" && (
                             <>
                               <div className="gd-fluid-fill error">
                                 <div className="gd-wave-jagged"></div>
@@ -385,7 +783,11 @@ function GroupDetail() {
                             </>
                           )}
                           <span className="gd-btn-content">
-                            <X className={`icon ${activity.myVote === "Nu" ? "glowing" : ""}`} strokeWidth={3} /> Nu
+                            <X
+                              className={`icon ${event.myVote === "Nu" ? "glowing" : ""}`}
+                              strokeWidth={3}
+                            />{" "}
+                            Nu
                           </span>
                         </button>
                       </div>
@@ -394,6 +796,43 @@ function GroupDetail() {
                 </motion.div>
               );
             })}
+          </div>
+
+          {/* Leave Group Button */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "2rem",
+              marginBottom: "2rem"
+            }}
+          >
+            <button
+              className="gd-leave-btn"
+              onClick={handleLeaveGroup}
+              style={{
+                padding: "14px 32px",
+                borderRadius: "12px",
+                border: "1px solid rgba(255, 59, 48, 0.3)",
+                background: "rgba(255, 59, 48, 0.1)",
+                color: "#ff3b30",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontWeight: "500",
+                transition: "all 0.3s ease"
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "rgba(255, 59, 48, 0.2)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "rgba(255, 59, 48, 0.1)";
+              }}
+            >
+              <LogOut size={20} />
+              <span>{t("groupdetail.leave_group", "Părăsește Grupul")}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -407,11 +846,11 @@ function GroupDetail() {
             exit={{ opacity: 0 }}
             className="gd-modal-overlay"
           >
-            <div 
+            <div
               className="gd-modal-backdrop"
               onClick={() => setIsModalOpen(false)}
             />
-            
+
             <motion.div
               initial={{ y: 20, opacity: 0, scale: 0.95 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -421,39 +860,115 @@ function GroupDetail() {
             >
               <div className="gd-modal-header">
                 <div>
-                  <h2>{t('groupdetail.modal_title')}</h2>
-                  <p>{totalMembers} {t('groupdetail.modal_members')}</p>
+                  <h2>{t("groupdetail.modal_title")}</h2>
+                  <p>
+                    {totalMembers} {t("groupdetail.modal_members")}
+                  </p>
                 </div>
-                <button onClick={() => setIsModalOpen(false)} className="gd-close-btn">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="gd-close-btn"
+                >
                   <X className="icon" />
                 </button>
               </div>
 
               <div className="gd-modal-body custom-scrollbar">
-                {mockMembers.map((member) => (
-                  <div key={member.id} className="gd-modal-member-row">
-                    <div className={`gd-modal-avatar ${member.isReal ? 'real' : 'placeholder'}`}>
-                      {member.isReal ? (
-                        <img src={member.avatar} alt={member.name} />
-                      ) : (
-                        <span>(poza)</span>
-                      )}
+                {members.map((member) => {
+                  const memberId = member?.userId ?? member?.id;
+                  const memberName = getMemberDisplayName(member);
+                  const memberAvatar = getMemberAvatar(member);
+                  const isReal = Boolean(memberAvatar) || Boolean(member?.isReal);
+
+                  return (
+                    <div
+                      key={`${memberId ?? memberName}-${member?.role || "member"}`}
+                      className="gd-modal-member-row"
+                    >
+                      <div
+                        className={`gd-modal-avatar ${
+                          isReal ? "real" : "placeholder"
+                        }`}
+                      >
+                        {memberAvatar ? (
+                          <img src={memberAvatar} alt={memberName} />
+                        ) : (
+                          <span>{memberId ?? "?"}</span>
+                        )}
+                      </div>
+                      <div className="gd-modal-member-info">
+                        <h4 className={isReal ? "real" : "placeholder"}>
+                          {memberName}
+                        </h4>
+                        <span>
+                          {t("groupdetail.modal_member_label")} {memberId}
+                          {member?.role && (
+                            <span
+                              className="gd-member-role badge"
+                              style={{ marginLeft: "8px" }}
+                            >
+                              {member.role}
+                            </span>
+                          )}
+                        </span>
+                      </div>
                     </div>
-                    <div className="gd-modal-member-info">
-                      <h4 className={member.isReal ? 'real' : 'placeholder'}>
-                        {member.name}
-                      </h4>
-                      <span>{t('groupdetail.modal_member_label')} {member.id}</span>
-                    </div>
-                  </div>
-                ))}
-                
-                <button className="gd-modal-invite-btn">
+                  );
+                })}
+
+                <button
+                  className="gd-modal-invite-btn"
+                  onClick={() => setIsInviteOpen((prev) => !prev)}
+                >
                   <div className="gd-modal-invite-icon">
                     <span>+</span>
                   </div>
-                  <span className="gd-modal-invite-text">{t('groupdetail.invite_new')}</span>
+                  <span className="gd-modal-invite-text">
+                    {t("groupdetail.invite_new")}
+                  </span>
                 </button>
+
+                {isInviteOpen && (
+                  <div className="gd-invite-panel">
+                    <input
+                      type="text"
+                      className="gd-invite-search"
+                      value={inviteQuery}
+                      onChange={(event) => setInviteQuery(event.target.value)}
+                      placeholder="Cauta utilizatori"
+                    />
+
+                    {inviteStatus && (
+                      <p className={`gd-invite-status ${inviteStatus.type}`}>
+                        {inviteStatus.text}
+                      </p>
+                    )}
+
+                    {isInviteSearching && (
+                      <p className="gd-invite-status">Se cauta...</p>
+                    )}
+
+                    {!isInviteSearching && inviteQuery.trim().length >= 2 && inviteResults.length === 0 && (
+                      <p className="gd-invite-status">Nu sunt utilizatori disponibili</p>
+                    )}
+
+                    {inviteResults.map((user) => (
+                      <div className="gd-invite-result" key={user.id}>
+                        <div className="gd-invite-user">
+                          <strong>{user.fullname || user.username}</strong>
+                          <span>{user.username}</span>
+                        </div>
+                        <button
+                          className="gd-invite-send"
+                          disabled={invitingUserId === user.id}
+                          onClick={() => handleSendInvite(user.id)}
+                        >
+                          {invitingUserId === user.id ? "..." : "Invita"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

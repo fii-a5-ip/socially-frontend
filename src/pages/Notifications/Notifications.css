@@ -42,7 +42,7 @@
 
 .notifications_section-title.notifications_section_electricboogaloo {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-sm);
   padding-bottom: var(--space-sm);
   margin-top: var(--space-lg);
@@ -72,11 +72,16 @@
 
 /* ── Individual notification card ── */
 .notification {
+  min-height: 120px;
+
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+
+  position: relative;
+  
+  align-items:flex-start;
   gap: var(--space-lg);
   padding: var(--space-lg) var(--space-xl);
+  
   border-radius: var(--radius-lg);
   background: var(--bg-card);
   border: 1px solid var(--border-color, rgba(0,0,0,0.06));
@@ -86,6 +91,11 @@
 .notification:hover {
   box-shadow: 0 4px 16px rgba(0,0,0,0.06);
   transform: translateY(-1px);
+
+}
+
+.notification:hover .notification_text {
+  max-height: 300em; /* big enough to fit most text */
 }
 
 /* ── Unread state ── */
@@ -101,6 +111,7 @@
   gap: var(--space-xs);
   flex: 1;
   min-width: 0;
+  overflow: visible; /* poate e necesar*/
 }
 
 .notification_text {
@@ -108,6 +119,18 @@
   font-weight: 500;
   color: var(--text-primary);
   line-height: 1.5;
+  /*gap: var(--space-md);*/
+
+
+  /*testing pentru expansiune casutei la hover*/
+  max-height: 4.5em; /* (line-height) x (number of lines) */
+  overflow: hidden;
+
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  transition: max-height 0.25s ease;
+
 }
 
 .notification_time {
@@ -120,6 +143,7 @@
   display: flex;
   gap: var(--space-sm);
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .notification_actions .btn {
@@ -136,6 +160,13 @@
   font-size: var(--font-size-base);
 }
 
+.notifications_action-error {
+  margin: 0 0 var(--space-md);
+  color: var(--color-error, #ef4444);
+  text-align: center;
+  font-weight: 600;
+}
+
 /* ── Responsive tweaks ── */
 @media (max-width: 600px) {
   .notification {
@@ -147,6 +178,8 @@
 
   .notification_actions {
     width: 100%;
+    gap: var(--space-sm);
+   margin-top: var(--space-sm);
   }
 
   .notification_actions .btn {
@@ -154,3 +187,60 @@
     text-align: center;
   }
 }
+
+/*___ Cerc pentru pfp ___*/
+.notification_avatar {
+  width: 70px;
+  height: 70px; 
+  min-width: 70px; /*trebuie si asta aparent fiindca flex e un dezastru*/
+  /*border-radius: 50%; /* transforma patrat in cerc*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /*temporar* dadaddasdadas*/
+  font-size:9px;
+
+}
+
+.notification--user .notification_avatar {
+  border: 4px solid var(--border-color);
+  border-radius: 12px; /*patrat cu rounded corners */
+  overflow: hidden; /* ca sa fiu sigur*/
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.25);
+
+  font-size: 50px;
+  padding-top: 2x; /*11px pentru ca emoji-ul sa se lipeasca de fundul casutei sale */
+}
+
+/*nu am testat foarte tare*/
+
+.notification_avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.notification--system .notification_avatar {
+  font-size: 60px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);}
+
+
+/*___ Username + timestamp placement ___*/
+.notification_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-xs);
+  gap: var(--space-md);
+  flex-wrap: nowrap;
+}
+
+.notification_username {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-primary-dark); /* ce fel de "dark" este asta? lol*/
+}
+
+  .notification--system .notification_username
+  { color: var(--color-info);}

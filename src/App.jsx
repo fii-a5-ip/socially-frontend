@@ -13,6 +13,7 @@ import GroupDetail from './pages/GroupDetail/GroupDetail'
 import CreateGroup from './pages/CreateGroup/CreateGroup'
 import CreateEvent from './pages/CreateEvent/CreateEvent'
 import Onboarding from './pages/Onboarding/Onboarding'
+import PreferencesFlow from './components/PreferencesFlow/PreferencesFlow' //ca sa pot testa functionalitatea
 import About from './pages/About/About'
 import SoloDiscovering from './pages/SoloDiscovering/SoloDiscovering'
 import Profile from './pages/Profile/Profile'
@@ -25,9 +26,10 @@ const PUBLIC_ROUTES = ['/', '/login', '/register', '/onboarding', '/about']
 
 function App() {
   const location = useLocation()
-
-
   const { isLoggedIn } = useApp()
+
+  //nu afisam navbarul deloc
+  const isMandatoryFlow = ['/preferences'].includes(location.pathname)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -35,7 +37,7 @@ function App() {
 
   return (
     <div className="app">
-      {isLoggedIn ? <Navbar /> : <PublicNavbar />}
+      {!isMandatoryFlow && (isLoggedIn ? <Navbar /> : <PublicNavbar />)}
       <main className="app__content">
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -43,6 +45,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/preferences" element={<PreferencesFlow />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/mode" element={<ModeSelection />} />
           <Route path="/groups" element={<Groups />} />

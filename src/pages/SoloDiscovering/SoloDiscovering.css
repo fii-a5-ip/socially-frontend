@@ -281,6 +281,11 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-xl);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.sd-filter-panel-body::-webkit-scrollbar {
+    display: none;
 }
 
 .sd-filter-group {
@@ -423,6 +428,7 @@
 }
 
 /* --- Discovery Screen (Card) --- */
+/* --- Discovery Screen (Card) --- */
 .sd-card {
     width: 100%;
     max-width: 400px;
@@ -550,8 +556,12 @@
 .sd-action-btn.dislike { color: var(--color-error); }
 .sd-action-btn.like { color: var(--color-success); }
 
-/* --- Favorites Screen (Grid) --- */
+/* --- Favorites / MyEvents Grid --- */
 .sd-favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    width: 100%;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--space-lg);
