@@ -279,7 +279,6 @@ function DiscoveryScreen({ location, onAction, onOpenDetails }) {
       <div className="sd-card-info">
         <div className="sd-card-header">
           <h2 className="sd-card-title">{location.title}</h2>
-          <span className="sd-card-rating">⭐ {location.rating}</span>
         </div>
         <span className="sd-card-schedule">🕒 {location.schedule}</span>
         <span className="sd-card-category">{location.category}</span>
@@ -377,8 +376,7 @@ function PlaceDetails({ place, onClose, onCancel }) {
       <div className="sd-pd-content">
         <h1 className="sd-pd-title">{place.title}</h1>
         <div className="sd-pd-top-meta">
-          {place.rating && <span className="sd-pd-meta-badge rating">⭐ {place.rating}</span>}
-          {place.distance && <span className="sd-pd-meta-badge distance">🚶 {place.distance}</span>}
+          {place.distance && <span className="sd-pd-meta-badge distance">📍 {place.distance}</span>}
           {place.category && <span className="sd-pd-meta-badge category">{place.category}</span>}
         </div>
         <div className="sd-pd-info-clean">
@@ -464,7 +462,7 @@ function SoloDiscovering() {
     const s = localStorage.getItem('socially_dislikedIds');
     return s ? JSON.parse(s) : [];
   });
-  const [myEvents] = useState(() => {
+  const [myEvents, setMyEvents] = useState(() => {
     const s = localStorage.getItem('socially_myEvents');
     return s ? JSON.parse(s) : [];
   });
@@ -732,8 +730,23 @@ function SoloDiscovering() {
       <PlaceDetails
         place={selectedPlace}
         onClose={() => setSelectedPlace(null)}
-        onCancel={(id) => {
+        onCancel={async (id) => {
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_URL}/api/events/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) {
+              const errTxt = await res.text();
+              console.error("Failed to delete event in backend:", errTxt);
+              alert("Nu s-a putut șterge evenimentul din baza de date: " + errTxt);
+            }
+          } catch(err) {
+            console.error(err);
+          }
           const updated = myEvents.filter((p) => p.id !== id);
+          setMyEvents(updated);
           localStorage.setItem('socially_myEvents', JSON.stringify(updated));
           setSelectedPlace(null);
         }}

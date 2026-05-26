@@ -17,6 +17,9 @@ const initialValues = {
   description: '',
   date: '',
   address: '',
+  locationId: null,
+  mapHtml: '',
+  weatherData: null,
 };
 
 const validationRules = {
@@ -91,7 +94,7 @@ function CreateEvent() {
   const submitFinalEvent = async () => {
       const stepErrors = {};
       if (!values.date) { stepErrors.date = 'Data este obligatorie.'; }
-      if (!values.address) { stepErrors.address = 'Adresa este obligatorie.'; }
+      if (!values.locationId) { stepErrors.address = 'Te rugăm să selectezi o adresă din listă.'; }
 
       if (Object.keys(stepErrors).length > 0) {
           setErrors(prev => ({ ...prev, ...stepErrors }));
@@ -127,29 +130,35 @@ function CreateEvent() {
         localStorage.setItem('socially_myEvents', JSON.stringify([newEvent, ...existing]));
       }
 
-      // If creating for a group, also send to backend API
-      if (groupId) {
-        const token = localStorage.getItem('token');
-        const payload = {
-          name: values.name,
-          url: 'https://socially.app/event',
-          desc: values.description,
-          locationId: 1,
-          groupId: parseInt(groupId),
-          scheduledDate: values.date,
-          filterIds: []
-        };
-        await fetch(`${API_URL}/api/events`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(payload)
-        });
+      // Always send to backend API
+      const token = localStorage.getItem('token');
+      const payload = {
+        name: values.name,
+        url: 'https://socially.app/event',
+        desc: values.description,
+        locationId: values.locationId,
+        groupId: groupId ? parseInt(groupId) : null,
+        scheduledDate: values.date,
+        filterIds: []
+      };
+      const res = await fetch(`${API_URL}/api/events`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+          const errText = await res.text();
+          console.error("Backend error when saving event:", errText);
+          alert("Eroare la salvarea evenimentului in baza de date: " + errText);
+          return;
       }
     } catch (e) {
       console.error("Failed to save event", e);
+      alert("A aparut o eroare neasteptata: " + e.message);
+      return;
     }
 
     setCreationSuccess(true);
@@ -217,6 +226,7 @@ function CreateEvent() {
                     touched={touched} 
                     handleChange={handleChange} 
                     handleBlur={handleBlur}
+                    setValues={setValues}
                   />
                 )}
               </motion.div>
