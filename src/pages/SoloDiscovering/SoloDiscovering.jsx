@@ -133,9 +133,6 @@ const mapEventDTO = (event) => {
     }
   }
 
-  // --- Rating ---
-  const rating = event.rating ?? 5.0;
-
   // --- Adresă ---
   const address = event.address ?? '';
 
@@ -146,7 +143,6 @@ const mapEventDTO = (event) => {
     id: event.id,
     title,
     category,
-    rating,
     distance,
     schedule,
     address,
@@ -462,10 +458,7 @@ function SoloDiscovering() {
     const s = localStorage.getItem('socially_dislikedIds');
     return s ? JSON.parse(s) : [];
   });
-  const [myEvents, setMyEvents] = useState(() => {
-    const s = localStorage.getItem('socially_myEvents');
-    return s ? JSON.parse(s) : [];
-  });
+  const [myEvents, setMyEvents] = useState([]);
 
   // Geolocație
   useEffect(() => {
@@ -497,7 +490,26 @@ function SoloDiscovering() {
         console.error('Eroare sincronizare salvate:', err);
       }
     };
+
+    const fetchCreatedEvents = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const response = await fetch(`${API_URL}/api/events/created`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const mapped = data.map(mapEventDTO).map(e => ({ ...e, isMine: true }));
+          setMyEvents(mapped);
+        }
+      } catch (err) {
+        console.error('Eroare sincronizare evenimente create:', err);
+      }
+    };
+
     fetchSavedEvents();
+    fetchCreatedEvents();
   }, []);
 
   // ----------------------------------------
