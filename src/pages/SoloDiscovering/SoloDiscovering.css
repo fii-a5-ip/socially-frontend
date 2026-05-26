@@ -578,7 +578,7 @@
     box-shadow: var(--shadow-sm);
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     cursor: pointer;
-    height: 110px;
+    min-height: 120px;
 }
 
 .sd-fav-image {
@@ -592,7 +592,8 @@
     padding: var(--space-md);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 2px;
     flex-grow: 1;
     overflow: hidden;
 }
