@@ -14,6 +14,7 @@ const Register = () => {
 	const { login, isLoggedIn } = useApp();
 	const navigate = useNavigate();
 	const fileInputRef = useRef(null);
+	const hasRegistered = useRef(false);
 	const [avatarPreview, setAvatarPreview] = useState(null);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -111,6 +112,7 @@ const Register = () => {
 
 			saveAuthData(data, jwtToken);
 
+			hasRegistered.current = true;
 			login();
 			toast.success("Autentificare reușită!");
 			navigate('/onboarding');
@@ -123,7 +125,7 @@ const Register = () => {
 
 	// Polish: Redirecționare automată dacă utilizatorul este deja logat
 	useEffect(() => {
-		if (isLoggedIn) {
+		if (isLoggedIn && !hasRegistered.current) {
 			navigate('/mode');
 		}
 	}, [isLoggedIn, navigate]);
@@ -204,17 +206,20 @@ const Register = () => {
 						body: avatarData
 					})
 						.then(() => {
+							hasRegistered.current = true;
 							login();
 							toast.success("Cont creat cu succes!");
 							navigate('/onboarding');
 						})
 						.catch(() => {
+							hasRegistered.current = true;
 							login();
 							toast.success("Cont creat (fără avatar)!");
 							navigate('/onboarding');
 						});
 				} else {
 					if (jwtToken) {
+						hasRegistered.current = true;
 						login();
 						toast.success("Cont creat cu succes!");
 						navigate('/onboarding');
