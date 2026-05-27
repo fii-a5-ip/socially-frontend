@@ -330,9 +330,11 @@ function GroupDetail() {
   };
 
   const openInvitePanel = () => {
-    setIsModalOpen(true);
+   if(! groupDetails?.isCurrentUserMember) {return;}
+   else
+   {setIsModalOpen(true);
     setIsInviteOpen(true);
-    setInviteStatus(null);
+    setInviteStatus(null);}
   };
 
   const handleSendInvite = async (userId) => {
@@ -470,6 +472,7 @@ function GroupDetail() {
                   );
                 })}
 
+                {groupDetails?.isCurrentUserMember && (
                 <button
                   className="gd-member-item gd-invite-btn group"
                   onClick={openInvitePanel}
@@ -480,7 +483,7 @@ function GroupDetail() {
                   <span className="gd-member-name text-invite">
                     {t("groupdetail.invite")}
                   </span>
-                </button>
+                </button> ) }
               </div>
             </div>
           )}
@@ -916,6 +919,7 @@ function GroupDetail() {
                   );
                 })}
 
+                { groupDetails?.isCurrentUserMember && (
                 <button
                   className="gd-modal-invite-btn"
                   onClick={() => setIsInviteOpen((prev) => !prev)}
@@ -926,7 +930,7 @@ function GroupDetail() {
                   <span className="gd-modal-invite-text">
                     {t("groupdetail.invite_new")}
                   </span>
-                </button>
+                </button> ) }
 
                 {isInviteOpen && (
                   <div className="gd-invite-panel">
