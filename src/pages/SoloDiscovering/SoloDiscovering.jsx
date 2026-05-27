@@ -237,6 +237,7 @@ function SearchResultsGrid({ results, onOpenDetails }) {
   );
 }
 
+//comentariu
 // ==========================================
 // 5. DiscoveryScreen (swipe)
 // ==========================================
