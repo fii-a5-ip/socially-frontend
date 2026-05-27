@@ -5,6 +5,28 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { API_URL } from '../../api/config';
 import './SoloDiscovering.css';
 
+const REGISTERED_EVENTS_STORAGE_KEY = 'socially_registeredEventIds';
+
+const readRegisteredEventIds = () => {
+  try {
+    return JSON.parse(localStorage.getItem(REGISTERED_EVENTS_STORAGE_KEY) || '[]');
+  } catch {
+    return [];
+  }
+};
+
+const writeRegisteredEventIds = (ids) => {
+  localStorage.setItem(REGISTERED_EVENTS_STORAGE_KEY, JSON.stringify([...new Set(ids)]));
+};
+
+const applyLocalRegistrationState = (event) => {
+  const registeredIds = readRegisteredEventIds().map(String);
+  return {
+    ...event,
+    isJoined: Boolean(event.isJoined) || registeredIds.includes(String(event.id)),
+  };
+};
+
 // ==========================================
 // 1. Mock Data & Filtre Hardcodate
 // ==========================================
@@ -150,6 +172,7 @@ const mapEventDTO = (event) => {
     description,
     longDescription,
     isMine,
+    isJoined: Boolean(event.isJoined ?? event.joined ?? event.registered ?? false),
   };
 };
 
@@ -360,9 +383,10 @@ function MyEventsScreen({ events, onOpenDetails }) {
 // ==========================================
 // 8. PlaceDetails
 // ==========================================
-function PlaceDetails({ place, onClose, onCancel }) {
+function PlaceDetails({ place, onClose, onCancel, onToggleRegistration, registrationPendingId }) {
   const { t } = useTranslation();
   if (!place) return null;
+  const isRegistrationPending = registrationPendingId === place.id;
   return (
     <div className="sd-place-details fade-in-fast">
       <div className="sd-pd-header" style={{ backgroundImage: `url(${place.image})` }}>
@@ -415,10 +439,15 @@ function PlaceDetails({ place, onClose, onCancel }) {
           </div>
         ) : (
           <button
-            className="btn btn--primary btn--full sd-pd-reserve-btn"
-            onClick={() => alert('Acțiune Rezervare Placeholder')}
+            className={`btn btn--primary btn--full sd-pd-reserve-btn${place.isJoined ? ' sd-pd-reserve-btn--joined' : ''}`}
+            disabled={isRegistrationPending}
+            onClick={() => onToggleRegistration(place)}
           >
-            {t('solo.reserve')}
+            {isRegistrationPending
+              ? t('solo.register_pending')
+              : place.isJoined
+                ? t('solo.registered')
+                : t('solo.register')}
           </button>
         )}
       </div>
@@ -451,13 +480,14 @@ function SoloDiscovering() {
 
   const [likedPlaces, setLikedPlaces] = useState(() => {
     const s = localStorage.getItem('socially_likedPlaces');
-    return s ? JSON.parse(s) : [];
+    return s ? JSON.parse(s).map(applyLocalRegistrationState) : [];
   });
   const [dislikedIds, setDislikedIds] = useState(() => {
     const s = localStorage.getItem('socially_dislikedIds');
     return s ? JSON.parse(s) : [];
   });
   const [myEvents, setMyEvents] = useState([]);
+  const [registrationPendingId, setRegistrationPendingId] = useState(null);
 
   // Geolocație
   useEffect(() => {
@@ -481,7 +511,7 @@ function SoloDiscovering() {
         });
         if (response.ok) {
           const data = await response.json();
-          const mapped = data.map(mapEventDTO);
+          const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState);
           setLikedPlaces(mapped);
           localStorage.setItem('socially_likedPlaces', JSON.stringify(mapped));
         }
@@ -499,7 +529,7 @@ function SoloDiscovering() {
         });
         if (response.ok) {
           const data = await response.json();
-          const mapped = data.map(mapEventDTO).map(e => ({ ...e, isMine: true }));
+          const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState).map(e => ({ ...e, isMine: true }));
           setMyEvents(mapped);
         }
       } catch (err) {
@@ -553,7 +583,7 @@ function SoloDiscovering() {
       } else {
         setHasMoreData(true);
       }
-      setPlaces(data.map(mapEventDTO));
+      setPlaces(data.map(mapEventDTO).map(applyLocalRegistrationState));
     } catch (error) {
       console.error('[DISCOVER] EROARE — fallback pe mock:', error);
       setPlaces(MOCK_LOCATIONS);
@@ -619,7 +649,7 @@ function SoloDiscovering() {
       } else {
         setHasMoreData(true);
       }
-      setSearchResults(data.map(mapEventDTO));
+      setSearchResults(data.map(mapEventDTO).map(applyLocalRegistrationState));
     } catch (error) {
       console.error('[SEARCH] EROARE — fallback pe mock:', error);
       setSearchResults(MOCK_LOCATIONS);
@@ -726,6 +756,56 @@ function SoloDiscovering() {
     }
   };
 
+  const updateRegistrationState = (eventId, isJoined) => {
+    const updateList = (items) =>
+      items.map((item) =>
+        String(item.id) === String(eventId) ? { ...item, isJoined } : item
+      );
+
+    setPlaces(updateList);
+    setSearchResults(updateList);
+    setLikedPlaces((prev) => {
+      const updated = updateList(prev);
+      localStorage.setItem('socially_likedPlaces', JSON.stringify(updated));
+      return updated;
+    });
+    setMyEvents(updateList);
+    setSelectedPlace((prev) =>
+      prev && String(prev.id) === String(eventId) ? { ...prev, isJoined } : prev
+    );
+
+    const currentIds = readRegisteredEventIds();
+    const nextIds = isJoined
+      ? [...currentIds, eventId]
+      : currentIds.filter((id) => String(id) !== String(eventId));
+    writeRegisteredEventIds(nextIds);
+  };
+
+  const handleToggleRegistration = async (place) => {
+    const eventId = place.id;
+    const nextIsJoined = !place.isJoined;
+    const token = localStorage.getItem('token');
+
+    setRegistrationPendingId(eventId);
+    updateRegistrationState(eventId, nextIsJoined);
+
+    try {
+      const response = await fetch(`${API_URL}/api/events/${eventId}/join`, {
+        method: nextIsJoined ? 'POST' : 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.warn('Event registration persisted locally only:', text || response.status);
+      }
+    } catch (error) {
+      console.warn('Event registration persisted locally only:', error);
+    } finally {
+      setRegistrationPendingId(null);
+    }
+  };
+
   const toggleFilter = (id) =>
     setSelectedFilters((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -741,6 +821,8 @@ function SoloDiscovering() {
       <PlaceDetails
         place={selectedPlace}
         onClose={() => setSelectedPlace(null)}
+        onToggleRegistration={handleToggleRegistration}
+        registrationPendingId={registrationPendingId}
         onCancel={async (id) => {
           try {
             const token = localStorage.getItem('token');
