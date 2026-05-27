@@ -328,6 +328,7 @@ function CreateEvent() {
                       touched={touched}
                       handleChange={handleChange}
                       handleBlur={handleBlur}
+                      setValues={setValues}
                     />
                   )}
 
