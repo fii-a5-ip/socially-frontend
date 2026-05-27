@@ -141,6 +141,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 3px  /* linia asta rezolva problema vizuala in care cercurile
+                      de la imaginile de profil aveau partea de sus taiata */
 }
 
 .gd-member-avatar.real {
