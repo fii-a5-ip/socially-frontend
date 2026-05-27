@@ -333,6 +333,8 @@ export const en = {
   'createevent.edit_success_desc': 'Your changes have been published.',
   'createevent.form.name': 'Event Name',
   'createevent.form.name_ph': 'e.g. Hang Out & Study',
+  'createevent.form.image_url': 'Event Image URL',
+  'createevent.form.image_url_ph': 'e.g. https://example.com/event-image.jpg',
   'createevent.form.desc': 'Description',
   'createevent.form.desc_ph': 'Provide some attractive details...',
   'createevent.form.location': 'Location',
@@ -341,6 +343,11 @@ export const en = {
   'createevent.form.date_ph': 'e.g. 10:00 - 18:00 or Saturday, 20:00',
   'createevent.form.address': 'Address',
   'createevent.form.address_ph': 'Enter full address',
+  'createevent.validation.name': 'Event name is required.',
+  'createevent.validation.image_url': 'Event image URL is required.',
+  'createevent.validation.desc': 'Description is required.',
+  'createevent.validation.date': 'Date and time are required.',
+  'createevent.validation.address': 'Please select an address from the list.',
 
   // Privacy Page
   'privacy.title': 'Your Privacy',

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { useTranslation } from '../../../hooks/useTranslation';
@@ -40,14 +40,14 @@ export function Step1Details({
 
       <div className="ce-form-group">
         <label className="ce-label">
-          URL eveniment <span className="ce-required">*</span>
+          {t('createevent.form.image_url')} <span className="ce-required">*</span>
         </label>
 
         <input
           className={`ce-input ${errors.url ? 'error' : ''}`}
           type="url"
           name="url"
-          placeholder="https://exemplu.ro/eveniment"
+          placeholder={t('createevent.form.image_url_ph')}
           value={values.url}
           onChange={handleChange}
           onBlur={handleBlur}

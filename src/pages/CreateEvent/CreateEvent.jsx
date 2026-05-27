@@ -165,15 +165,15 @@ function CreateEvent() {
     const stepErrors = {};
 
     if (!values.name?.trim()) {
-      stepErrors.name = 'Numele evenimentului este obligatoriu.';
+      stepErrors.name = t('createevent.validation.name');
     }
 
     if (!values.url?.trim()) {
-      stepErrors.url = 'URL-ul evenimentului este obligatoriu.';
+      stepErrors.url = t('createevent.validation.image_url');
     }
 
     if (!values.description?.trim()) {
-      stepErrors.description = 'Descrierea este obligatorie.';
+      stepErrors.description = t('createevent.validation.desc');
     }
 
     if (Object.keys(stepErrors).length > 0) {
@@ -193,11 +193,11 @@ function CreateEvent() {
     const stepErrors = {};
 
     if (!values.date) {
-      stepErrors.date = 'Data este obligatorie.';
+      stepErrors.date = t('createevent.validation.date');
     }
 
     if (!values.locationId) {
-      stepErrors.address = 'Te rugăm să selectezi o adresă din listă.';
+      stepErrors.address = t('createevent.validation.address');
     }
 
     if (Object.keys(stepErrors).length > 0) {
