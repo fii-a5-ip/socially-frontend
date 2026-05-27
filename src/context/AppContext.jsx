@@ -21,6 +21,10 @@ export function AppProvider({ children }) {
   const logout = () => {
     setIsLoggedIn(false)
     localStorage.removeItem('isLoggedIn')
+    localStorage.removeItem('token')
+    localStorage.removeItem('socially_likedPlaces')
+    localStorage.removeItem('socially_dislikedIds')
+    localStorage.removeItem('socially_myEvents')
   }
 
   // .. codul curent cu useEffect pentru teme ramane la fel ..

@@ -160,6 +160,13 @@
   font-size: var(--font-size-base);
 }
 
+.notifications_action-error {
+  margin: 0 0 var(--space-md);
+  color: var(--color-error, #ef4444);
+  text-align: center;
+  font-weight: 600;
+}
+
 /* ── Responsive tweaks ── */
 @media (max-width: 600px) {
   .notification {
