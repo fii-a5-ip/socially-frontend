@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import { ArrowRight, Check, Loader2, RotateCcw } from 'lucide-react';
-import { API_URL } from '../../api/config';
+import { API_URL, AI_API_URL } from '../../api/config';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
@@ -38,7 +38,7 @@ function Onboarding() {
 
   const callOnboarding = async (payload) => {
     for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
-      const response = await fetch(`${API_URL}/api/onboardingProcess`, {
+      const response = await fetch(`${AI_API_URL}/api/onboardingProcess/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ function Onboarding() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ filterIds }),
+      body: JSON.stringify({ filterIds: filterIds }),
     });
 
     if (!response.ok) {

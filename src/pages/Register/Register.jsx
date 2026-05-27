@@ -42,6 +42,12 @@ const Register = () => {
 		if (data.id) {
 			localStorage.setItem("current_userid", data.id);
 		}
+
+		if (data.fullname || data.name) {
+			localStorage.setItem("current_fullname", data.fullname || data.name);
+		} else {
+			localStorage.removeItem("current_fullname");
+		}
 	};
 
 	const parseErrorResponse = async (response, fallbackMessage) => {
