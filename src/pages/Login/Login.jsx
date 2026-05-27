@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+// Polish: Importat toast și Toaster pentru notificări
+import toast, { Toaster } from "react-hot-toast";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useApp } from "../../context/AppContext";
@@ -11,7 +13,7 @@ import "./Login.css";
 import { GoogleLogin } from "@react-oauth/google";
 
 function Login() {
-  const { login } = useApp();
+  const { login, isLoggedIn } = useApp();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -19,6 +21,15 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  // Polish: Verificare mediu dev pentru bypass
+  const isDev = import.meta.env.DEV;
+  
+  // Polish: Redirecționare automată dacă utilizatorul este deja logat
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/mode');
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,7 +69,7 @@ function Login() {
       navigate('/mode'); // Mergem la selecția modului
     } catch (err) {
       console.error(err);
-      alert(t('login.error_message') || "Email sau parolă greșită");    } finally {
+      toast.error(t('login.error_message') || "Email sau parolă greșită");    } finally {
       setIsLoading(false);
     }
   };
@@ -129,7 +140,12 @@ function Login() {
                 {t('login.remember_me')}
               </label>
 
-              <button className="login-forgot">
+              <button 
+                type="button"
+                className="login-forgot"
+                // Polish: Placeholder pentru Forgot Password (toast)
+                onClick={() => toast.success(t('login.forgot_password_placeholder') || "Funcționalitatea va fi disponibilă curând!")}
+              >
                 {t('login.forgot_password')}
               </button>
             </div>
@@ -165,18 +181,21 @@ function Login() {
                     navigate('/mode');
                   } catch (err) {
                     console.error(err);
-                    alert("Eroare la login cu Google");
+                    toast.error("Eroare la login cu Google");
                   }
                 }}
                 onError={() => {
-                  alert("Google login failed");
+                  toast.error("Google login failed");
                 }}
               />
             </div>
 
-            <button type="button" onClick={handleDevLogin} className="dev-bypass-btn">
-              🔓 Bypass Login (Dev)
-            </button>
+            {/* Polish: Afișare buton bypass doar în mediul de development */}
+            {isDev && (
+              <button type="button" onClick={handleDevLogin} className="dev-bypass-btn">
+                🔓 Bypass Login (Dev)
+              </button>
+            )}
           </form>
 
 
@@ -185,6 +204,8 @@ function Login() {
           </p>
         </div>
       </motion.div>
+      {/* Polish: Container pentru notificările toast (localizat aici pentru a nu modifica alte fișiere) */}
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
 
   );
