@@ -79,10 +79,10 @@ function Dropdown({ trigger, children }) {
 }
 
 /* ── Navbar ── */
-function NavBtn({ to, icon, className= "" }) {
+function NavBtn({ to, icon, className = '' }) {
   const location = useLocation()
   return (
-    <Link to={to} className={`nb-icon-btn${location.pathname === to ? ' nb-icon-btn--active' : ''} ${className}`}>
+    <Link to={to} className={`nb-icon-btn${location.pathname === to ? ' nb-icon-btn--active' : ''}${className ? ` ${className}` : ''}`}>
       {icon}
     </Link>
   )
@@ -92,33 +92,40 @@ function Navbar() {
   const { theme, toggleTheme, lang, setLang } = useApp()
   const { t } = useTranslation()
 
-  const [hasUnread, setHasUnread] = useState(false);
+  const [hasUnread, setHasUnread] = useState(false)
 
-  //Verificare daca exista notificari noi si actualizarea clopotelului
   useEffect(() => {
     const fetchUnreadCount = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) { return; }
+      const token = localStorage.getItem('token')
+      if (!token) {
+        setHasUnread(false)
+        return
+      }
 
-      try {const response = await fetch(`${API_URL}/api/notifications/unread-count`, { //unread-count provine de la metoda "countByRecipientUserIdAndIsReadFalse" pe care o implementeaza Spring-Boot 
-          headers: { 'Authorization': `Bearer ${token}` } });
+      try {
+        const response = await fetch(`${API_URL}/api/notifications/unread-count`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
 
-      if (response.ok) { 
-        const count = await response.json(); 
-        setHasUnread(count > 0); }
+        if (response.ok) {
+          const count = await response.json()
+          setHasUnread(count > 0)
+        }
+      } catch (error) {
+        console.error('Eroare la verificarea notificărilor de către clopoțel', error)
+      }
+    }
 
-          } catch (error) { console.error("Eroare la verificarea notificărilor de către clopoțel", error);}
-    };
-    fetchUnreadCount();
+    fetchUnreadCount()
 
-    const interval = setInterval(fetchUnreadCount, 20000);// = la fiecare 2o sec
+    const interval = setInterval(fetchUnreadCount, 20000)
+    globalThis.addEventListener('notificationChanged', fetchUnreadCount)
 
-    globalThis.addEventListener("notificationChanged", fetchUnreadCount);//atunci interactionam pe pagina de notifications
-
-
-    return () => clearInterval(interval);
-
-  }, []);
+    return () => {
+      clearInterval(interval)
+      globalThis.removeEventListener('notificationChanged', fetchUnreadCount)
+    }
+  }, [])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -129,7 +136,7 @@ function Navbar() {
       {/* Top bar */}
       <nav className="nb-top">
         <div className="nb-top__inner">
-                  <Link to="/" className="nb-logo">Socially</Link>
+          <Link to="/" className="nb-logo">Socially</Link>
           <div className="nb-top__nav">
             <NavBtn to="/" icon={<IconHome />} />
             <NavBtn to="/mode" icon={<IconUsers />} />

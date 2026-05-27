@@ -27,7 +27,7 @@ function Notifications() {
   const [actionError, setActionError] = useState(null);
   const [pendingActionId, setPendingActionId] = useState(null);
 
-  const userTypes = ["GROUP_INVITE","USER_MESSAGE"];
+  const userTypes = ["GROUP_INVITE", "USER_MESSAGE"];
   const systemTypes = ["OUTGOING_UPDATE", "REMINDER", "SYSTEM_UPDATE", "SYSTEM_MESSAGE"];
 
   const isSystemType = (type) => systemTypes.includes(type);
@@ -70,54 +70,54 @@ function Notifications() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleInviteAction = async (id, action) => {
-
+  const handleNotificationAction = async (id, action) => {
     const token = localStorage.getItem("token");
     setPendingActionId(id);
     setActionError(null);
 
-    const currentNotif = notifications.find(n => n.id === id);
+    const currentNotif = notifications.find((n) => n.id === id);
     const isInvite = currentNotif?.hasActions;
 
     try {
-  if (isInvite && (action === "accept" || action === "decline")) {
-    const responseModificareTabel_Edi = await fetch(`${API_URL}/api/notifications/${id}/${action}`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-           if (!responseModificareTabel_Edi.ok) {
-        throw new Error(action === "accept"
-          ? "Nu s-a putut accepta invitația"
-          : "Nu s-a putut refuza invitația");
+      if (isInvite && (action === "accept" || action === "decline")) {
+        const inviteResponse = await fetch(`${API_URL}/api/notifications/${id}/${action}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!inviteResponse.ok) {
+          throw new Error(action === "accept"
+            ? "Nu s-a putut accepta invitația"
+            : "Nu s-a putut refuza invitația");
         }
       }
 
-      
-    const responseModificareContor_Dinu = await fetch(`${API_URL}/api/notifications/${id}/read`,{
+      const readResponse = await fetch(`${API_URL}/api/notifications/${id}/read`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ action }),
       });
-      if (!responseModificareContor_Dinu.ok) {throw new Error("Eroare la procesarea notificării"); }
 
-    // Mută notificarea în Archived ( teoretic functional )
-    setNotifications((prev) =>
-      prev.map((notif) =>
-        notif.id === id ? { ...notif, isRead: true }: notif
-      )
-    );
-    
-    window.dispatchEvent(new Event("notificationChanged")); //posibil sa mearga si fara window.
+      if (!readResponse.ok) {
+        throw new Error("Eroare la procesarea notificării");
+      }
 
-  } catch (error) {
-    console.error("Eroare la apelul API:", error);
-    setActionError(error.message);
-  } finally {
-    setPendingActionId(null);
-  }
+      setNotifications((prev) =>
+        prev.map((notif) =>
+          notif.id === id ? { ...notif, isRead: true } : notif
+        )
+      );
+
+      window.dispatchEvent(new Event("notificationChanged"));
+    } catch (error) {
+      console.error("Eroare la apelul API:", error);
+      setActionError(error.message);
+    } finally {
+      setPendingActionId(null);
+    }
   };
 
   const newNotifications = notifications.filter((notif) => !notif.isRead);
@@ -165,12 +165,10 @@ function Notifications() {
                   </div>
                   {notif.hasActions && !notif.isRead && (
                     <div className="notification_actions">
-
-
                       <button
                         className="btn btn--primary"
                         disabled={pendingActionId === notif.id}
-                        onClick={() => handleInviteAction(notif.id, "accept")}
+                        onClick={() => handleNotificationAction(notif.id, "accept")}
                       >
                         {t('notifications.accept')}
                       </button>
@@ -178,22 +176,22 @@ function Notifications() {
                       <button
                         className="btn btn--secondary"
                         disabled={pendingActionId === notif.id}
-                        onClick={() => handleInviteAction(notif.id, "decline")}
+                        onClick={() => handleNotificationAction(notif.id, "decline")}
                       >
                         {t('notifications.decline')}
                       </button>
                     </div>
                   )}
 
-                   {!notif.hasActions && !notif.isRead && (
-                      <button  
-                        className="notification_X_button"
-                        disabled={pendingActionId === notif.id}
-                        onClick={() => handleInviteAction(notif.id, "remove")}
-                        > x </button> )}
-
-
-
+                  {!notif.hasActions && !notif.isRead && (
+                    <button
+                      className="notification_X_button"
+                      disabled={pendingActionId === notif.id}
+                      onClick={() => handleNotificationAction(notif.id, "remove")}
+                    >
+                      x
+                    </button>
+                  )}
                 </div>
                 <p className="notification_text">{notif.text}</p>
               </div>
