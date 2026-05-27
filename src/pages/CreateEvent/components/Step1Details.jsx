@@ -3,48 +3,80 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from '../../../hooks/useTranslation';
 
-export function Step1Details({ values, errors, handleChange, handleBlur }) {
-    const { t } = useTranslation();
+export function Step1Details({
+  values,
+  errors,
+  handleChange,
+  handleBlur
+}) {
+  const { t } = useTranslation();
 
-    return (
-        <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="ce-form-section"
-        >
-            <div className="ce-form-group">
-                <label className="ce-label">
-                    {t('createevent.form.name')} <span className="ce-required">*</span>
-                </label>
-                <input
-                    className={`ce-input ${errors.name ? 'error' : ''}`}
-                    type="text"
-                    name="name"
-                    placeholder={t('createevent.form.name_ph')}
-                    value={values.name}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                />
-                {errors.name && <span className="ce-error-text">{errors.name}</span>}
-            </div>
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="ce-form-section"
+    >
+      <div className="ce-form-group">
+        <label className="ce-label">
+          {t('createevent.form.name')} <span className="ce-required">*</span>
+        </label>
 
-            <div className="ce-form-group">
-                <label className="ce-label">
-                    {t('createevent.form.desc')} <span className="ce-required">*</span>
-                </label>
-                <textarea
-                    className={`ce-textarea ${errors.description ? 'error' : ''}`}
-                    name="description"
-                    placeholder={t('createevent.form.desc_ph')}
-                    value={values.description}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    rows={5}
-                />
-                {errors.description && <span className="ce-error-text">{errors.description}</span>}
-            </div>
+        <input
+          className={`ce-input ${errors.name ? 'error' : ''}`}
+          type="text"
+          name="name"
+          placeholder={t('createevent.form.name_ph')}
+          value={values.name}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
 
-        </motion.div>
-    );
+        {errors.name && (
+          <span className="ce-error-text">{errors.name}</span>
+        )}
+      </div>
+
+      <div className="ce-form-group">
+        <label className="ce-label">
+          URL eveniment <span className="ce-required">*</span>
+        </label>
+
+        <input
+          className={`ce-input ${errors.url ? 'error' : ''}`}
+          type="url"
+          name="url"
+          placeholder="https://exemplu.ro/eveniment"
+          value={values.url}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
+
+        {errors.url && (
+          <span className="ce-error-text">{errors.url}</span>
+        )}
+      </div>
+
+      <div className="ce-form-group">
+        <label className="ce-label">
+          {t('createevent.form.desc')} <span className="ce-required">*</span>
+        </label>
+
+        <textarea
+          className={`ce-textarea ${errors.description ? 'error' : ''}`}
+          name="description"
+          placeholder={t('createevent.form.desc_ph')}
+          value={values.description}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          rows={5}
+        />
+
+        {errors.description && (
+          <span className="ce-error-text">{errors.description}</span>
+        )}
+      </div>
+    </motion.div>
+  );
 }

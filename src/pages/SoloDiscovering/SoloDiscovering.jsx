@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import { API_URL } from '../../api/config';
@@ -431,7 +431,6 @@ function PlaceDetails({ place, onClose, onCancel }) {
 // ==========================================
 function SoloDiscovering() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const [viewMode, setViewMode] = useState('list');
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -447,7 +446,7 @@ function SoloDiscovering() {
 
   const [places, setPlaces] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasMoreData, setHasMoreData] = useState(true);
+  const [, setHasMoreData] = useState(true);
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
 
   const [likedPlaces, setLikedPlaces] = useState(() => {
