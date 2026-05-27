@@ -939,6 +939,7 @@
 
 .sd-pd-reserve-btn--joined {
     background: var(--color-success, #22c55e);
+    color: var(--color-white, #ffffff) !important;
     box-shadow: 0 4px 15px rgba(34, 197, 94, 0.35);
 }
 

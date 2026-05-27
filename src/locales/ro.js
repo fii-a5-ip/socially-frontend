@@ -266,6 +266,7 @@ export const ro = {
   'solo.reserve': 'Rezervă Loc',
   'solo.register': 'Înscrie-te la eveniment',
   'solo.registered': 'Ești înscris ✓',
+  'solo.unregister': 'Renunță la înscriere',
   'solo.register_pending': 'Se procesează...',
   'solo.add_event': '+ Adaugă',
   'solo.search_placeholder': 'Caută...',

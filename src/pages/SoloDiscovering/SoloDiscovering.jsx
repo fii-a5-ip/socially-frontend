@@ -414,7 +414,7 @@ function RegisteredEventsScreen({ registeredEvents, onUnregister, onOpenDetails 
                 onUnregister(place); 
               }}
             >
-              {t('solo.cancel_event') || 'Renunță'}
+              {t('solo.unregister')}
             </button>
           </div>
         </div>
@@ -480,17 +480,30 @@ function PlaceDetails({ place, onClose, onCancel, onToggleRegistration, registra
               {t('solo.cancel_event')} ✕
             </button>
           </div>
+        ) : place.isJoined ? (
+          <div className="sd-pd-action-group">
+            <div 
+              className="btn btn--primary sd-pd-reserve-btn sd-pd-reserve-btn--joined" 
+              style={{ flex: 1, cursor: 'default', transform: 'none', boxShadow: 'none' }}
+            >
+              {t('solo.registered')}
+            </div>
+            <button
+              className="btn btn--secondary sd-pd-cancel-btn"
+              style={{ flex: 1, height: '56px', fontSize: '1.1rem' }}
+              disabled={isRegistrationPending}
+              onClick={() => onToggleRegistration(place)}
+            >
+              {isRegistrationPending ? t('solo.register_pending') : t('solo.unregister')}
+            </button>
+          </div>
         ) : (
           <button
-            className={`btn btn--primary btn--full sd-pd-reserve-btn${place.isJoined ? ' sd-pd-reserve-btn--joined' : ''}`}
+            className="btn btn--primary btn--full sd-pd-reserve-btn"
             disabled={isRegistrationPending}
             onClick={() => onToggleRegistration(place)}
           >
-            {isRegistrationPending
-              ? t('solo.register_pending')
-              : place.isJoined
-                ? t('solo.registered')
-                : t('solo.register')}
+            {isRegistrationPending ? t('solo.register_pending') : t('solo.register')}
           </button>
         )}
       </div>

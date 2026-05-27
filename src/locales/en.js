@@ -266,6 +266,7 @@ export const en = {
   'solo.reserve': 'Reserve Place',
   'solo.register': 'Register for event',
   'solo.registered': 'Registered ✓',
+  'solo.unregister': 'Unregister',
   'solo.register_pending': 'Processing...',
   'solo.add_event': '+ Add',
   'solo.search_placeholder': 'Search...',
