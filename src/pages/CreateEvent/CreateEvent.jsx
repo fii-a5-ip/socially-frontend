@@ -102,34 +102,6 @@ function CreateEvent() {
       }
 
     try {
-      // Save to localStorage for local state (Solo Discover)
-      const existing = JSON.parse(localStorage.getItem('socially_myEvents') || '[]');
-      const newEvent = {
-          id: isEditMode ? Number(id) : Date.now(),
-          title: values.name,
-          category: 'Toate',
-          rating: 5.0,
-          distance: isEditMode ? 'Updated' : 'New',
-          schedule: values.date ? new Date(values.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Vezi descrierea',
-          address: values.address || 'Locație flexibilă',
-          image: 'https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&q=80&w=800',
-          description: values.description.substring(0, 60) + (values.description.length > 60 ? '...' : ''),
-          longDescription: values.description,
-          rawDate: values.date,
-          isMine: true
-      };
-      
-      if (isEditMode) {
-        const targetIndex = existing.findIndex(e => e.id === Number(id));
-        if (targetIndex !== -1) {
-          newEvent.image = existing[targetIndex].image;
-          existing[targetIndex] = newEvent;
-          localStorage.setItem('socially_myEvents', JSON.stringify(existing));
-        }
-      } else {
-        localStorage.setItem('socially_myEvents', JSON.stringify([newEvent, ...existing]));
-      }
-
       // Always send to backend API
       const token = localStorage.getItem('token');
       const payload = {
