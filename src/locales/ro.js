@@ -189,6 +189,7 @@ export const ro = {
   'groupdetail.view_all': 'Vezi toți membrii',
   'groupdetail.invite': 'Invită',
   'groupdetail.proposed_activities': 'Activități propuse',
+  'groupdetail.propose_event': 'Propune',
   'groupdetail.winning_activity': 'Activitate Câștigătoare',
   'groupdetail.ai_score': 'Scor AI:',
   'groupdetail.profile_prefs': 'Profilul & Preferințele Tale',
@@ -199,6 +200,8 @@ export const ro = {
   'groupdetail.modal_members': 'membri în grup',
   'groupdetail.modal_member_label': 'MEMBRU',
   'groupdetail.invite_new': 'Invită un prieten nou',
+  'groupdetail.leave_group': 'Părăsește Grupul',
+  'groupdetail.search_event': 'Caută un eveniment',
 
   // Notifications
   'notifications.title': 'Notificări',
@@ -229,6 +232,14 @@ export const ro = {
   'creategroup.searching': 'Se caută...',
   'creategroup.search_empty': 'Caută prieteni pentru a-i adăuga în grup',
   'creategroup.no_results': 'Nu s-au găsit rezultate după',
+  "creategroup.group_name_label": "Numele grupului",
+  "creategroup.group_name_placeholder": "Ex: Ieșire la munte",
+  "creategroup.group_desc_label": "Scurtă descriere",
+  "creategroup.group_desc_placeholder": "Despre ce este acest grup?",
+  "creategroup.group_image_label": "Imagine Copertă Grup (opțional)",
+  "creategroup.group_image_placeholder": "Click pentru a încărca o imagine",
+  "creategroup.error_name_required": "Numele grupului este obligatoriu.",
+  "creategroup.error_save": "A apărut o eroare la salvarea grupului.",
 
   // Solo Discovering
   'solo.title': 'Descoperă',
@@ -257,17 +268,46 @@ export const ro = {
   'solo.filters_title': 'Filtre',
   'solo.filters_reset': 'Resetează',
   'solo.filters_apply': 'Aplică',
-  'solo.filter_group_location': 'Tip locație',
-  'solo.filter_group_activity': 'Activitate',
-  'solo.filter_restaurante': 'Restaurante',
-  'solo.filter_cafenele': 'Cafenele',
-  'solo.filter_parcuri': 'Parcuri',
-  'solo.filter_muzee': 'Muzee',
-  'solo.filter_sport': 'Sport',
-  'solo.filter_cultura': 'Cultură',
-  'solo.filter_relaxare': 'Relaxare',
-  'solo.filter_educatie': 'Educație',
-  'solo.searching_backend': 'Se caută evenimente prin AI...',
+
+  //Filtre predefinite
+
+  'solo.filter_venue_type': 'Tip locație',
+
+  'solo.filter_restaurant': 'Restaurant',
+  'solo.filter_cafe': 'Cafenea',
+  'solo.filter_bar': 'Bar',
+  'solo.filter_pub': 'Pub',
+
+  'solo.filter_food': 'Mâncare',
+
+  'solo.filter_pizza': 'Pizza',
+  'solo.filter_sushi': 'Sushi',
+  'solo.filter_buffet': 'Bufet',
+  'solo.filter_vegetarian': 'Vegetarian',
+  'solo.filter_gluten_free': 'Fără gluten',
+
+  'solo.filter_activities': 'Activități',
+
+  'solo.filter_live_music': 'Muzică live',
+  'solo.filter_sports_screening': 'Screening sportiv',
+  'solo.filter_board_games': 'Jocuri de societate',
+
+  'solo.filter_facilities': 'Facilități',
+
+  'solo.filter_free_wifi': 'Internet gratuit',
+  'solo.filter_air_conditioning': 'Aer condiționat',
+  'solo.filter_power_outlets': 'Prize',
+
+  'solo.filter_transport_parking': 'Transport și parcare',
+
+  'solo.filter_free_parking': 'Parcare gratis',
+  'solo.filter_public_transport_nearby': 'Transport public apropiat',
+
+
+  //No result
+  'solo.results_for': 'rezultate pentru',
+  'solo.no_results_for': 'Niciun rezultat pentru',
+  'solo.no_results_title': 'Niciun rezultat',
 
   // Create Event
   'createevent.title': 'Creează Eveniment',
@@ -315,4 +355,8 @@ export const ro = {
   'help.card2.desc': 'Folosește butonul "+" din secțiunea Descoperă.',
   'help.card3.title': 'Raportare Probleme',
   'help.card3.desc': 'Contactează-ne direct la adresa: sociallyteam@gmail.com.'
+
+
+
+
 };

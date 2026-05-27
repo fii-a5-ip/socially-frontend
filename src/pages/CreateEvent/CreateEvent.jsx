@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -24,7 +24,10 @@ const initialValues = {
   url: '',
   description: '',
   date: '',
-  locationId: '',
+  address: '',
+  locationId: null,
+  mapHtml: '',
+  weatherData: null,
   filterIds: []
 };
 
@@ -74,15 +77,13 @@ function CreateEvent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get('groupId');
   const isEditMode = Boolean(id);
 
   const [step, setStep] = useState(1);
   const [creationSuccess, setCreationSuccess] = useState(false);
-
-  const [locations, setLocations] = useState([]);
-  const [filters, setFilters] = useState([]);
-
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(isEditMode);
   const [isSaving, setIsSaving] = useState(false);
   const [apiError, setApiError] = useState('');
 
@@ -103,66 +104,46 @@ function CreateEvent() {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadData() {
+    async function loadEvent() {
+      if (!isEditMode) {
+        return;
+      }
+
       setIsLoading(true);
       setApiError('');
 
       try {
-        const locationsResponse = await fetch(`${API_URL}/api/locations`, {
+        const response = await fetch(`${API_URL}/api/events/${id}`, {
           method: 'GET',
           headers: getAuthHeaders()
         });
 
-        const filtersResponse = await fetch(`${API_URL}/api/filters`, {
-          method: 'GET',
-          headers: getAuthHeaders()
-        });
-
-        const loadedLocations = await parseResponse(
-          locationsResponse,
-          'Nu s-au putut încărca locațiile.'
-        );
-
-        const loadedFilters = await parseResponse(
-          filtersResponse,
-          'Nu s-au putut încărca filtrele.'
+        const eventData = await parseResponse(
+          response,
+          'Nu s-au putut încărca datele evenimentului.'
         );
 
         if (cancelled) {
           return;
         }
 
-        setLocations(Array.isArray(loadedLocations) ? loadedLocations : []);
-        setFilters(Array.isArray(loadedFilters) ? loadedFilters : []);
+        const locationId = eventData?.locationId ?? null;
 
-        if (isEditMode) {
-          const eventResponse = await fetch(`${API_URL}/api/events/${id}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-          });
-
-          const eventData = await parseResponse(
-            eventResponse,
-            'Nu s-au putut încărca datele evenimentului.'
-          );
-
-          if (cancelled) {
-            return;
-          }
-
-          setValues({
-            name: eventData?.name || '',
-            url: eventData?.url || '',
-            description: eventData?.desc || '',
-            date: formatDateForInput(eventData?.scheduledDate),
-            locationId: eventData?.locationId
-              ? String(eventData.locationId)
-              : '',
-            filterIds: Array.isArray(eventData?.filterIds)
-              ? eventData.filterIds
-              : []
-          });
-        }
+        setValues({
+          name: eventData?.name || '',
+          url: eventData?.url || '',
+          description: eventData?.desc || '',
+          date: formatDateForInput(eventData?.scheduledDate),
+          address: eventData?.address
+            || eventData?.formattedAddress
+            || (locationId ? `Locația #${locationId}` : ''),
+          locationId,
+          mapHtml: '',
+          weatherData: null,
+          filterIds: Array.isArray(eventData?.filterIds)
+            ? eventData.filterIds
+            : []
+        });
       } catch (error) {
         console.error('Create/Edit event load failed:', error);
         setApiError(error.message || 'A apărut o eroare la încărcare.');
@@ -173,7 +154,7 @@ function CreateEvent() {
       }
     }
 
-    loadData();
+    loadEvent();
 
     return () => {
       cancelled = true;
@@ -208,23 +189,6 @@ function CreateEvent() {
     setStep(1);
   };
 
-  const handleToggleFilter = (filterId) => {
-    setValues((previousValues) => {
-      const currentFilterIds = Array.isArray(previousValues.filterIds)
-        ? previousValues.filterIds
-        : [];
-
-      const alreadySelected = currentFilterIds.includes(filterId);
-
-      return {
-        ...previousValues,
-        filterIds: alreadySelected
-          ? currentFilterIds.filter((idValue) => idValue !== filterId)
-          : [...currentFilterIds, filterId]
-      };
-    });
-  };
-
   const submitFinalEvent = async () => {
     const stepErrors = {};
 
@@ -233,7 +197,7 @@ function CreateEvent() {
     }
 
     if (!values.locationId) {
-      stepErrors.locationId = 'Locația este obligatorie.';
+      stepErrors.address = 'Te rugăm să selectezi o adresă din listă.';
     }
 
     if (Object.keys(stepErrors).length > 0) {
@@ -249,6 +213,7 @@ function CreateEvent() {
       url: values.url.trim(),
       desc: values.description.trim(),
       locationId: Number(values.locationId),
+      groupId: groupId ? Number(groupId) : null,
       scheduledDate: values.date,
       filterIds: Array.isArray(values.filterIds)
         ? values.filterIds
@@ -280,7 +245,7 @@ function CreateEvent() {
       setCreationSuccess(true);
 
       setTimeout(() => {
-        navigate('/discover');
+        navigate(groupId ? `/groups/${groupId}` : '/discover');
       }, 2500);
     } catch (error) {
       console.error('Create/Edit event save failed:', error);
@@ -373,9 +338,7 @@ function CreateEvent() {
                       touched={touched}
                       handleChange={handleChange}
                       handleBlur={handleBlur}
-                      locations={locations}
-                      filters={filters}
-                      handleToggleFilter={handleToggleFilter}
+                      setValues={setValues}
                     />
                   )}
                 </motion.div>
@@ -423,7 +386,7 @@ function CreateEvent() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => navigate('/discover')}
+                  onClick={() => navigate(groupId ? `/groups/${groupId}` : '/discover')}
                   className="ce-btn ce-btn-secondary"
                   disabled={isSaving}
                 >

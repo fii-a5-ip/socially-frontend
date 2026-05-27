@@ -189,6 +189,7 @@ export const en = {
   'groupdetail.view_all': 'View all members',
   'groupdetail.invite': 'Invite',
   'groupdetail.proposed_activities': 'Proposed activities',
+  'groupdetail.propose_event': 'Propose',
   'groupdetail.winning_activity': 'Winning Activity',
   'groupdetail.ai_score': 'AI Score:',
   'groupdetail.profile_prefs': 'Your Profile & Preferences',
@@ -199,6 +200,8 @@ export const en = {
   'groupdetail.modal_members': 'members in group',
   'groupdetail.modal_member_label': 'MEMBER',
   'groupdetail.invite_new': 'Invite a new friend',
+  'groupdetail.leave_group': 'Leave Group',
+  'groupdetail.search_event': 'Search for an event',
 
   // Notifications
   'notifications.title': 'Notifications',
@@ -229,6 +232,14 @@ export const en = {
   'creategroup.searching': 'Searching...',
   'creategroup.search_empty': 'Search for friends to add to the group',
   'creategroup.no_results': 'No results found for',
+  "creategroup.group_name_label": "Group Name",
+  "creategroup.group_name_placeholder": "e.g., Mountain Trip",
+  "creategroup.group_desc_label": "Short Description",
+  "creategroup.group_desc_placeholder": "What is this group about?",
+  "creategroup.group_image_label": "Group Cover Image (optional)",
+  "creategroup.group_image_placeholder": "Click to upload an image",
+  "creategroup.error_name_required": "Group name is required.",
+  "creategroup.error_save": "An error occurred while saving the group.",
 
   // Solo Discovering
   'solo.title': 'Discover',
@@ -257,16 +268,46 @@ export const en = {
   'solo.filters_title': 'Filters',
   'solo.filters_reset': 'Reset',
   'solo.filters_apply': 'Apply',
-  'solo.filter_group_location': 'Location type',
-  'solo.filter_group_activity': 'Activity',
-  'solo.filter_restaurante': 'Restaurants',
-  'solo.filter_cafenele': 'Cafés',
-  'solo.filter_parcuri': 'Parks',
-  'solo.filter_muzee': 'Museums',
-  'solo.filter_sport': 'Sport',
-  'solo.filter_cultura': 'Culture',
-  'solo.filter_relaxare': 'Relaxation',
-  'solo.filter_educatie': 'Education',
+
+  //Filtre predefinite
+
+  'solo.filter_venue_type': 'Venue Type',
+
+  'solo.filter_restaurant': 'Restaurant',
+  'solo.filter_cafe': 'Café',
+  'solo.filter_bar': 'Bar',
+  'solo.filter_pub': 'Pub',
+
+  'solo.filter_food': 'Food',
+
+  'solo.filter_pizza': 'Pizza',
+  'solo.filter_sushi': 'Sushi',
+  'solo.filter_buffet': 'Buffet',
+  'solo.filter_vegetarian': 'Vegetarian',
+  'solo.filter_gluten_free': 'Gluten-free',
+
+  'solo.filter_activities': 'Activități',
+
+  'solo.filter_live_music': 'Live music',
+  'solo.filter_sports_screening': 'Sports screening',
+  'solo.filter_board_games': 'Board games',
+
+  'solo.filter_facilities': 'Facilities',
+
+  'solo.filter_free_wifi': 'Free Wi-Fi',
+  'solo.filter_air_conditioning': 'Air conditioning',
+  'solo.filter_power_outlets': 'Power outlets',
+
+  'solo.filter_transport_parking': 'Transport & Parking',
+
+  'solo.filter_free_parking': 'Free parking',
+  'solo.filter_public_transport_nearby': 'Public transport nearby',
+
+
+  // No result
+  'solo.results_for': 'results for',
+  'solo.no_results_for': 'No results for',
+  'solo.no_results_title': 'No results',
 
   // Create Event
   'createevent.title': 'Create Event',
@@ -294,7 +335,7 @@ export const en = {
   'createevent.form.address': 'Address',
   'createevent.form.address_ph': 'Enter full address',
 
-   // Privacy Page
+  // Privacy Page
   'privacy.title': 'Your Privacy',
   'privacy.subtitle': 'Full transparency on how we protect the Socially community data.',
   'privacy.card1.title': 'Data Protection',

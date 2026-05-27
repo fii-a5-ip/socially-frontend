@@ -5,13 +5,14 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import { API_URL } from '../../api/config'
+import { getMyGroups } from '../../api/groupsApi'
 import './Profile.css'
 
 function Profile() {
-  const { t, lang } = useTranslation()
+  const { t } = useTranslation()
   const [istoricExtins, setIstoricExtins] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(() => Boolean(localStorage.getItem('token')))
   const { logout } = useApp()
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
@@ -30,17 +31,16 @@ function Profile() {
   const [aiScore, setAiScore] = useState(98)
   
   const [availableFilters, setAvailableFilters] = useState([
-    { id: 1, name: 'sport' },
-    { id: 2, name: 'muzica' },
-    { id: 3, name: 'tech' },
-    { id: 4, name: 'travel' },
-    { id: 5, name: 'art' }
+    { id: 192, name: 'Sports' },
+    { id: 144, name: 'Music' },
+    { id: 13, name: 'Art & Culture' },
+    { id: 156, name: 'Outdoors' },
+    { id: 95, name: 'Food' }
   ])
   const [selectedFilters, setSelectedFilters] = useState([])
 
   useEffect(() => {
     if (!token) {
-      setIsLoading(false)
       return
     }
 
@@ -50,13 +50,13 @@ function Profile() {
     fetch(`${API_URL}/api/users/me`, { headers })
       .then(res => res.json())
       .then(userData => {
-        setProfileData({
+        setProfileData(prevProfileData => ({
           id: userData.id,
-          nume: userData.fullname || `${userData.firstname || ''} ${userData.lastname || ''}`.trim() || profileData.nume,
-          email: userData.email || profileData.email,
+          nume: userData.fullname || `${userData.firstname || ''} ${userData.lastname || ''}`.trim() || prevProfileData.nume,
+          email: userData.email || prevProfileData.email,
           bio: userData.bio || '',
           avatarUrl: userData.avatarUrl || null
-        })
+        }))
         if (userData.aiScore) setAiScore(userData.aiScore)
 
         // Pasul 2: Acum ca avem ID-ul, luam filtrele specifice ale userului (cerinta Cris/SM)
@@ -74,7 +74,7 @@ function Profile() {
         // Pasul 3: Luam lista globala de filtre pentru selector
         Promise.allSettled([
           fetch(`${API_URL}/api/filters`, { headers }).then(res => res.json()),
-          fetch(`${API_URL}/api/groups`, { headers }).then(res => res.json()),
+          getMyGroups(),
           fetch(`${API_URL}/api/activities/history`, { headers }).then(res => res.json())
         ]).then((results) => {
           const [filtersRes, groupsRes, historyRes] = results
