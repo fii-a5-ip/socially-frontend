@@ -120,6 +120,10 @@
   color: var(--color-primary-dark);
 }
 
+.nb-icon-btn.nb-icon-btn--alert {
+  color: var(--color-warning) !important;
+}
+
 /* ── Language button ── */
 .nb-lang-btn {
   padding: 6px 8px;

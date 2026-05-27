@@ -281,6 +281,11 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-xl);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.sd-filter-panel-body::-webkit-scrollbar {
+    display: none;
 }
 
 .sd-filter-group {
@@ -413,18 +418,23 @@
 
 /* Card Container (Centrare swipe) */
 .sd-cards-container {
-    height: 100%;
+    flex: 1; /* Ocupă doar spațiul rămas, fără să forțeze depășirea ecranului */
     display: flex;
     align-items: center;
     justify-content: center;
     perspective: 1000px;
-    padding: 0 var(--space-md);
+    padding: 10px var(--space-md);
+    overflow: hidden; /* Tăiem ce dă pe dinafară pentru a preveni dublul-scroll */
 }
 
+/* --- Discovery Screen (Card) --- */
 /* --- Discovery Screen (Card) --- */
 .sd-card {
     width: 100%;
     max-width: 400px;
+    max-height: 100%; /* Cardul nu va fi niciodată mai înalt decât containerul său */
+    display: flex;
+    flex-direction: column; /* Transformăm cardul într-o coloană flexibilă */
     background-color: var(--bg-card);
     border-radius: var(--radius-xl);
     overflow: hidden;
@@ -435,26 +445,21 @@
     cursor: pointer;
 }
 
-.swipe-left {
-    transform: translateX(-150%) rotate(-15deg);
-    opacity: 0;
-}
-
-.swipe-right {
-    transform: translateX(150%) rotate(15deg);
-    opacity: 0;
-}
+/* Animații Swipe */
+.swipe-left { transform: translateX(-150%) rotate(-15deg); opacity: 0; }
+.swipe-right { transform: translateX(150%) rotate(15deg); opacity: 0; }
 
 .sd-card-image-wrapper {
     position: relative;
     width: 100%;
-    height: 250px;
+    flex: 0 1 250px; /* Preferă 250px, dar SE POATE MICȘORA (shrink) dacă ecranul e mic */
+    min-height: 140px; /* Limită minimă pentru a arăta decent */
 }
 
 .sd-card-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* Poza se decupează frumos fără să se deformeze */
 }
 
 .sd-card-badge {
@@ -471,6 +476,10 @@
 
 .sd-card-info {
     padding: var(--space-lg);
+    flex: 1 1 auto; /* Zona de text ocupă spațiul rămas și se adaptează */
+    overflow-y: auto; /* Dacă descrierea e prea lungă, primește scroll intern */
+    display: flex;
+    flex-direction: column;
 }
 
 .sd-card-header {
@@ -491,6 +500,7 @@
     font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--color-warning);
+    white-space: nowrap;
 }
 
 .sd-card-schedule {
@@ -508,17 +518,15 @@
     padding: 2px 8px;
     border-radius: var(--radius-sm);
     margin-bottom: var(--space-md);
+    align-self: flex-start; /* Să nu se întindă pe tot rândul */
 }
 
 .sd-card-desc {
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
     line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    margin: 0;
+    /* Am scos limitarea de 2 rânduri ca să poată face scroll dacă e nevoie */
 }
 
 .sd-card-actions {
@@ -526,6 +534,7 @@
     justify-content: center;
     gap: var(--space-xl);
     padding: var(--space-xs) var(--space-lg) var(--space-lg);
+    flex-shrink: 0; /* Butoanele NU au voie să se micșoreze/turtească */
 }
 
 .sd-action-btn {
@@ -547,9 +556,12 @@
 .sd-action-btn.dislike { color: var(--color-error); }
 .sd-action-btn.like { color: var(--color-success); }
 
-
-/* --- Favorites Screen (Grid) --- */
+/* --- Favorites / MyEvents Grid --- */
 .sd-favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    width: 100%;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--space-lg);
@@ -566,20 +578,24 @@
     box-shadow: var(--shadow-sm);
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     cursor: pointer;
+    min-height: 120px;
 }
 
 .sd-fav-image {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 100%;
     object-fit: cover;
+    flex-shrink: 0;
 }
 
 .sd-fav-info {
     padding: var(--space-md);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 2px;
     flex-grow: 1;
+    overflow: hidden;
 }
 
 .sd-fav-title {
@@ -587,6 +603,9 @@
     font-weight: 600;
     margin: 0;
     color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sd-fav-schedule {
@@ -916,6 +935,17 @@
     height: 56px;
     font-size: 1.1rem;
     box-shadow: 0 4px 15px var(--color-primary-glow);
+}
+
+.sd-pd-reserve-btn--joined {
+    background: var(--color-success, #22c55e);
+    color: var(--color-white, #ffffff) !important;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.35);
+}
+
+.sd-pd-reserve-btn:disabled {
+    cursor: progress;
+    opacity: 0.8;
 }
 
 .sd-pd-action-group {

@@ -27,8 +27,8 @@ function Notifications() {
   const [actionError, setActionError] = useState(null);
   const [pendingActionId, setPendingActionId] = useState(null);
 
-  const userTypes = ["GROUP_INVITE"];
-  const systemTypes = ["OUTGOING_UPDATE", "REMINDER", "SYSTEM_UPDATE", "MESSAGE"];
+  const userTypes = ["GROUP_INVITE", "USER_MESSAGE"];
+  const systemTypes = ["OUTGOING_UPDATE", "REMINDER", "SYSTEM_UPDATE", "SYSTEM_MESSAGE"];
 
   const isSystemType = (type) => systemTypes.includes(type);
 
@@ -70,21 +70,39 @@ function Notifications() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleInviteAction = async (id, action) => {
+  const handleNotificationAction = async (id, action) => {
     const token = localStorage.getItem("token");
-    setActionError(null);
     setPendingActionId(id);
+    setActionError(null);
+
+    const currentNotif = notifications.find((n) => n.id === id);
+    const isInvite = currentNotif?.hasActions;
 
     try {
-      const response = await fetch(`${API_URL}/api/notifications/${id}/${action}`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+      if (isInvite && (action === "accept" || action === "decline")) {
+        const inviteResponse = await fetch(`${API_URL}/api/notifications/${id}/${action}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!inviteResponse.ok) {
+          throw new Error(action === "accept"
+            ? "Nu s-a putut accepta invitația"
+            : "Nu s-a putut refuza invitația");
+        }
+      }
+
+      const readResponse = await fetch(`${API_URL}/api/notifications/${id}/read`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action }),
       });
 
-      if (!response.ok) {
-        throw new Error(action === "accept"
-          ? "Nu s-a putut accepta invitația"
-          : "Nu s-a putut refuza invitația");
+      if (!readResponse.ok) {
+        throw new Error("Eroare la procesarea notificării");
       }
 
       setNotifications((prev) =>
@@ -92,9 +110,11 @@ function Notifications() {
           notif.id === id ? { ...notif, isRead: true } : notif
         )
       );
-    } catch (err) {
-      console.error("Error handling group invite:", err);
-      setActionError(err.message);
+
+      window.dispatchEvent(new Event("notificationChanged"));
+    } catch (error) {
+      console.error("Eroare la apelul API:", error);
+      setActionError(error.message);
     } finally {
       setPendingActionId(null);
     }
@@ -148,18 +168,29 @@ function Notifications() {
                       <button
                         className="btn btn--primary"
                         disabled={pendingActionId === notif.id}
-                        onClick={() => handleInviteAction(notif.id, "accept")}
+                        onClick={() => handleNotificationAction(notif.id, "accept")}
                       >
                         {t('notifications.accept')}
                       </button>
+
                       <button
                         className="btn btn--secondary"
                         disabled={pendingActionId === notif.id}
-                        onClick={() => handleInviteAction(notif.id, "decline")}
+                        onClick={() => handleNotificationAction(notif.id, "decline")}
                       >
                         {t('notifications.decline')}
                       </button>
                     </div>
+                  )}
+
+                  {!notif.hasActions && !notif.isRead && (
+                    <button
+                      className="notification_X_button"
+                      disabled={pendingActionId === notif.id}
+                      onClick={() => handleNotificationAction(notif.id, "remove")}
+                    >
+                      x
+                    </button>
                   )}
                 </div>
                 <p className="notification_text">{notif.text}</p>

@@ -114,6 +114,24 @@
   overflow: visible; /* poate e necesar*/
 }
 
+.notification_X_button {
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+ 
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+ 
+  font-size: var(  --font-size-3xl);
+  line-height: 1;
+  color: var(--color-primary );
+ 
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
 .notification_text {
   font-size: var(--font-size-base);
   font-weight: 500;

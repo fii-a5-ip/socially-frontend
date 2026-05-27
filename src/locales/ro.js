@@ -249,6 +249,9 @@ export const ro = {
   'solo.my_events_empty_title': 'Nu ai adăugat niciun eveniment',
   'solo.my_events_empty_desc': 'Orice eveniment vei crea folosind butonul + Add va apărea aici.',
   'solo.organized_by_you': 'Organizat de tine',
+  'solo.registered_events': 'Înscrieri',
+  'solo.registered_events_empty_title': 'Nu ești înscris la niciun eveniment',
+  'solo.registered_events_empty_desc': 'Orice eveniment la care te înscrii va apărea aici.',
   'solo.cancel_event': 'Anulează Eveniment',
   'solo.edit_event': 'Editează',
   'solo.filter_all': 'Toate',
@@ -261,6 +264,10 @@ export const ro = {
   'solo.schedule': 'Interval Orar:',
   'solo.address': 'Adresa completă (Click pt. Hartă):',
   'solo.reserve': 'Rezervă Loc',
+  'solo.register': 'Înscrie-te la eveniment',
+  'solo.registered': 'Ești înscris ✓',
+  'solo.unregister': 'Renunță la înscriere',
+  'solo.register_pending': 'Se procesează...',
   'solo.add_event': '+ Adaugă',
   'solo.search_placeholder': 'Caută...',
   'solo.km_label': 'Km',
@@ -355,6 +362,8 @@ export const ro = {
   'help.card2.desc': 'Folosește butonul "+" din secțiunea Descoperă.',
   'help.card3.title': 'Raportare Probleme',
   'help.card3.desc': 'Contactează-ne direct la adresa: sociallyteam@gmail.com.'
+
+
 
 
 };

@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
@@ -10,7 +11,7 @@ import './Register.css';
 
 const Register = () => {
 	const { t } = useTranslation();
-	const { login } = useApp();
+	const { login, isLoggedIn } = useApp();
 	const navigate = useNavigate();
 	const fileInputRef = useRef(null);
 	const [avatarPreview, setAvatarPreview] = useState(null);
@@ -65,7 +66,7 @@ const Register = () => {
 		const googleToken = credentialResponse.credential;
 
 		if (!googleToken) {
-			alert("Google nu a returnat token.");
+			toast.error("Google nu a returnat token.");
 			return;
 		}
 
@@ -105,29 +106,46 @@ const Register = () => {
 			saveAuthData(data, jwtToken);
 
 			login();
+			toast.success("Autentificare reușită!");
 			navigate('/onboarding');
 		} catch (error) {
-			alert("Backend: " + error.message);
+			toast.error("Backend: " + error.message);
 		} finally {
 			setIsLoading(false);
 		}
 	};
+
+	// Polish: Redirecționare automată dacă utilizatorul este deja logat
+	useEffect(() => {
+		if (isLoggedIn) {
+			navigate('/mode');
+		}
+	}, [isLoggedIn, navigate]);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setIsLoading(true);
 
 		const formData = new FormData(e.target);
+		const password = formData.get("password");
+		const confirmPassword = formData.get("confirmPassword");
 
-		if (formData.get("password") !== formData.get("confirmPassword")) {
-			alert("Parolele nu coincid!");
+		// Polish: Validare robustă pe Register (lungime minimă și confirmare parolă)
+		if (password.length < 8) {
+			toast.error("Parola trebuie să aibă cel puțin 8 caractere!");
+			setIsLoading(false);
+			return;
+		}
+
+		if (password !== confirmPassword) {
+			toast.error("Parolele nu coincid!");
 			setIsLoading(false);
 			return;
 		}
 
 		const payload = {
 			username: formData.get("username"),
-			password: formData.get("password"),
+			password: password,
 			fullname: formData.get("fullname"),
 			email: formData.get("email")
 		};
@@ -181,24 +199,27 @@ const Register = () => {
 					})
 						.then(() => {
 							login();
+							toast.success("Cont creat cu succes!");
 							navigate('/onboarding');
 						})
 						.catch(() => {
 							login();
+							toast.success("Cont creat (fără avatar)!");
 							navigate('/onboarding');
 						});
 				} else {
 					if (jwtToken) {
 						login();
+						toast.success("Cont creat cu succes!");
 						navigate('/onboarding');
 					} else {
-						alert("Cont creat! Acum te poți autentifica.");
+						toast.success("Cont creat! Acum te poți autentifica.");
 						navigate('/login');
 					}
 				}
 			})
 			.catch(error => {
-				alert("Backend: " + error.message);
+				toast.error("Backend: " + error.message);
 				setIsLoading(false);
 			});
 	};
@@ -225,7 +246,7 @@ const Register = () => {
 									<GoogleLogin
 										onSuccess={handleGoogleRegister}
 										onError={() => {
-											alert("Autentificarea cu Google a eșuat.");
+											toast.error("Autentificarea cu Google a eșuat.");
 										}}
 										text="signup_with"
 										shape="pill"
@@ -236,7 +257,7 @@ const Register = () => {
 								<button
 									className="social-btn"
 									type="button"
-									onClick={() => alert("Lipsește VITE_GOOGLE_CLIENT_ID din .env")}
+									onClick={() => toast.error("Lipsește VITE_GOOGLE_CLIENT_ID din .env")}
 								>
 									<svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
 										<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -385,6 +406,8 @@ const Register = () => {
 					</motion.div>
 				</motion.div>
 			</div>
+			{/* Polish: Container pentru notificările toast (localizat aici pentru a nu modifica alte fișiere) */}
+			<Toaster position="top-right" reverseOrder={false} />
 		</div>
 	);
 };

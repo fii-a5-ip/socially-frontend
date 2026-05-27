@@ -1,9 +1,31 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import { API_URL } from '../../api/config';
 import './SoloDiscovering.css';
+
+const REGISTERED_EVENTS_STORAGE_KEY = 'socially_registeredEventIds';
+
+const readRegisteredEventIds = () => {
+  try {
+    return JSON.parse(localStorage.getItem(REGISTERED_EVENTS_STORAGE_KEY) || '[]');
+  } catch {
+    return [];
+  }
+};
+
+const writeRegisteredEventIds = (ids) => {
+  localStorage.setItem(REGISTERED_EVENTS_STORAGE_KEY, JSON.stringify([...new Set(ids)]));
+};
+
+const applyLocalRegistrationState = (event) => {
+  const registeredIds = readRegisteredEventIds().map(String);
+  return {
+    ...event,
+    isJoined: Boolean(event.isJoined) || registeredIds.includes(String(event.id)),
+  };
+};
 
 // ==========================================
 // 1. Mock Data & Filtre Hardcodate
@@ -22,6 +44,7 @@ const MOCK_LOCATIONS = [
     image: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&q=80&w=800",
     description: "Zona dedicată activităților din cadrul CJE Iași.",
     longDescription: "Un eveniment de weekend dedicat studenților și asociațiilor din zona tineretului."
+    
   },
   {
     id: 3, title: "Muzeul de Artă Modernă", category: "Muzee", rating: 4.6,
@@ -29,6 +52,7 @@ const MOCK_LOCATIONS = [
     image: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&q=80&w=800",
     description: "Colecție vastă de artă contemporană și expoziții temporare.",
     longDescription: "Ai poftă să te pierzi puțin în gânduri artistice? Muzeul găzduiește expoziția temporală de fotografie."
+    
   },
   {
     id: 4, title: "La Trattoria", category: "Restaurante", rating: 4.5,
@@ -36,31 +60,32 @@ const MOCK_LOCATIONS = [
     image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&q=80&w=800",
     description: "Restaurant cu specific italian recunoscut pentru pizza autentică.",
     longDescription: "Un restaurant intim ideal atunci când simți că meriți o cină fantastică – doar pentru tine."
+    
   }
 ];
 
 const AVAILABLE_FILTERS = [
-  { id: 257, labelKey: "solo.filter_restaurant", groupKey: "solo.filter_venue_type" },
-  { id: 60, labelKey: "solo.filter_cafe",    groupKey: "solo.filter_venue_type" },
-  { id: 27, labelKey: "solo.filter_bar",     groupKey: "solo.filter_venue_type" },
-  { id: 247, labelKey: "solo.filter_pub",       groupKey: "solo.filter_venue_type" },
+  { id: 175, labelKey: "solo.filter_restaurant", groupKey: "solo.filter_venue_type" },
+  { id: 46, labelKey: "solo.filter_cafe",    groupKey: "solo.filter_venue_type" },
+  { id: 20, labelKey: "solo.filter_bar",     groupKey: "solo.filter_venue_type" },
+  { id: 171, labelKey: "solo.filter_pub",       groupKey: "solo.filter_venue_type" },
 
-  { id: 233, labelKey: "solo.filter_pizza", groupKey: "solo.filter_food" },
-  { id: 305, labelKey: "solo.filter_sushi", groupKey: "solo.filter_food" },
-  { id: 56, labelKey: "solo.filter_buffet", groupKey: "solo.filter_food" },
-  { id: 325, labelKey: "solo.filter_vegetarian",  groupKey: "solo.filter_food" },
-  { id: 141, labelKey: "solo.filter_gluten_free", groupKey: "solo.filter_food" },
+  { id: 167, labelKey: "solo.filter_pizza", groupKey: "solo.filter_food" },
+  { id: 121, labelKey: "solo.filter_sushi", groupKey: "solo.filter_food" },
+  { id: 43, labelKey: "solo.filter_buffet", groupKey: "solo.filter_food" },
+  { id: 217, labelKey: "solo.filter_vegetarian",  groupKey: "solo.filter_food" },
+  { id: 105, labelKey: "solo.filter_gluten_free", groupKey: "solo.filter_food" },
 
-  { id: 181, labelKey: "solo.filter_live_music", groupKey: "solo.filter_activities" },
-  { id: 40, labelKey: "solo.filter_board_games", groupKey: "solo.filter_activities" },
-  { id: 293, labelKey: "solo.filter_sports_screening", groupKey: "solo.filter_activities" },
+  { id: 134, labelKey: "solo.filter_live_music", groupKey: "solo.filter_activities" },
+  { id: 33, labelKey: "solo.filter_board_games", groupKey: "solo.filter_activities" },
+  { id: 135, labelKey: "solo.filter_sports_screening", groupKey: "solo.filter_activities" },
 
-  { id: 134, labelKey: "solo.filter_free_wifi", groupKey: "solo.filter_facilities" },
-  { id: 240, labelKey: "solo.filter_power_outlets", groupKey: "solo.filter_facilities" },
-  { id: 9, labelKey: "solo.filter_air_conditioning", groupKey: "solo.filter_facilities" },
+  { id: 101, labelKey: "solo.filter_free_wifi", groupKey: "solo.filter_facilities" },
+  { id: 70, labelKey: "solo.filter_power_outlets", groupKey: "solo.filter_facilities" },
+  { id: 7, labelKey: "solo.filter_air_conditioning", groupKey: "solo.filter_facilities" },
 
-  { id: 62, labelKey: "solo.filter_free_parking", groupKey: "solo.filter_transport_parking" },
-  { id: 250, labelKey: "solo.filter_public_transport_nearby", groupKey: "solo.filter_transport_parking" },
+  { id: 100, labelKey: "solo.filter_free_parking", groupKey: "solo.filter_transport_parking" },
+  { id: 161, labelKey: "solo.filter_public_transport_nearby", groupKey: "solo.filter_transport_parking" },
 
 ];
 
@@ -130,9 +155,6 @@ const mapEventDTO = (event) => {
     }
   }
 
-  // --- Rating ---
-  const rating = event.rating ?? 5.0;
-
   // --- Adresă ---
   const address = event.address ?? '';
 
@@ -143,7 +165,6 @@ const mapEventDTO = (event) => {
     id: event.id,
     title,
     category,
-    rating,
     distance,
     schedule,
     address,
@@ -151,6 +172,7 @@ const mapEventDTO = (event) => {
     description,
     longDescription,
     isMine,
+    isJoined: Boolean(event.isJoined ?? event.joined ?? event.registered ?? false),
   };
 };
 
@@ -276,7 +298,6 @@ function DiscoveryScreen({ location, onAction, onOpenDetails }) {
       <div className="sd-card-info">
         <div className="sd-card-header">
           <h2 className="sd-card-title">{location.title}</h2>
-          <span className="sd-card-rating">⭐ {location.rating}</span>
         </div>
         <span className="sd-card-schedule">🕒 {location.schedule}</span>
         <span className="sd-card-category">{location.category}</span>
@@ -312,6 +333,7 @@ function FavoritesScreen({ likedPlaces, onRemove, onOpenDetails }) {
           <div className="sd-fav-info">
             <h4 className="sd-fav-title">{place.title}</h4>
             <span className="sd-fav-category">{place.category}</span>
+            {place.distance && <span className="sd-fav-category" style={{marginTop: '4px'}}>📍 {place.distance}</span>}
             <button
               className="sd-fav-remove-btn"
               onClick={(e) => { e.stopPropagation(); onRemove(place.id); }}
@@ -347,6 +369,7 @@ function MyEventsScreen({ events, onOpenDetails }) {
           <div className="sd-fav-info">
             <h4 className="sd-fav-title">{place.title}</h4>
             <span className="sd-fav-category">{place.schedule}</span>
+            {place.distance && <span className="sd-fav-category" style={{marginTop: '4px'}}>📍 {place.distance}</span>}
             <span className="sd-fav-category" style={{ marginTop: '4px', fontStyle: 'italic', color: 'var(--color-primary)' }}>
               {t('solo.organized_by_you')}
             </span>
@@ -358,11 +381,55 @@ function MyEventsScreen({ events, onOpenDetails }) {
 }
 
 // ==========================================
+// 7.5. RegisteredEventsScreen
+// ==========================================
+function RegisteredEventsScreen({ registeredEvents, onUnregister, onOpenDetails }) {
+  const { t } = useTranslation();
+  
+  const activeRegistered = registeredEvents.filter(e => e.isJoined);
+
+  if (activeRegistered.length === 0) {
+    return (
+      <div className="sd-no-more fade-in">
+        <span className="sd-no-more-icon">🎟️</span>
+        <h3>{t('solo.registered_events_empty_title')}</h3>
+        <p>{t('solo.registered_events_empty_desc')}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="sd-favorites-grid fade-in">
+      {activeRegistered.map(place => (
+        <div key={place.id} className="sd-fav-card" onClick={() => onOpenDetails(place)}>
+          <img src={place.image} alt={place.title} className="sd-fav-image" />
+          <div className="sd-fav-info">
+            <h4 className="sd-fav-title">{place.title}</h4>
+            <span className="sd-fav-category">{place.category}</span>
+            {place.distance && <span className="sd-fav-category" style={{marginTop: '4px'}}>📍 {place.distance}</span>}
+            <button
+              className="sd-fav-remove-btn"
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                onUnregister(place); 
+              }}
+            >
+              {t('solo.unregister')}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ==========================================
 // 8. PlaceDetails
 // ==========================================
-function PlaceDetails({ place, onClose, onCancel }) {
+function PlaceDetails({ place, onClose, onCancel, onToggleRegistration, registrationPendingId }) {
   const { t } = useTranslation();
   if (!place) return null;
+  const isRegistrationPending = registrationPendingId === place.id;
   return (
     <div className="sd-place-details fade-in-fast">
       <div className="sd-pd-header" style={{ backgroundImage: `url(${place.image})` }}>
@@ -372,8 +439,7 @@ function PlaceDetails({ place, onClose, onCancel }) {
       <div className="sd-pd-content">
         <h1 className="sd-pd-title">{place.title}</h1>
         <div className="sd-pd-top-meta">
-          {place.rating && <span className="sd-pd-meta-badge rating">⭐ {place.rating}</span>}
-          {place.distance && <span className="sd-pd-meta-badge distance">🚶 {place.distance}</span>}
+          {place.distance && <span className="sd-pd-meta-badge distance">📍 {place.distance}</span>}
           {place.category && <span className="sd-pd-meta-badge category">{place.category}</span>}
         </div>
         <div className="sd-pd-info-clean">
@@ -414,12 +480,30 @@ function PlaceDetails({ place, onClose, onCancel }) {
               {t('solo.cancel_event')} ✕
             </button>
           </div>
+        ) : place.isJoined ? (
+          <div className="sd-pd-action-group">
+            <div 
+              className="btn btn--primary sd-pd-reserve-btn sd-pd-reserve-btn--joined" 
+              style={{ flex: 1, cursor: 'default', transform: 'none', boxShadow: 'none' }}
+            >
+              {t('solo.registered')}
+            </div>
+            <button
+              className="btn btn--secondary sd-pd-cancel-btn"
+              style={{ flex: 1, height: '56px', fontSize: '1.1rem' }}
+              disabled={isRegistrationPending}
+              onClick={() => onToggleRegistration(place)}
+            >
+              {isRegistrationPending ? t('solo.register_pending') : t('solo.unregister')}
+            </button>
+          </div>
         ) : (
           <button
             className="btn btn--primary btn--full sd-pd-reserve-btn"
-            onClick={() => alert('Acțiune Rezervare Placeholder')}
+            disabled={isRegistrationPending}
+            onClick={() => onToggleRegistration(place)}
           >
-            {t('solo.reserve')}
+            {isRegistrationPending ? t('solo.register_pending') : t('solo.register')}
           </button>
         )}
       </div>
@@ -432,7 +516,6 @@ function PlaceDetails({ place, onClose, onCancel }) {
 // ==========================================
 function SoloDiscovering() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const [viewMode, setViewMode] = useState('list');
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -441,27 +524,27 @@ function SoloDiscovering() {
   const [searchResults, setSearchResults] = useState([]);
 
   const [searchString, setSearchString] = useState('');
-  const [maxDistance, setMaxDistance] = useState('');
-  const [maxDays, setMaxDays] = useState('');
+  const [maxDistance, setMaxDistance] = useState('100');
+  const [maxDays, setMaxDays] = useState('30');
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
 
   const [places, setPlaces] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [, setHasMoreData] = useState(true);
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
 
   const [likedPlaces, setLikedPlaces] = useState(() => {
     const s = localStorage.getItem('socially_likedPlaces');
-    return s ? JSON.parse(s) : [];
+    return s ? JSON.parse(s).map(applyLocalRegistrationState) : [];
   });
   const [dislikedIds, setDislikedIds] = useState(() => {
     const s = localStorage.getItem('socially_dislikedIds');
     return s ? JSON.parse(s) : [];
   });
-  const [myEvents] = useState(() => {
-    const s = localStorage.getItem('socially_myEvents');
-    return s ? JSON.parse(s) : [];
-  });
+  const [myEvents, setMyEvents] = useState([]);
+  const [registeredEvents, setRegisteredEvents] = useState([]);
+  const [registrationPendingId, setRegistrationPendingId] = useState(null);
 
   // Geolocație
   useEffect(() => {
@@ -474,12 +557,71 @@ function SoloDiscovering() {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchSavedEvents = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const url = `${API_URL}/api/events/saved`;
+        const response = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState);
+          setLikedPlaces(mapped);
+          localStorage.setItem('socially_likedPlaces', JSON.stringify(mapped));
+        }
+      } catch (err) {
+        console.error('Eroare sincronizare salvate:', err);
+      }
+    };
+
+    const fetchCreatedEvents = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const response = await fetch(`${API_URL}/api/events/created`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState).map(e => ({ ...e, isMine: true }));
+          setMyEvents(mapped);
+        }
+      } catch (err) {
+        console.error('Eroare sincronizare evenimente create:', err);
+      }
+    };
+
+    const fetchRegisteredEvents = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const response = await fetch(`${API_URL}/api/events/registered`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState);
+          setRegisteredEvents(mapped);
+        }
+      } catch (err) {
+        console.error('Eroare sincronizare evenimente înscrise:', err);
+      }
+    };
+
+    fetchSavedEvents();
+    fetchCreatedEvents();
+    fetchRegisteredEvents();
+  }, []);
+
   // ----------------------------------------
   // Fetch Feed Principal (Explore - swipe mode)
   // Răspuns așteptat: List<EventResponseDTO> (JSON array)
   // ----------------------------------------
-  const fetchMainFeed = useCallback(async () => {
-    setIsLoading(true);
+  const fetchMainFeed = useCallback(async (background = false) => {
+    if (!background) setIsLoading(true);
     try {
       const params = new URLSearchParams();
       if (maxDistance) params.append('maxDistance', maxDistance);
@@ -494,7 +636,7 @@ function SoloDiscovering() {
       const token = localStorage.getItem('token');
 
       // const API_BASE_URL = import.meta.env.VITE_API_URL;
-      const url = `${API_URL}/api/events/search?query=...`; // Acum url va fi "http://localhost:9090/api/events..."
+      const url = `${API_URL}/api/events/discover?${params.toString()}`;
       console.log('[DISCOVER] GET', url, '| token:', token ? 'prezent' : 'LIPSĂ');
 
       const response = await fetch(url, {
@@ -510,14 +652,20 @@ function SoloDiscovering() {
 
       const data = await response.json();
       console.log('[DISCOVER] date primite:', data);
-      setPlaces(data.map(mapEventDTO));
+      
+      if (data.length === 0) {
+        setHasMoreData(false);
+      } else {
+        setHasMoreData(true);
+      }
+      setPlaces(data.map(mapEventDTO).map(applyLocalRegistrationState));
     } catch (error) {
       console.error('[DISCOVER] EROARE — fallback pe mock:', error);
       setPlaces(MOCK_LOCATIONS);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [maxDistance, maxDays, selectedFilters, userLocation]);
+      } finally {
+        if (!background) setIsLoading(false);
+      }
+    }, [maxDistance, maxDays, selectedFilters, userLocation]);
 
   // ----------------------------------------
   // Fetch pentru Grid (Search)
@@ -571,7 +719,12 @@ function SoloDiscovering() {
 
       const data = await response.json();
       console.log('[SEARCH] date primite:', data);
-      setSearchResults(data.map(mapEventDTO));
+      if (data.length === 0) {
+        setHasMoreData(false);
+      } else {
+        setHasMoreData(true);
+      }
+      setSearchResults(data.map(mapEventDTO).map(applyLocalRegistrationState));
     } catch (error) {
       console.error('[SEARCH] EROARE — fallback pe mock:', error);
       setSearchResults(MOCK_LOCATIONS);
@@ -582,16 +735,22 @@ function SoloDiscovering() {
 
   useEffect(() => {
     if (!isSearchMode) {
-      fetchMainFeed();
+      const handler = setTimeout(() => {
+        fetchMainFeed();
+      }, 500);
+      return () => clearTimeout(handler);
     }
   }, [userLocation, fetchMainFeed, isSearchMode]);
 
   const availablePlaces = useMemo(() => {
+    if (isSearchMode) {
+      return places;
+    }
     return places.filter(
       (loc) =>
         !likedPlaces.some((lp) => lp.id === loc.id) && !dislikedIds.includes(loc.id)
     );
-  }, [places, likedPlaces, dislikedIds]);
+  }, [places, likedPlaces, dislikedIds, isSearchMode]);
 
   // --- Handlers ---
   const handleSearch = (e) => {
@@ -627,20 +786,114 @@ function SoloDiscovering() {
     }
   };
 
-  const handleCardAction = (location, action) => {
-    if (action === 'reset') { setDislikedIds([]); return; }
+  const handleCardAction = async (location, action) => {
+    const token = localStorage.getItem('token');
+    
+    if (action === 'reset') { 
+      try {
+        await fetch(`${API_URL}/api/events/reset-dislikes`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.error('Failed to reset dislikes', err);
+      }
+      setDislikedIds([]); 
+      localStorage.removeItem('socially_dislikedIds');
+      setHasMoreData(true);
+      fetchMainFeed();
+      return; 
+    }
+    
     if (action === 'like') {
       const updated = likedPlaces.some((p) => p.id === location.id)
         ? likedPlaces
         : [...likedPlaces, location];
       setLikedPlaces(updated);
       localStorage.setItem('socially_likedPlaces', JSON.stringify(updated));
+      
+      fetch(`${API_URL}/api/events/${location.id}/vote?type=Da`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(err => console.error('Failed to send like', err));
+      
     } else {
       const updated = dislikedIds.includes(location.id)
         ? dislikedIds
         : [...dislikedIds, location.id];
       setDislikedIds(updated);
       localStorage.setItem('socially_dislikedIds', JSON.stringify(updated));
+      
+      fetch(`${API_URL}/api/events/${location.id}/vote?type=Nu`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(err => console.error('Failed to send dislike', err));
+    }
+  };
+
+  const updateRegistrationState = (eventId, isJoined) => {
+    const updateList = (items) =>
+      items.map((item) =>
+        String(item.id) === String(eventId) ? { ...item, isJoined } : item
+      );
+
+    setPlaces(updateList);
+    setSearchResults(updateList);
+    setLikedPlaces((prev) => {
+      const updated = updateList(prev);
+      localStorage.setItem('socially_likedPlaces', JSON.stringify(updated));
+      return updated;
+    });
+    setMyEvents(updateList);
+    setRegisteredEvents((prev) => {
+      const exists = prev.some((item) => String(item.id) === String(eventId));
+      if (exists) {
+        return updateList(prev);
+      } else if (isJoined) {
+        const eventObj = places.find((item) => String(item.id) === String(eventId)) ||
+                         searchResults.find((item) => String(item.id) === String(eventId)) ||
+                         likedPlaces.find((item) => String(item.id) === String(eventId)) ||
+                         myEvents.find((item) => String(item.id) === String(eventId)) ||
+                         (selectedPlace && String(selectedPlace.id) === String(eventId) ? selectedPlace : null);
+        if (eventObj) {
+          return [...prev, { ...eventObj, isJoined: true }];
+        }
+      }
+      return prev;
+    });
+    setSelectedPlace((prev) =>
+      prev && String(prev.id) === String(eventId) ? { ...prev, isJoined } : prev
+    );
+
+    const currentIds = readRegisteredEventIds();
+    const nextIds = isJoined
+      ? [...currentIds, eventId]
+      : currentIds.filter((id) => String(id) !== String(eventId));
+    writeRegisteredEventIds(nextIds);
+  };
+
+  const handleToggleRegistration = async (place) => {
+    const eventId = place.id;
+    const nextIsJoined = !place.isJoined;
+    const token = localStorage.getItem('token');
+
+    setRegistrationPendingId(eventId);
+    updateRegistrationState(eventId, nextIsJoined);
+
+    try {
+      const response = await fetch(`${API_URL}/api/events/${eventId}/join`, {
+        method: nextIsJoined ? 'POST' : 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.warn('Event registration persisted locally only:', text || response.status);
+      }
+    } catch (error) {
+      console.warn('Event registration persisted locally only:', error);
+    } finally {
+      setRegistrationPendingId(null);
     }
   };
 
@@ -659,8 +912,25 @@ function SoloDiscovering() {
       <PlaceDetails
         place={selectedPlace}
         onClose={() => setSelectedPlace(null)}
-        onCancel={(id) => {
+        onToggleRegistration={handleToggleRegistration}
+        registrationPendingId={registrationPendingId}
+        onCancel={async (id) => {
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_URL}/api/events/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) {
+              const errTxt = await res.text();
+              console.error("Failed to delete event in backend:", errTxt);
+              alert("Nu s-a putut șterge evenimentul din baza de date: " + errTxt);
+            }
+          } catch(err) {
+            console.error(err);
+          }
           const updated = myEvents.filter((p) => p.id !== id);
+          setMyEvents(updated);
           localStorage.setItem('socially_myEvents', JSON.stringify(updated));
           setSelectedPlace(null);
         }}
@@ -696,6 +966,12 @@ function SoloDiscovering() {
             >
               {t('solo.my_events')}{myEvents.length > 0 && ` (${myEvents.length})`}
             </button>
+            <button
+              className={"sd-toggle-btn" + (viewMode === 'registered' ? ' active' : '')}
+              onClick={() => { setViewMode('registered'); setIsSearchMode(false); }}
+            >
+              {t('solo.registered_events')}{registeredEvents.filter(e => e.isJoined).length > 0 && ` (${registeredEvents.filter(e => e.isJoined).length})`}
+            </button>
           </div>
 
           <div className="sd-searchbar-row">
@@ -727,9 +1003,9 @@ function SoloDiscovering() {
             <div className="sd-inline-param">
               <span className="sd-inline-label">{t('solo.km_label')}</span>
               <input
-                type="number" min="0" max="100" className="sd-inline-input"
+                type="number" min="0" max="1000" className="sd-inline-input"
                 value={maxDistance} onChange={(e) => setMaxDistance(e.target.value)}
-                placeholder="10" title="Distanța maximă (km)"
+                placeholder="100" title="Distanța maximă (km)"
               />
             </div>
 
@@ -769,7 +1045,7 @@ function SoloDiscovering() {
         )}
       </header>
 
-      <div className={`sd-content${isSearchMode ? ' sd-content--scrollable' : ''}`}>
+      <div className={`sd-content${(isSearchMode || viewMode === 'saved' || viewMode === 'mine' || viewMode === 'registered') ? ' sd-content--scrollable' : ''}`}>
         {isLoading && (
           <div style={{ textAlign: 'center', marginTop: '50px' }}>Încărcare...</div>
         )}
@@ -777,10 +1053,34 @@ function SoloDiscovering() {
         {!isLoading && viewMode === 'mine' && !isSearchMode && (
           <MyEventsScreen events={myEvents} onOpenDetails={setSelectedPlace} />
         )}
+        {!isLoading && viewMode === 'registered' && !isSearchMode && (
+          <RegisteredEventsScreen
+            registeredEvents={registeredEvents}
+            onUnregister={handleToggleRegistration}
+            onOpenDetails={setSelectedPlace}
+          />
+        )}
         {!isLoading && viewMode === 'saved' && !isSearchMode && (
           <FavoritesScreen
             likedPlaces={likedPlaces}
-            onRemove={(id) => setLikedPlaces((prev) => prev.filter((p) => p.id !== id))}
+            onRemove={async (id) => {
+              const updated = likedPlaces.filter((p) => p.id !== id);
+              setLikedPlaces(updated);
+              localStorage.setItem('socially_likedPlaces', JSON.stringify(updated));
+              
+              const token = localStorage.getItem('token');
+              try {
+                const API_BASE = window.API_URL || "http://localhost:9090"; // Fallback in case API_URL isn't globally available here
+                await fetch(`${API_BASE}/api/events/${id}/vote`, {
+                  method: 'DELETE',
+                  headers: { Authorization: `Bearer ${token}` }
+                });
+                // Fetch main feed to repopulate the event in the Explore tab if it was empty
+                fetchMainFeed(true);
+              } catch (err) {
+                console.error('Failed to remove vote from backend', err);
+              }
+            }}
             onOpenDetails={setSelectedPlace}
           />
         )}
