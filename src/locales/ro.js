@@ -333,6 +333,11 @@ export const ro = {
   'createevent.edit_success_desc': 'Modificările au fost publicate.',
   'createevent.form.name': 'Nume Eveniment',
   'createevent.form.name_ph': 'ex. Hang Out & Study',
+  'createevent.form.image_url': 'URL Imagine Eveniment',
+  'createevent.form.image_url_ph': 'ex. https://exemplu.ro/imagine-eveniment.jpg',
+  'createevent.form.image': 'Imagine Eveniment',
+  'createevent.form.click_to_upload': 'Click pentru a încărca o imagine din PC',
+  'createevent.form.or_enter_url': 'Sau introdu un link URL pentru imagine:',
   'createevent.form.desc': 'Descriere',
   'createevent.form.desc_ph': 'Oferă câteva detalii atractive...',
   'createevent.form.location': 'Locație',
@@ -341,6 +346,11 @@ export const ro = {
   'createevent.form.date_ph': 'ex. 10:00 - 18:00 sau Sâmbătă, 20:00',
   'createevent.form.address': 'Adresă',
   'createevent.form.address_ph': 'Introdu adresa completă',
+  'createevent.validation.name': 'Numele evenimentului este obligatoriu.',
+  'createevent.validation.image_url': 'URL-ul imaginii evenimentului este obligatoriu.',
+  'createevent.validation.desc': 'Descrierea este obligatorie.',
+  'createevent.validation.date': 'Data și ora sunt obligatorii.',
+  'createevent.validation.address': 'Te rugăm să selectezi o adresă din listă.',
 
 
   // Privacy Page

@@ -50,10 +50,6 @@ function EventDetailsModal({ event, onClose, isJoined, onToggleJoin }) {
 
         <div className="gd-pd-top-meta">
           <span className="gd-pd-meta-badge category">{event.type}</span>
-          <span className="gd-pd-meta-badge rating">
-            <Trophy size={12} style={{ marginRight: "4px" }} />
-            {event.score || 85}% Match
-          </span>
         </div>
 
         <div className="gd-pd-info-clean">
@@ -449,17 +445,13 @@ function GroupDetail() {
                           isReal ? "real" : "placeholder"
                         }`}
                       >
-                        {memberAvatar ? (
-                          <img
-                            src={
-                              memberAvatar ||
-                              "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
-                            }
-                            alt={memberName}
-                          />
-                        ) : (
-                          <span>{memberId ?? "?"}</span>
-                        )}
+                        <img
+                          src={
+                            memberAvatar ||
+                            "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+                          }
+                          alt={memberName}
+                        />
                       </div>
                       <span
                         className={`gd-member-name ${
@@ -536,10 +528,6 @@ function GroupDetail() {
                   <Plus className="icon-sm" />
                   {t("groupdetail.propose_event", "Propune")}
                 </button>
-                <div className="gd-ai-badge">
-                  <Sparkles className="icon-sm" />
-                  AI Matched
-                </div>
               </div>
             </div>
 
@@ -596,10 +584,6 @@ function GroupDetail() {
                       </div>
                     )}
 
-                    <div className="gd-score-badge">
-                      <Sparkles className="icon-xs" />
-                      {t("groupdetail.ai_score")} {averageMatch}%
-                    </div>
                   </div>
 
                   {/* Content Area */}
@@ -620,32 +604,7 @@ function GroupDetail() {
                       </div>
                     </div>
 
-                    {/* Profilul Evenimentului */}
-                    <div className="gd-event-profile">
-                      <div className="gd-event-profile-header">
-                        <ActivityIcon className="icon-sm" />
-                        <span>{t("groupdetail.profile_prefs", "Compatibilitate")}</span>
-                      </div>
-                      <div className="gd-attributes-list">
-                        <div className="gd-attribute-item">
-                          <div className="gd-attribute-labels">
-                            <span>Compatibilitate Medie</span>
-                            <span>
-                              {averageMatch}% {t("groupdetail.match")}
-                            </span>
-                          </div>
-                          <div className="gd-attribute-bar-bg">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${averageMatch}%` }}
-                              transition={{ duration: 1, delay: 0.2 }}
-                              className="gd-attribute-fill"
-                              style={{ backgroundColor: "var(--color-primary)" }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+
 
                     {/* Voting System */}
                     <div className="gd-voting-system">
@@ -893,11 +852,13 @@ function GroupDetail() {
                           isReal ? "real" : "placeholder"
                         }`}
                       >
-                        {memberAvatar ? (
-                          <img src={memberAvatar} alt={memberName} />
-                        ) : (
-                          <span>{memberId ?? "?"}</span>
-                        )}
+                        <img
+                          src={
+                            memberAvatar ||
+                            "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+                          }
+                          alt={memberName}
+                        />
                       </div>
                       <div className="gd-modal-member-info">
                         <h4 className={isReal ? "real" : "placeholder"}>
