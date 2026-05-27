@@ -381,6 +381,49 @@ function MyEventsScreen({ events, onOpenDetails }) {
 }
 
 // ==========================================
+// 7.5. RegisteredEventsScreen
+// ==========================================
+function RegisteredEventsScreen({ registeredEvents, onUnregister, onOpenDetails }) {
+  const { t } = useTranslation();
+  
+  const activeRegistered = registeredEvents.filter(e => e.isJoined);
+
+  if (activeRegistered.length === 0) {
+    return (
+      <div className="sd-no-more fade-in">
+        <span className="sd-no-more-icon">🎟️</span>
+        <h3>{t('solo.registered_events_empty_title')}</h3>
+        <p>{t('solo.registered_events_empty_desc')}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="sd-favorites-grid fade-in">
+      {activeRegistered.map(place => (
+        <div key={place.id} className="sd-fav-card" onClick={() => onOpenDetails(place)}>
+          <img src={place.image} alt={place.title} className="sd-fav-image" />
+          <div className="sd-fav-info">
+            <h4 className="sd-fav-title">{place.title}</h4>
+            <span className="sd-fav-category">{place.category}</span>
+            {place.distance && <span className="sd-fav-category" style={{marginTop: '4px'}}>📍 {place.distance}</span>}
+            <button
+              className="sd-fav-remove-btn"
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                onUnregister(place); 
+              }}
+            >
+              {t('solo.cancel_event') || 'Renunță'}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ==========================================
 // 8. PlaceDetails
 // ==========================================
 function PlaceDetails({ place, onClose, onCancel, onToggleRegistration, registrationPendingId }) {
@@ -487,6 +530,7 @@ function SoloDiscovering() {
     return s ? JSON.parse(s) : [];
   });
   const [myEvents, setMyEvents] = useState([]);
+  const [registeredEvents, setRegisteredEvents] = useState([]);
   const [registrationPendingId, setRegistrationPendingId] = useState(null);
 
   // Geolocație
@@ -537,8 +581,26 @@ function SoloDiscovering() {
       }
     };
 
+    const fetchRegisteredEvents = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const response = await fetch(`${API_URL}/api/events/registered`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState);
+          setRegisteredEvents(mapped);
+        }
+      } catch (err) {
+        console.error('Eroare sincronizare evenimente înscrise:', err);
+      }
+    };
+
     fetchSavedEvents();
     fetchCreatedEvents();
+    fetchRegisteredEvents();
   }, []);
 
   // ----------------------------------------
@@ -770,6 +832,22 @@ function SoloDiscovering() {
       return updated;
     });
     setMyEvents(updateList);
+    setRegisteredEvents((prev) => {
+      const exists = prev.some((item) => String(item.id) === String(eventId));
+      if (exists) {
+        return updateList(prev);
+      } else if (isJoined) {
+        const eventObj = places.find((item) => String(item.id) === String(eventId)) ||
+                         searchResults.find((item) => String(item.id) === String(eventId)) ||
+                         likedPlaces.find((item) => String(item.id) === String(eventId)) ||
+                         myEvents.find((item) => String(item.id) === String(eventId)) ||
+                         (selectedPlace && String(selectedPlace.id) === String(eventId) ? selectedPlace : null);
+        if (eventObj) {
+          return [...prev, { ...eventObj, isJoined: true }];
+        }
+      }
+      return prev;
+    });
     setSelectedPlace((prev) =>
       prev && String(prev.id) === String(eventId) ? { ...prev, isJoined } : prev
     );
@@ -875,6 +953,12 @@ function SoloDiscovering() {
             >
               {t('solo.my_events')}{myEvents.length > 0 && ` (${myEvents.length})`}
             </button>
+            <button
+              className={"sd-toggle-btn" + (viewMode === 'registered' ? ' active' : '')}
+              onClick={() => { setViewMode('registered'); setIsSearchMode(false); }}
+            >
+              {t('solo.registered_events')}{registeredEvents.filter(e => e.isJoined).length > 0 && ` (${registeredEvents.filter(e => e.isJoined).length})`}
+            </button>
           </div>
 
           <div className="sd-searchbar-row">
@@ -948,13 +1032,20 @@ function SoloDiscovering() {
         )}
       </header>
 
-      <div className={`sd-content${(isSearchMode || viewMode === 'saved' || viewMode === 'mine') ? ' sd-content--scrollable' : ''}`}>
+      <div className={`sd-content${(isSearchMode || viewMode === 'saved' || viewMode === 'mine' || viewMode === 'registered') ? ' sd-content--scrollable' : ''}`}>
         {isLoading && (
           <div style={{ textAlign: 'center', marginTop: '50px' }}>Încărcare...</div>
         )}
 
         {!isLoading && viewMode === 'mine' && !isSearchMode && (
           <MyEventsScreen events={myEvents} onOpenDetails={setSelectedPlace} />
+        )}
+        {!isLoading && viewMode === 'registered' && !isSearchMode && (
+          <RegisteredEventsScreen
+            registeredEvents={registeredEvents}
+            onUnregister={handleToggleRegistration}
+            onOpenDetails={setSelectedPlace}
+          />
         )}
         {!isLoading && viewMode === 'saved' && !isSearchMode && (
           <FavoritesScreen
