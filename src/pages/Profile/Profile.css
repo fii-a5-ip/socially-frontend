@@ -465,4 +465,124 @@
 
 .history-empty::before {
     content: "" !important;
+}/* --- TIMELINE HISTORY --- */
+.timeline-container {
+  position: relative;
+  padding-left: 30px;
+  margin-top: 15px;
+}
+
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-color);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -26px; /* 30 - 4 */
+  top: 20px;
+  width: 10px;
+  height: 10px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--bg-card);
+}
+
+.timeline-card {
+  display: flex;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  gap: 15px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.timeline-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.timeline-image-wrapper {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-main);
+}
+
+.timeline-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.timeline-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.timeline-role {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.role-organizer {
+  background: rgba(255, 71, 87, 0.1);
+  color: #ff4757;
+}
+
+.role-participant {
+  background: rgba(46, 213, 115, 0.1);
+  color: #2ed573;
+}
+
+.timeline-datetime {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.timeline-event-name {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.timeline-location {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .timeline-card {
+    flex-direction: column;
+  }
+  .timeline-image-wrapper {
+    width: 100%;
+    height: 120px;
+  }
 }

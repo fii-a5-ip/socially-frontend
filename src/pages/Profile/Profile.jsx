@@ -75,7 +75,7 @@ function Profile() {
         Promise.allSettled([
           fetch(`${API_URL}/api/filters`, { headers }).then(res => res.json()),
           getMyGroups(),
-          fetch(`${API_URL}/api/activities/history`, { headers }).then(res => res.json())
+          fetch(`${API_URL}/api/users/me/history`, { headers }).then(res => res.json())
         ]).then((results) => {
           const [filtersRes, groupsRes, historyRes] = results
 
@@ -249,15 +249,36 @@ function Profile() {
               </div>
             </div>
 
-            <div className="profile-section">
+                        <div className="profile-section">
               <h3 className="side-title">{t('profile.history.title')}</h3>
-              <ul className="history-list">
+              <div className="timeline-container">
                 {deAfisat.length > 0 ? (
-                  deAfisat.map((act, i) => <li key={i}>{act}</li>)
+                  deAfisat.map((event) => (
+                    <div key={event.id} className="timeline-item">
+                      <div className="timeline-marker"></div>
+                      <div className="timeline-card">
+                        {event.imageUrl && (
+                          <div className="timeline-image-wrapper">
+                            <img src={event.imageUrl} alt={event.name} className="timeline-image" />
+                          </div>
+                        )}
+                        <div className="timeline-content">
+                          <div className="timeline-header">
+                            <span className={	imeline-role role- + event.role.toLowerCase()}>{event.role}</span>
+                            <span className="timeline-datetime">{event.date} {event.time}</span>
+                          </div>
+                          <h4 className="timeline-event-name">{event.name}</h4>
+                          {event.locationName && (
+                            <p className="timeline-location">?? {event.locationName}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
                 ) : (
-                  <li className="history-empty">{t('history.empty')}</li>
+                  <p className="history-empty">{t('history.empty')}</p>
                 )}
-              </ul>
+              </div>
               {activitatiComplete.length > 3 && (
                 <button type="button" className="btn-history-more" onClick={() => setIstoricExtins(!istoricExtins)}>
                   {istoricExtins ? t('profile.history.less') : t('profile.history.more')}
@@ -280,3 +301,5 @@ function Profile() {
 }
 
 export default Profile
+
+
