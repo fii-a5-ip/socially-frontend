@@ -28,7 +28,6 @@ function Profile() {
   const [groupsCount, setGroupsCount] = useState(0)
   const [activitatiComplete, setActivitatiComplete] = useState([])
   const [totalOutings, setTotalOutings] = useState(0)
-  const [aiScore, setAiScore] = useState(98)
   
   const [availableFilters, setAvailableFilters] = useState([
     { id: 192, name: 'Sports' },
@@ -57,7 +56,6 @@ function Profile() {
           bio: userData.bio || '',
           avatarUrl: userData.profileImgUrl || userData.avatarUrl || null
         }))
-        if (userData.aiScore) setAiScore(userData.aiScore)
 
         // Pasul 2: Acum ca avem ID-ul, luam filtrele specifice ale userului (cerinta Cris/SM)
         return fetch(`${API_URL}/api/users/${userData.id}/filters`, { headers })
@@ -237,16 +235,6 @@ function Profile() {
               <h3 className="side-title">{t('profile.stats.title')}</h3>
               <div className="stat-row"><span>{t('profile.stats.active_groups')}</span> <strong>{groupsCount}</strong></div>
               <div className="stat-row"><span>{t('profile.stats.total_outings')}</span> <strong>{totalOutings}</strong></div>
-              <div className="stat-row">
-                <span>
-                  {t('profile.stats.ai_score')}
-                  <span className="ai-tooltip-trigger">
-                    ❓
-                    <span className="ai-tooltip-text">{t('profile.stats.ai_tooltip')}</span>
-                  </span>
-                </span>
-                <strong>{aiScore}%</strong>
-              </div>
             </div>
 
                         <div className="profile-section">
