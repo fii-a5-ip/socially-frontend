@@ -586,3 +586,11 @@
     height: 120px;
   }
 }
+/* Hide scrollbar for interests grid */
+.interests-grid::-webkit-scrollbar {
+  display: none;
+}
+.interests-grid {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -378,6 +378,7 @@ export const en = {
   'creategroup.error_name_required': 'Group name is required!',
   'creategroup.error_save': 'Error creating group. Please try again.',
   'common.loading': 'Loading data, please wait...',
+  'common.search': '🔍 Search through hundreds of interests...',
   'login.error_message': 'Login error, please check your credentials.',
   'login.forgot_password_placeholder': 'Enter your email address...',
   'history.empty': 'You haven\'t participated in any activity yet. Start exploring!',
