@@ -269,7 +269,7 @@ function Profile() {
                           </div>
                           <h4 className="timeline-event-name">{event.name}</h4>
                           {event.locationName && (
-                            <p className="timeline-location">?? {event.locationName}</p>
+                            <p className="timeline-location">📍 {event.locationName}</p>
                           )}
                         </div>
                       </div>
