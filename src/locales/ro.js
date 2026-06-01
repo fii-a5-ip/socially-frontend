@@ -371,9 +371,16 @@ export const ro = {
   'help.card2.title': 'Cum propun o locație?',
   'help.card2.desc': 'Folosește butonul "+" din secțiunea Descoperă.',
   'help.card3.title': 'Raportare Probleme',
-  'help.card3.desc': 'Contactează-ne direct la adresa: sociallyteam@gmail.com.'
-
-
-
-
+  'help.card3.desc': 'Contactează-ne direct la adresa: sociallyteam@gmail.com.',
+  'creategroup.group_name_label': 'Numele Grupului',
+  'creategroup.group_name_placeholder': 'Introdu numele grupului...',
+  'creategroup.group_desc_label': 'Descriere',
+  'creategroup.group_desc_placeholder': 'Ce fel de grup este acesta?',
+  'creategroup.error_name_required': 'Numele grupului este obligatoriu!',
+  'creategroup.error_save': 'Eroare la crearea grupului. Încearcă din nou.',
+  'common.loading': 'Se încarcă datele, te rugăm să aștepți...',
+  'login.error_message': 'Eroare la autentificare, verifică datele.',
+  'login.forgot_password_placeholder': 'Introdu adresa de email...',
+  'history.empty': 'Încă nu ai participat la nicio activitate. Explorează noi evenimente!',
+  'profile.interests.loading': 'Se încarcă interesele tale...'
 };

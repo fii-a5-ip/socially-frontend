@@ -370,5 +370,16 @@ export const en = {
   'help.card2.title': 'How do I propose a location?',
   'help.card2.desc': 'Use the "+" button in the Discover section.',
   'help.card3.title': 'Report Issues',
-  'help.card3.desc': 'Contact us via email at the address: sociallyteam@gmail.com.'
+  'help.card3.desc': 'Contact us via email at the address: sociallyteam@gmail.com.',
+  'creategroup.group_name_label': 'Group Name',
+  'creategroup.group_name_placeholder': 'Enter group name...',
+  'creategroup.group_desc_label': 'Description',
+  'creategroup.group_desc_placeholder': 'What is this group about?',
+  'creategroup.error_name_required': 'Group name is required!',
+  'creategroup.error_save': 'Error creating group. Please try again.',
+  'common.loading': 'Loading data, please wait...',
+  'login.error_message': 'Login error, please check your credentials.',
+  'login.forgot_password_placeholder': 'Enter your email address...',
+  'history.empty': 'You haven\'t participated in any activity yet. Start exploring!',
+  'profile.interests.loading': 'Loading your interests...'
 };
