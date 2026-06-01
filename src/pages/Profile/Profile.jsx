@@ -28,7 +28,6 @@ function Profile() {
   const [groupsCount, setGroupsCount] = useState(0)
   const [activitatiComplete, setActivitatiComplete] = useState([])
   const [totalOutings, setTotalOutings] = useState(0)
-  const [aiScore, setAiScore] = useState(98)
   
   const [availableFilters, setAvailableFilters] = useState([
     { id: 192, name: 'Sports' },
@@ -37,6 +36,7 @@ function Profile() {
     { id: 156, name: 'Outdoors' },
     { id: 95, name: 'Food' }
   ])
+  const [interestSearch, setInterestSearch] = useState('')
   const [selectedFilters, setSelectedFilters] = useState([])
 
   useEffect(() => {
@@ -55,9 +55,8 @@ function Profile() {
           nume: userData.fullname || `${userData.firstname || ''} ${userData.lastname || ''}`.trim() || prevProfileData.nume,
           email: userData.email || prevProfileData.email,
           bio: userData.bio || '',
-          avatarUrl: userData.avatarUrl || null
+          avatarUrl: userData.profileImgUrl || userData.avatarUrl || null
         }))
-        if (userData.aiScore) setAiScore(userData.aiScore)
 
         // Pasul 2: Acum ca avem ID-ul, luam filtrele specifice ale userului (cerinta Cris/SM)
         return fetch(`${API_URL}/api/users/${userData.id}/filters`, { headers })
@@ -75,7 +74,7 @@ function Profile() {
         Promise.allSettled([
           fetch(`${API_URL}/api/filters`, { headers }).then(res => res.json()),
           getMyGroups(),
-          fetch(`${API_URL}/api/activities/history`, { headers }).then(res => res.json())
+          fetch(`${API_URL}/api/users/me/history`, { headers }).then(res => res.json())
         ]).then((results) => {
           const [filtersRes, groupsRes, historyRes] = results
 
@@ -117,7 +116,7 @@ function Profile() {
         
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
-          currentAvatarUrl = uploadData.avatarUrl || uploadData.profilePictureUrl || currentAvatarUrl;
+          currentAvatarUrl = uploadData.profileImgUrl || uploadData.avatarUrl || uploadData.profilePictureUrl || currentAvatarUrl;
         } else {
           console.warn('Backend upload endpoint might not be ready.');
         }
@@ -127,9 +126,10 @@ function Profile() {
     }
 
     const payload = {
+      fullname: newProfileData.nume,
       email: newProfileData.email,
       bio: newProfileData.bio,
-      profilePictureUrl: currentAvatarUrl,
+      profileImgUrl: currentAvatarUrl,
       filterIds: selectedFilters
     }
 
@@ -212,8 +212,20 @@ function Profile() {
                 
                 <div className="profile-interests-section">
                   <h3 className="section-subtitle">{t('profile.interests.title')}</h3>
-                  <div className="interests-grid">
-                    {availableFilters.map(filter => (
+                  <div className="interests-search-bar" style={{ marginBottom: '15px' }}>
+                    <input 
+                      type="text" 
+                      placeholder={t('common.search', 'Cauta interese...')}
+                      value={interestSearch}
+                      onChange={(e) => setInterestSearch(e.target.value)}
+                      className="form-input"
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-main)', color: 'var(--text-primary)' }}
+                    />
+                  </div>
+                  <div className="interests-grid" style={{ maxHeight: '280px', overflowY: 'auto', paddingRight: '5px' }}>
+                    {availableFilters
+                      .filter(f => getInterestLabel(f.name).toLowerCase().includes(interestSearch.toLowerCase()))
+                      .map(filter => (
                       <button
                         key={filter.id}
                         className={`interest-tag ${selectedFilters.includes(filter.id) ? 'active' : ''}`}
@@ -223,7 +235,7 @@ function Profile() {
                       </button>
                     ))}
                   </div>
-                  <button className="btn-save-interests" onClick={() => handleSave(profileData)}>
+                  <button className="btn-save-interests" onClick={() => handleSave(profileData)} style={{ marginTop: '15px' }}>
                     {t('profile.interests.save')}
                   </button>
                 </div>
@@ -236,27 +248,38 @@ function Profile() {
               <h3 className="side-title">{t('profile.stats.title')}</h3>
               <div className="stat-row"><span>{t('profile.stats.active_groups')}</span> <strong>{groupsCount}</strong></div>
               <div className="stat-row"><span>{t('profile.stats.total_outings')}</span> <strong>{totalOutings}</strong></div>
-              <div className="stat-row">
-                <span>
-                  {t('profile.stats.ai_score')}
-                  <span className="ai-tooltip-trigger">
-                    ❓
-                    <span className="ai-tooltip-text">{t('profile.stats.ai_tooltip')}</span>
-                  </span>
-                </span>
-                <strong>{aiScore}%</strong>
-              </div>
             </div>
 
-            <div className="profile-section">
+                        <div className="profile-section">
               <h3 className="side-title">{t('profile.history.title')}</h3>
-              <ul className="history-list">
+              <div className="timeline-container">
                 {deAfisat.length > 0 ? (
-                  deAfisat.map((act, i) => <li key={i}>{act}</li>)
+                  deAfisat.map((event) => (
+                    <div key={event.id} className="timeline-item">
+                      <div className="timeline-marker"></div>
+                      <div className="timeline-card">
+                        {event.imageUrl && (
+                          <div className="timeline-image-wrapper">
+                            <img src={event.imageUrl} alt={event.name} className="timeline-image" />
+                          </div>
+                        )}
+                        <div className="timeline-content">
+                          <div className="timeline-header">
+                            <span className={`timeline-role role-${event.role.toLowerCase()}`}>{event.role}</span>
+                            <span className="timeline-datetime">{event.date} {event.time}</span>
+                          </div>
+                          <h4 className="timeline-event-name">{event.name}</h4>
+                          {event.locationName && (
+                            <p className="timeline-location">📍 {event.locationName}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
                 ) : (
-                  <li className="history-empty">{t('history.empty')}</li>
+                  <p className="history-empty">{t('history.empty')}</p>
                 )}
-              </ul>
+              </div>
               {activitatiComplete.length > 3 && (
                 <button type="button" className="btn-history-more" onClick={() => setIstoricExtins(!istoricExtins)}>
                   {istoricExtins ? t('profile.history.less') : t('profile.history.more')}
@@ -279,3 +302,5 @@ function Profile() {
 }
 
 export default Profile
+
+
