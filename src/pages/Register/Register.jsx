@@ -198,7 +198,7 @@ const Register = () => {
 					const avatarData = new FormData();
 					avatarData.append('avatar', avatarFile);
 
-					fetch(`${API_URL}/api/v1/users/avatar`, {
+					fetch(`${API_URL}/api/users/me/avatar`, {
 						method: 'POST',
 						headers: {
 							'Authorization': `Bearer ${jwtToken}`

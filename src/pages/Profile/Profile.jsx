@@ -55,7 +55,7 @@ function Profile() {
           nume: userData.fullname || `${userData.firstname || ''} ${userData.lastname || ''}`.trim() || prevProfileData.nume,
           email: userData.email || prevProfileData.email,
           bio: userData.bio || '',
-          avatarUrl: userData.avatarUrl || null
+          avatarUrl: userData.profileImgUrl || userData.avatarUrl || null
         }))
         if (userData.aiScore) setAiScore(userData.aiScore)
 
@@ -117,7 +117,7 @@ function Profile() {
         
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
-          currentAvatarUrl = uploadData.avatarUrl || uploadData.profilePictureUrl || currentAvatarUrl;
+          currentAvatarUrl = uploadData.profileImgUrl || uploadData.avatarUrl || uploadData.profilePictureUrl || currentAvatarUrl;
         } else {
           console.warn('Backend upload endpoint might not be ready.');
         }
@@ -127,9 +127,10 @@ function Profile() {
     }
 
     const payload = {
+      fullname: newProfileData.nume,
       email: newProfileData.email,
       bio: newProfileData.bio,
-      profilePictureUrl: currentAvatarUrl,
+      profileImgUrl: currentAvatarUrl,
       filterIds: selectedFilters
     }
 
