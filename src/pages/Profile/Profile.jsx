@@ -264,7 +264,7 @@ function Profile() {
                         )}
                         <div className="timeline-content">
                           <div className="timeline-header">
-                            <span className={	imeline-role role- + event.role.toLowerCase()}>{event.role}</span>
+                            <span className={`timeline-role role-${event.role.toLowerCase()}`}>{event.role}</span>
                             <span className="timeline-datetime">{event.date} {event.time}</span>
                           </div>
                           <h4 className="timeline-event-name">{event.name}</h4>
