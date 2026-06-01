@@ -36,6 +36,7 @@ function Profile() {
     { id: 156, name: 'Outdoors' },
     { id: 95, name: 'Food' }
   ])
+  const [interestSearch, setInterestSearch] = useState('')
   const [selectedFilters, setSelectedFilters] = useState([])
 
   useEffect(() => {
@@ -211,8 +212,20 @@ function Profile() {
                 
                 <div className="profile-interests-section">
                   <h3 className="section-subtitle">{t('profile.interests.title')}</h3>
-                  <div className="interests-grid">
-                    {availableFilters.map(filter => (
+                  <div className="interests-search-bar" style={{ marginBottom: '15px' }}>
+                    <input 
+                      type="text" 
+                      placeholder={t('common.search', 'Cauta interese...')}
+                      value={interestSearch}
+                      onChange={(e) => setInterestSearch(e.target.value)}
+                      className="form-input"
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-main)', color: 'var(--text-primary)' }}
+                    />
+                  </div>
+                  <div className="interests-grid" style={{ maxHeight: '280px', overflowY: 'auto', paddingRight: '5px' }}>
+                    {availableFilters
+                      .filter(f => getInterestLabel(f.name).toLowerCase().includes(interestSearch.toLowerCase()))
+                      .map(filter => (
                       <button
                         key={filter.id}
                         className={`interest-tag ${selectedFilters.includes(filter.id) ? 'active' : ''}`}
@@ -222,7 +235,7 @@ function Profile() {
                       </button>
                     ))}
                   </div>
-                  <button className="btn-save-interests" onClick={() => handleSave(profileData)}>
+                  <button className="btn-save-interests" onClick={() => handleSave(profileData)} style={{ marginTop: '15px' }}>
                     {t('profile.interests.save')}
                   </button>
                 </div>
