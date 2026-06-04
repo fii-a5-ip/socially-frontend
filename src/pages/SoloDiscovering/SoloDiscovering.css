@@ -476,8 +476,8 @@
 
 .sd-card-info {
     padding: var(--space-lg);
-    flex: 1 1 auto; /* Zona de text ocupă spațiul rămas și se adaptează */
-    overflow-y: auto; /* Dacă descrierea e prea lungă, primește scroll intern */
+    flex: 1 1 auto; /* Zona de text ocupa spatiul ramas si se adapteaza */
+    overflow: hidden; /* Nu mai folosim scroll intern ca arata urat */
     display: flex;
     flex-direction: column;
 }
@@ -526,7 +526,18 @@
     color: var(--text-secondary);
     line-height: 1.5;
     margin: 0;
-    /* Am scos limitarea de 2 rânduri ca să poată face scroll dacă e nevoie */
+    max-height: 4.5em; /* Exact 3 randuri a cate 1.5 line-height */
+    overflow: hidden;
+    position: relative;
+}
+.sd-card-desc::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 25%;
+    height: 1.5em;
+    background: linear-gradient(to right, transparent, var(--bg-card) 50%);
 }
 
 .sd-card-actions {
@@ -1108,4 +1119,32 @@
     .sd-results-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* Buton microfon (Voice Search) */
+.sd-mic-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0 10px;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sd-mic-button:hover {
+    color: var(--primary);
+    transform: scale(1.1);
+}
+.sd-mic-button.recording {
+    color: #ff3b30;
+    animation: pulseMic 1.5s infinite;
+}
+
+@keyframes pulseMic {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
 }
