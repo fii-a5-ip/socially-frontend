@@ -2,30 +2,8 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from '../../hooks/useTranslation';
-import { API_URL } from '../../api/config';
+import { API_URL, AI_API_URL } from '../../api/config';
 import './SoloDiscovering.css';
-
-const REGISTERED_EVENTS_STORAGE_KEY = 'socially_registeredEventIds';
-
-const readRegisteredEventIds = () => {
-  try {
-    return JSON.parse(localStorage.getItem(REGISTERED_EVENTS_STORAGE_KEY) || '[]');
-  } catch {
-    return [];
-  }
-};
-
-const writeRegisteredEventIds = (ids) => {
-  localStorage.setItem(REGISTERED_EVENTS_STORAGE_KEY, JSON.stringify([...new Set(ids)]));
-};
-
-const applyLocalRegistrationState = (event) => {
-  const registeredIds = readRegisteredEventIds().map(String);
-  return {
-    ...event,
-    isJoined: Boolean(event.isJoined) || registeredIds.includes(String(event.id)),
-  };
-};
 
 // ==========================================
 // 1. Mock Data & Filtre Hardcodate
@@ -173,7 +151,7 @@ const mapEventDTO = (event) => {
     longDescription,
     isMine,
     isJoined: Boolean(event.isJoined ?? event.joined ?? event.registered ?? false),
-    isExactMatch: event.isExactMatch,
+    isExactMatch: event.isExactMatch ?? event.exactMatch,
     tags: Array.isArray(event.filters) ? event.filters.map(f => f.name ?? f.label ?? f.labelKey ?? '') : []
   };
 };
@@ -353,6 +331,7 @@ function DiscoveryScreen({ location, onAction, onOpenDetails }) {
 // ==========================================
 function FavoritesScreen({ likedPlaces, onRemove, onOpenDetails }) {
   const { t } = useTranslation();
+  const [visibleCount, setVisibleCount] = useState(20);
   if (likedPlaces.length === 0) {
     return (
       <div className="sd-no-more">
@@ -362,9 +341,9 @@ function FavoritesScreen({ likedPlaces, onRemove, onOpenDetails }) {
       </div>
     );
   }
-  return (
+    return (
     <div className="sd-favorites-grid fade-in">
-      {likedPlaces.map(place => (
+      {likedPlaces.slice(0, visibleCount).map(place => (
         <div key={place.id} className="sd-fav-card" onClick={() => onOpenDetails(place)}>
           <img src={place.image} alt={place.title} className="sd-fav-image" />
           <div className="sd-fav-info">
@@ -389,6 +368,7 @@ function FavoritesScreen({ likedPlaces, onRemove, onOpenDetails }) {
 // ==========================================
 function MyEventsScreen({ events, onOpenDetails }) {
   const { t } = useTranslation();
+  const [visibleCount, setVisibleCount] = useState(20);
   if (!events || events.length === 0) {
     return (
       <div className="sd-no-more fade-in">
@@ -400,7 +380,7 @@ function MyEventsScreen({ events, onOpenDetails }) {
   }
   return (
     <div className="sd-favorites-grid fade-in">
-      {events.map(place => (
+      {events.slice(0, visibleCount).map(place => (
         <div key={place.id} className="sd-fav-card" onClick={() => onOpenDetails(place)}>
           <img src={place.image} alt={place.title} className="sd-fav-image" />
           <div className="sd-fav-info">
@@ -422,6 +402,7 @@ function MyEventsScreen({ events, onOpenDetails }) {
 // ==========================================
 function RegisteredEventsScreen({ registeredEvents, onUnregister, onOpenDetails }) {
   const { t } = useTranslation();
+  const [visibleCount, setVisibleCount] = useState(20);
   
   const activeRegistered = registeredEvents.filter(e => e.isJoined);
 
@@ -437,7 +418,7 @@ function RegisteredEventsScreen({ registeredEvents, onUnregister, onOpenDetails 
 
   return (
     <div className="sd-favorites-grid fade-in">
-      {activeRegistered.map(place => (
+      {activeRegistered.slice(0, visibleCount).map(place => (
         <div key={place.id} className="sd-fav-card" onClick={() => onOpenDetails(place)}>
           <img src={place.image} alt={place.title} className="sd-fav-image" />
           <div className="sd-fav-info">
@@ -554,6 +535,11 @@ function PlaceDetails({ place, onClose, onCancel, onToggleRegistration, registra
 function SoloDiscovering() {
   const { t } = useTranslation();
 
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = React.useRef(null);
+  const audioChunksRef = React.useRef([]);
+
+  const [activeTab, setActiveTab] = useState('explore');
   const [viewMode, setViewMode] = useState('list');
   const [selectedPlace, setSelectedPlace] = useState(null);
 
@@ -566,30 +552,13 @@ function SoloDiscovering() {
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
 
-  const [places, setPlaces] = useState(() => {
-    const cached = sessionStorage.getItem('socially_discover_cache');
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (Date.now() - parsed.timestamp < 5 * 60 * 1000) {
-          return parsed.data;
-        }
-      } catch(e) {}
-    }
-    return [];
-  });
+  const [places, setPlaces] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasMoreData, setHasMoreData] = useState(true);
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
 
-  const [likedPlaces, setLikedPlaces] = useState(() => {
-    const s = localStorage.getItem('socially_likedPlaces');
-    return s ? JSON.parse(s).map(applyLocalRegistrationState) : [];
-  });
-  const [dislikedIds, setDislikedIds] = useState(() => {
-    const s = localStorage.getItem('socially_dislikedIds');
-    return s ? JSON.parse(s) : [];
-  });
+  const [likedPlaces, setLikedPlaces] = useState([]);
+  const [dislikedIds, setDislikedIds] = useState([]);
   const [myEvents, setMyEvents] = useState([]);
   const [registeredEvents, setRegisteredEvents] = useState([]);
   const [registrationPendingId, setRegistrationPendingId] = useState(null);
@@ -616,9 +585,9 @@ function SoloDiscovering() {
         });
         if (response.ok) {
           const data = await response.json();
-          const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState);
+          const mapped = data.map(mapEventDTO);
           setLikedPlaces(mapped);
-          localStorage.setItem('socially_likedPlaces', JSON.stringify(mapped));
+          
         }
       } catch (err) {
         console.error('Eroare sincronizare salvate:', err);
@@ -634,7 +603,7 @@ function SoloDiscovering() {
         });
         if (response.ok) {
           const data = await response.json();
-          const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState).map(e => ({ ...e, isMine: true }));
+          const mapped = data.map(mapEventDTO).map(e => ({ ...e, isMine: true }));
           setMyEvents(mapped);
         }
       } catch (err) {
@@ -651,7 +620,7 @@ function SoloDiscovering() {
         });
         if (response.ok) {
           const data = await response.json();
-          const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState);
+          const mapped = data.map(mapEventDTO);
           setRegisteredEvents(mapped);
         }
       } catch (err) {
@@ -706,7 +675,7 @@ function SoloDiscovering() {
         setHasMoreData(true);
       }
       
-      const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState);
+      const mapped = data.map(mapEventDTO);
       
       setPlaces(prev => {
         const newPlaces = isAppend ? [...prev, ...mapped] : mapped;
@@ -729,10 +698,10 @@ function SoloDiscovering() {
   // Fetch pentru Grid (Search)
   // Răspuns așteptat: List<EventResponseDTO> (JSON array)
   // ----------------------------------------
-  const fetchSearchResults = useCallback(async () => {
+  const fetchSearchResults = useCallback(async (overrideQuery = null) => {
     setIsLoading(true);
     try {
-      const query = searchString.trim();
+      const query = overrideQuery !== null ? overrideQuery.trim() : searchString.trim();
       const params = new URLSearchParams();
       params.append('query', query);
       if (maxDistance) params.append('maxDistance', maxDistance);
@@ -782,7 +751,7 @@ function SoloDiscovering() {
       } else {
         setHasMoreData(true);
       }
-      setSearchResults(data.map(mapEventDTO).map(applyLocalRegistrationState));
+      setSearchResults(data.map(mapEventDTO));
     } catch (error) {
       console.error('[SEARCH] EROARE — fallback pe mock:', error);
       setSearchResults(MOCK_LOCATIONS);
@@ -843,6 +812,66 @@ function SoloDiscovering() {
     }
   };
 
+  const handleMicClick = async () => {
+    if (isRecording) {
+      // Stop recording
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+      }
+      setIsRecording(false);
+    } else {
+      // Start recording
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorderRef.current = new MediaRecorder(stream);
+        audioChunksRef.current = [];
+
+        mediaRecorderRef.current.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            audioChunksRef.current.push(e.data);
+          }
+        };
+
+        mediaRecorderRef.current.onstop = async () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          const formData = new FormData();
+          formData.append('file', audioBlob, 'voice_search.webm');
+
+          try {
+            const response = await fetch(`${AI_API_URL}/speechToText/`, {
+              method: 'POST',
+              body: formData,
+            });
+            const data = await response.json();
+            if (data.status === 'success' && data.transcription) {
+              setSearchString(data.transcription);
+              // Trigger search automatically
+              if (data.transcription.trim().length > 0) {
+                setViewMode('list');
+                setIsSearchMode(true);
+                // We pass the transcription directly to avoid stale state issues
+                fetchSearchResults(data.transcription);
+              }
+            } else {
+              console.error('Transcription failed:', data);
+            }
+          } catch (error) {
+            console.error('Error sending audio to server:', error);
+          }
+
+          // Stop all audio tracks
+          stream.getTracks().forEach((track) => track.stop());
+        };
+
+        mediaRecorderRef.current.start();
+        setIsRecording(true);
+      } catch (err) {
+        console.error('Error accessing microphone:', err);
+        alert('Nu am putut accesa microfonul. Te rugăm să verifici permisiunile.');
+      }
+    }
+  };
+
   const handleApplyFilters = () => {
     setIsFilterPanelOpen(false);
     if (isSearchMode && searchString.trim().length > 0) {
@@ -865,7 +894,7 @@ function SoloDiscovering() {
         console.error('Failed to reset dislikes', err);
       }
       setDislikedIds([]); 
-      localStorage.removeItem('socially_dislikedIds');
+      
       setHasMoreData(true);
       fetchMainFeed();
       return; 
@@ -876,7 +905,7 @@ function SoloDiscovering() {
         ? likedPlaces
         : [...likedPlaces, location];
       setLikedPlaces(updated);
-      localStorage.setItem('socially_likedPlaces', JSON.stringify(updated));
+      
       
       fetch(`${API_URL}/api/events/${location.id}/vote?type=Da`, {
         method: 'POST',
@@ -888,7 +917,7 @@ function SoloDiscovering() {
         ? dislikedIds
         : [...dislikedIds, location.id];
       setDislikedIds(updated);
-      localStorage.setItem('socially_dislikedIds', JSON.stringify(updated));
+      
       
       fetch(`${API_URL}/api/events/${location.id}/vote?type=Nu`, {
         method: 'POST',
@@ -907,7 +936,7 @@ function SoloDiscovering() {
     setSearchResults(updateList);
     setLikedPlaces((prev) => {
       const updated = updateList(prev);
-      localStorage.setItem('socially_likedPlaces', JSON.stringify(updated));
+      
       return updated;
     });
     setMyEvents(updateList);
@@ -935,7 +964,7 @@ function SoloDiscovering() {
     const nextIds = isJoined
       ? [...currentIds, eventId]
       : currentIds.filter((id) => String(id) !== String(eventId));
-    writeRegisteredEventIds(nextIds);
+    
   };
 
   const handleToggleRegistration = async (place) => {
@@ -997,7 +1026,7 @@ function SoloDiscovering() {
           }
           const updated = myEvents.filter((p) => p.id !== id);
           setMyEvents(updated);
-          localStorage.setItem('socially_myEvents', JSON.stringify(updated));
+          
           setSelectedPlace(null);
         }}
       />
@@ -1051,6 +1080,13 @@ function SoloDiscovering() {
                 onChange={handleSearchChange}
                 onKeyDown={handleSearch}
               />
+              <button 
+                className={`sd-mic-button ${isRecording ? 'recording' : ''}`}
+                onClick={handleMicClick}
+                title={isRecording ? 'Oprește înregistrarea' : 'Căutare vocală'}
+              >
+                🎤
+              </button>
               {isSearchMode && (
                 <button
                   className="sd-searchbar-clear"
@@ -1132,7 +1168,7 @@ function SoloDiscovering() {
             onRemove={async (id) => {
               const updated = likedPlaces.filter((p) => p.id !== id);
               setLikedPlaces(updated);
-              localStorage.setItem('socially_likedPlaces', JSON.stringify(updated));
+              
               
               const token = localStorage.getItem('token');
               try {
