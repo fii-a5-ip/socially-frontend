@@ -173,6 +173,8 @@ const mapEventDTO = (event) => {
     longDescription,
     isMine,
     isJoined: Boolean(event.isJoined ?? event.joined ?? event.registered ?? false),
+    isExactMatch: event.isExactMatch,
+    tags: Array.isArray(event.filters) ? event.filters.map(f => f.name ?? f.label ?? f.labelKey ?? '') : []
   };
 };
 
@@ -222,7 +224,7 @@ function FilterPanel({ isOpen, onClose, selectedFilters, onToggleFilter, onClear
 // ==========================================
 // 4. SearchResultsGrid
 // ==========================================
-function SearchResultsGrid({ results, onOpenDetails }) {
+function SearchResultsGrid({ results, onOpenDetails, searchString }) {
   const { t } = useTranslation();
 
   if (results.length === 0) {
@@ -234,28 +236,63 @@ function SearchResultsGrid({ results, onOpenDetails }) {
     );
   }
 
+  const query = (searchString || '').toLowerCase().trim();
+  
+  let exactMatches = [];
+  let otherMatches = [];
+
+  if (!query) {
+    exactMatches = results;
+  } else {
+    // We now rely on the Backend's flag which already processed AI filters and text matching
+    exactMatches = results.filter(place => place.isExactMatch !== false);
+    otherMatches = results.filter(place => place.isExactMatch === false);
+  }
+
+  const renderCard = (place) => (
+    <div key={place.id} className="sd-result-card" onClick={() => onOpenDetails(place)}>
+      <div className="sd-result-info">
+        <h4 className="sd-result-title">{place.title}</h4>
+        {place.category && <span className="sd-result-category">{place.category}</span>}
+        {place.distance && <span className="sd-result-distance">🚶 {place.distance}</span>}
+      </div>
+      <img
+        src={place.image}
+        alt={place.title}
+        className="sd-result-image"
+        onError={e => {
+          e.target.src =
+            'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=800';
+        }}
+      />
+    </div>
+  );
+
   return (
     <div className="sd-search-results fade-in">
-      <div className="sd-results-grid">
-        {results.map(place => (
-          <div key={place.id} className="sd-result-card" onClick={() => onOpenDetails(place)}>
-            <div className="sd-result-info">
-              <h4 className="sd-result-title">{place.title}</h4>
-              {place.category && <span className="sd-result-category">{place.category}</span>}
-              {place.distance && <span className="sd-result-distance">🚶 {place.distance}</span>}
-            </div>
-            <img
-              src={place.image}
-              alt={place.title}
-              className="sd-result-image"
-              onError={e => {
-                e.target.src =
-                  'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=800';
-              }}
-            />
+      {exactMatches.length > 0 && (
+        <div style={{ marginBottom: otherMatches.length > 0 ? '24px' : '0' }}>
+          {otherMatches.length > 0 && (
+             <h3 className="sd-section-title" style={{ marginBottom: '16px', fontSize: '1.2rem' }}>
+               {t('solo.search_exact_matches')}
+             </h3>
+          )}
+          <div className="sd-results-grid">
+            {exactMatches.map(renderCard)}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {otherMatches.length > 0 && (
+        <div>
+          <h3 className="sd-section-title" style={{ marginBottom: '16px', fontSize: '1.2rem', marginTop: exactMatches.length > 0 ? '8px' : '0' }}>
+            {t('solo.search_other_matches')}
+          </h3>
+          <div className="sd-results-grid">
+            {otherMatches.map(renderCard)}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -529,9 +566,20 @@ function SoloDiscovering() {
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
 
-  const [places, setPlaces] = useState([]);
+  const [places, setPlaces] = useState(() => {
+    const cached = sessionStorage.getItem('socially_discover_cache');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Date.now() - parsed.timestamp < 5 * 60 * 1000) {
+          return parsed.data;
+        }
+      } catch(e) {}
+    }
+    return [];
+  });
   const [isLoading, setIsLoading] = useState(true);
-  const [, setHasMoreData] = useState(true);
+  const [hasMoreData, setHasMoreData] = useState(true);
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
 
   const [likedPlaces, setLikedPlaces] = useState(() => {
@@ -620,8 +668,8 @@ function SoloDiscovering() {
   // Fetch Feed Principal (Explore - swipe mode)
   // Răspuns așteptat: List<EventResponseDTO> (JSON array)
   // ----------------------------------------
-  const fetchMainFeed = useCallback(async (background = false) => {
-    if (!background) setIsLoading(true);
+  const fetchMainFeed = useCallback(async (isAppend = false) => {
+    if (!isAppend) setIsLoading(true);
     try {
       const params = new URLSearchParams();
       if (maxDistance) params.append('maxDistance', maxDistance);
@@ -632,10 +680,11 @@ function SoloDiscovering() {
         params.append('lng', userLocation.lng);
       }
       params.append('localTime', new Date().toISOString());
+      
+      const currentOffset = isAppend ? places.length : 0;
+      params.append('offset', currentOffset);
 
       const token = localStorage.getItem('token');
-
-      // const API_BASE_URL = import.meta.env.VITE_API_URL;
       const url = `${API_URL}/api/events/discover?${params.toString()}`;
       console.log('[DISCOVER] GET', url, '| token:', token ? 'prezent' : 'LIPSĂ');
 
@@ -645,27 +694,36 @@ function SoloDiscovering() {
 
       console.log('[DISCOVER] status:', response.status);
       if (!response.ok) {
-        const text = await response.text();
-        console.error('[DISCOVER] eroare body:', text);
         throw new Error(`HTTP ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('[DISCOVER] date primite:', data);
+      console.log('[DISCOVER] date primite:', data.length);
       
       if (data.length === 0) {
         setHasMoreData(false);
       } else {
         setHasMoreData(true);
       }
-      setPlaces(data.map(mapEventDTO).map(applyLocalRegistrationState));
+      
+      const mapped = data.map(mapEventDTO).map(applyLocalRegistrationState);
+      
+      setPlaces(prev => {
+        const newPlaces = isAppend ? [...prev, ...mapped] : mapped;
+        sessionStorage.setItem('socially_discover_cache', JSON.stringify({
+            timestamp: Date.now(),
+            data: newPlaces
+        }));
+        return newPlaces;
+      });
+      
     } catch (error) {
       console.error('[DISCOVER] EROARE — fallback pe mock:', error);
-      setPlaces(MOCK_LOCATIONS);
+      if (!isAppend) setPlaces(MOCK_LOCATIONS);
       } finally {
-        if (!background) setIsLoading(false);
+        if (!isAppend) setIsLoading(false);
       }
-    }, [maxDistance, maxDays, selectedFilters, userLocation]);
+    }, [maxDistance, maxDays, selectedFilters, userLocation, places.length]);
 
   // ----------------------------------------
   // Fetch pentru Grid (Search)
@@ -734,13 +792,13 @@ function SoloDiscovering() {
   }, [searchString, maxDistance, maxDays, selectedFilters, userLocation]);
 
   useEffect(() => {
-    if (!isSearchMode) {
+    if (!isSearchMode && places.length === 0) {
       const handler = setTimeout(() => {
-        fetchMainFeed();
+        fetchMainFeed(false);
       }, 500);
       return () => clearTimeout(handler);
     }
-  }, [userLocation, fetchMainFeed, isSearchMode]);
+  }, [userLocation, fetchMainFeed, isSearchMode, places.length]);
 
   const availablePlaces = useMemo(() => {
     if (isSearchMode) {
@@ -751,6 +809,14 @@ function SoloDiscovering() {
         !likedPlaces.some((lp) => lp.id === loc.id) && !dislikedIds.includes(loc.id)
     );
   }, [places, likedPlaces, dislikedIds, isSearchMode]);
+
+  // Infinite Scroll Trigger
+  useEffect(() => {
+    if (!isSearchMode && !isLoading && availablePlaces.length > 0 && availablePlaces.length <= 4 && hasMoreData) {
+      console.log(`[INFINITE SCROLL] Numai ${availablePlaces.length} carduri ramase, declansez fetch...`);
+      fetchMainFeed(true);
+    }
+  }, [availablePlaces.length, isSearchMode, isLoading, hasMoreData, fetchMainFeed]);
 
   // --- Handlers ---
   const handleSearch = (e) => {
@@ -1099,7 +1165,7 @@ function SoloDiscovering() {
 
         {/* Grid Search Results Mode */}
         {!isLoading && viewMode === 'list' && isSearchMode && (
-          <SearchResultsGrid results={searchResults} onOpenDetails={setSelectedPlace} />
+          <SearchResultsGrid results={searchResults} onOpenDetails={setSelectedPlace} searchString={searchString} />
         )}
       </div>
 

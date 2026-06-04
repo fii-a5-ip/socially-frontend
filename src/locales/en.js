@@ -316,6 +316,8 @@ export const en = {
   'solo.results_for': 'results for',
   'solo.no_results_for': 'No results for',
   'solo.no_results_title': 'No results',
+  'solo.search_exact_matches': 'Events matching your search',
+  'solo.search_other_matches': 'Other events that fit you',
 
   // Create Event
   'createevent.title': 'Create Event',
