@@ -511,6 +511,8 @@ export const ro = {
   'solo.results_for': 'rezultate pentru',
   'solo.no_results_for': 'Niciun rezultat pentru',
   'solo.no_results_title': 'Niciun rezultat',
+  'solo.search_exact_matches': 'Evenimente care se potrivesc cu căutarea ta',
+  'solo.search_other_matches': 'Alte evenimente care ți se potrivesc',
 
   // Create Event
   'createevent.title': 'Creează Eveniment',
