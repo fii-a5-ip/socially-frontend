@@ -108,6 +108,11 @@ html[data-theme="dark"] .onboarding-container {
   box-shadow: 0 0 0 3px var(--bg-primary);
 }
 
+select.onboarding-input option {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
 .onboarding-input[type="textarea"],
 textarea.onboarding-input {
   min-height: 8rem;
