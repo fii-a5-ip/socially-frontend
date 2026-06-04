@@ -205,6 +205,7 @@ export const en = {
 
   // Notifications
   'notifications.title': 'Notifications',
+  'notifications.loading': 'Loading notifications, please wait...',
   'notifications.empty': 'You have no new notifications.',
   'notifications.new': 'New',
   'notifications.archived': 'Archived',

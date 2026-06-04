@@ -400,6 +400,7 @@ export const ro = {
 
   // Notifications
   'notifications.title': 'Notificări',
+  'notifications.loading': 'Se încarcă notificările, te rugăm să aștepți...',
   'notifications.empty': 'Nu ai notificări noi.',
   'notifications.new': 'Noi',
   'notifications.archived': 'Arhivate',
