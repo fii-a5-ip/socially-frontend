@@ -637,8 +637,8 @@ function SoloDiscovering() {
   // Fetch Feed Principal (Explore - swipe mode)
   // Răspuns așteptat: List<EventResponseDTO> (JSON array)
   // ----------------------------------------
-  const fetchMainFeed = useCallback(async (isAppend = false) => {
-    if (!isAppend) setIsLoading(true);
+  const fetchMainFeed = useCallback(async () => {
+    setIsLoading(true);
     try {
       const params = new URLSearchParams();
       if (maxDistance) params.append('maxDistance', maxDistance);
@@ -650,9 +650,6 @@ function SoloDiscovering() {
       }
       params.append('localTime', new Date().toISOString());
       
-      const currentOffset = isAppend ? places.length : 0;
-      params.append('offset', currentOffset);
-
       const token = localStorage.getItem('token');
       const url = `${API_URL}/api/events/discover?${params.toString()}`;
       console.log('[DISCOVER] GET', url, '| token:', token ? 'prezent' : 'LIPSĂ');
@@ -669,30 +666,14 @@ function SoloDiscovering() {
       const data = await response.json();
       console.log('[DISCOVER] date primite:', data.length);
       
-      if (data.length === 0) {
-        setHasMoreData(false);
-      } else {
-        setHasMoreData(true);
-      }
-      
-      const mapped = data.map(mapEventDTO);
-      
-      setPlaces(prev => {
-        const newPlaces = isAppend ? [...prev, ...mapped] : mapped;
-        sessionStorage.setItem('socially_discover_cache', JSON.stringify({
-            timestamp: Date.now(),
-            data: newPlaces
-        }));
-        return newPlaces;
-      });
-      
+      setPlaces(data.map(mapEventDTO));
     } catch (error) {
       console.error('[DISCOVER] EROARE — fallback pe mock:', error);
-      if (!isAppend) setPlaces(MOCK_LOCATIONS);
-      } finally {
-        if (!isAppend) setIsLoading(false);
-      }
-    }, [maxDistance, maxDays, selectedFilters, userLocation, places.length]);
+      setPlaces(MOCK_LOCATIONS);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [maxDistance, maxDays, selectedFilters, userLocation]);
 
   // ----------------------------------------
   // Fetch pentru Grid (Search)
@@ -779,14 +760,7 @@ function SoloDiscovering() {
     );
   }, [places, likedPlaces, dislikedIds, isSearchMode]);
 
-  // Infinite Scroll Trigger
-  useEffect(() => {
-    if (!isSearchMode && !isLoading && availablePlaces.length > 0 && availablePlaces.length <= 4 && hasMoreData) {
-      console.log(`[INFINITE SCROLL] Numai ${availablePlaces.length} carduri ramase, declansez fetch...`);
-      fetchMainFeed(true);
-    }
-  }, [availablePlaces.length, isSearchMode, isLoading, hasMoreData, fetchMainFeed]);
-
+  // Infinite Scroll Trigger removed
   // --- Handlers ---
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
@@ -1178,7 +1152,7 @@ function SoloDiscovering() {
                   headers: { Authorization: `Bearer ${token}` }
                 });
                 // Fetch main feed to repopulate the event in the Explore tab if it was empty
-                fetchMainFeed(true);
+                fetchMainFeed();
               } catch (err) {
                 console.error('Failed to remove vote from backend', err);
               }

@@ -24,11 +24,12 @@ function Groups() {
         }
 
         setError(null)
-        const data = normalizedQuery
-          ? await searchGroups(normalizedQuery)
-          : await getMyGroups()
+        const allMyGroups = await getMyGroups();
+        const data = normalizedQuery 
+          ? (Array.isArray(allMyGroups) ? allMyGroups.filter(g => g.name.toLowerCase().includes(normalizedQuery.toLowerCase())) : [])
+          : allMyGroups;
 
-        setGroups(Array.isArray(data) ? data : [])
+        setGroups(Array.isArray(data) ? data : []);
       } catch (err) {
         setError(err.message || (normalizedQuery ? 'Nu s-au putut cauta grupurile' : 'Nu s-au putut incarca grupurile'))
         console.error(normalizedQuery ? 'Error searching groups:' : 'Error loading groups:', err)
