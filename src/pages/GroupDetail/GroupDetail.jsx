@@ -865,7 +865,6 @@ function GroupDetail() {
                           {memberName}
                         </h4>
                         <span>
-                          {t("groupdetail.modal_member_label")} {memberId}
                           {member?.role && (
                             <span
                               className="gd-member-role badge"

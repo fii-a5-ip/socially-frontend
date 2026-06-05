@@ -65,10 +65,10 @@ export function Step2Members({ setValues }) {
   // IDs selectate pentru filtrare rapidă
   const selectedIds = new Set(selectedFriendsData.map(f => f.id));
   const selectedCount = selectedFriendsData.length;
+  const currentUserId = parseInt(localStorage.getItem('current_userid'), 10);
 
-  // Filtrează rezultatele: scoate cei deja selectați, max 4
   const filteredSearchResults = friendsList
-    .filter(f => !selectedIds.has(f.id))
+    .filter(f => !selectedIds.has(f.id) && f.id !== currentUserId)
     .slice(0, 4);
 
   return (
